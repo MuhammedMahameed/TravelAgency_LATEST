@@ -1,0 +1,13 @@
+@model List<TravelAgency.Models.Trip>
+
+<h2>Available Trips</h2>
+
+@foreach (var trip in Model)
+{
+    <div class="trip-card">
+        <h3>@trip.Destination, @trip.Country</h3>
+        <p>Price: ₪@trip.Price</p>
+        <p>Rooms: @trip.AvailableRooms</p>
+        <a href="#">Book</a>
+    </div>
+}

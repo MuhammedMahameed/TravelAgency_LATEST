@@ -1,0 +1,28 @@
+@model List<TravelAgency.Models.Trip>
+
+<h2>Manage Trips</h2>
+
+<a href="/Admin/AddTrip">➕ Add New Trip</a>
+
+<table border="1">
+    <tr>
+        <th>Destination</th>
+        <th>Country</th>
+        <th>Price</th>
+        <th>Rooms</th>
+        <th>Actions</th>
+    </tr>
+
+    @foreach (var t in Model)
+    {
+        <tr>
+            <td>@t.Destination</td>
+            <td>@t.Country</td>
+            <td>@t.Price</td>
+            <td>@t.AvailableRooms</td>
+            <td>
+                <a href="/Admin/EditTrip/@t.TripId">Edit</a>
+            </td>
+        </tr>
+    }
+</table>

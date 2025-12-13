@@ -1,0 +1,13 @@
+<h2>Payment</h2>
+
+<p>This is a simulated payment.</p>
+
+<form method="post" action="/Payment/Process">
+    <input type="hidden" name="bookingId" value="@ViewBag.BookingId" />
+
+    Card Number: <input disabled value="**** **** **** 1234" /><br />
+    Expiry: <input disabled value="12/26" /><br />
+    CVV: <input disabled value="***" /><br />
+
+    <button type="submit">Pay Now</button>
+</form>

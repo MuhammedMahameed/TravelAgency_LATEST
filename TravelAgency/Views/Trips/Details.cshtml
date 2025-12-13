@@ -1,0 +1,47 @@
+@model TravelAgency.Models.Trip
+
+<div class="container mt-4">
+
+    <h2>@Model.Destination, @Model.Country</h2>
+
+    @if (!string.IsNullOrEmpty(Model.ImagePath))
+    {
+        <img src="@Model.ImagePath"
+             class="img-fluid rounded mb-4"
+             style="max-height:400px; object-fit:cover;" />
+    }
+
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Category:</strong> @Model.Category</p>
+            <p><strong>Start Date:</strong> @Model.StartDate.ToShortDateString()</p>
+            <p><strong>End Date:</strong> @Model.EndDate.ToShortDateString()</p>
+        </div>
+
+        <div class="col-md-6">
+            <p><strong>Price:</strong> ₪@Model.Price</p>
+            <p><strong>Available Rooms:</strong> @Model.AvailableRooms</p>
+        </div>
+    </div>
+
+    <hr />
+
+    <p>@Model.Description</p>
+
+    <div class="mt-3">
+        @if (Model.AvailableRooms > 0)
+        {
+            <a href="/Booking/Start/@Model.TripId" class="btn btn-primary">
+                Book Now
+            </a>
+        }
+        else
+        {
+            <span class="text-danger">Fully booked</span>
+        }
+
+        <a href="/Trips/Gallery" class="btn btn-secondary ms-2">
+            Back to Gallery
+        </a>
+    </div>
+</div>

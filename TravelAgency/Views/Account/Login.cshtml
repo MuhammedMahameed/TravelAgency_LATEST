@@ -1,0 +1,12 @@
+<h2>Login</h2>
+
+@if (ViewBag.Error != null)
+{
+    <p style="color:red">@ViewBag.Error</p>
+}
+
+<form method="post">
+    Email: <input name="email" /><br />
+    Password: <input name="password" type="password" /><br />
+    <button type="submit">Login</button>
+</form>
