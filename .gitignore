@@ -3,3 +3,4 @@ bin/
 obj/
 .idea/
 appsettings.json
+/TravelAgency/obj/Debug/net9.0
