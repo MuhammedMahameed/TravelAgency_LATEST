@@ -1462,24 +1462,31 @@
     ]
   },
   "packageFolders": {
-    "/Users/muhammedsalah/.nuget/packages/": {}
+    "C:\\Users\\mhmds\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/TravelAgency.csproj",
+      "projectUniqueName": "C:\\Users\\mhmds\\OneDrive\\Documents\\GitHub\\STAM\\TravelAgency_LATEST\\TravelAgency\\TravelAgency.csproj",
       "projectName": "TravelAgency",
-      "projectPath": "/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/TravelAgency.csproj",
-      "packagesPath": "/Users/muhammedsalah/.nuget/packages/",
-      "outputPath": "/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/obj/",
+      "projectPath": "C:\\Users\\mhmds\\OneDrive\\Documents\\GitHub\\STAM\\TravelAgency_LATEST\\TravelAgency\\TravelAgency.csproj",
+      "packagesPath": "C:\\Users\\mhmds\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\mhmds\\OneDrive\\Documents\\GitHub\\STAM\\TravelAgency_LATEST\\TravelAgency\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/Users/muhammedsalah/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\mhmds\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -1498,7 +1505,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net9.0": {
@@ -1528,7 +1535,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
