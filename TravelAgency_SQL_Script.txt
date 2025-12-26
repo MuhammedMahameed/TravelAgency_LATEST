@@ -1,0 +1,58 @@
+CREATE DATABASE TravelAgencyDB;
+GO
+USE TravelAgencyDB;
+GO
+
+CREATE TABLE Trips (
+    TripId INT IDENTITY PRIMARY KEY,
+    Destination NVARCHAR(100) NOT NULL,
+    Country NVARCHAR(100) NOT NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE NOT NULL,
+    Price DECIMAL(10,2) NOT NULL,
+    AvailableRooms INT NOT NULL,
+    Category NVARCHAR(50),
+    MinAge INT,
+    Description NVARCHAR(MAX)
+);
+
+CREATE TABLE Users (
+    UserId INT IDENTITY PRIMARY KEY,
+    FullName NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(100) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    Role NVARCHAR(20) NOT NULL -- 'Admin' or 'User'
+);
+CREATE TABLE Bookings (
+    BookingId INT IDENTITY PRIMARY KEY,
+    UserId INT NOT NULL,
+    TripId INT NOT NULL,
+    BookingDate DATETIME NOT NULL DEFAULT GETDATE(),
+    Status NVARCHAR(20) NOT NULL, -- 'Active', 'Cancelled'
+    
+    CONSTRAINT FK_Booking_User FOREIGN KEY (UserId) REFERENCES Users(UserId),
+    CONSTRAINT FK_Booking_Trip FOREIGN KEY (TripId) REFERENCES Trips(TripId)
+);
+CREATE TABLE WaitingList (
+    WaitingId INT IDENTITY PRIMARY KEY,
+    TripId INT NOT NULL,
+    UserId INT NOT NULL,
+    JoinDate DATETIME NOT NULL DEFAULT GETDATE(),
+
+    CONSTRAINT FK_Waiting_Trip FOREIGN KEY (TripId) REFERENCES Trips(TripId),
+    CONSTRAINT FK_Waiting_User FOREIGN KEY (UserId) REFERENCES Users(UserId),
+    CONSTRAINT UQ_Wait UNIQUE (TripId, UserId)
+);
+
+CREATE TABLE Payments (
+    PaymentId INT IDENTITY PRIMARY KEY,
+    BookingId INT NOT NULL,
+    Amount DECIMAL(10,2) NOT NULL,
+    PaymentDate DATETIME NOT NULL DEFAULT GETDATE(),
+    Status NVARCHAR(20) NOT NULL, -- 'Success', 'Failed'
+
+    CONSTRAINT FK_Payment_Booking 
+        FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId)
+);
+
+
