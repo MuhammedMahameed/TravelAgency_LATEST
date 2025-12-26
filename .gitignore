@@ -3,9 +3,14 @@ bin/
 obj/
 .idea/
 appsettings.json
+<<<<<<< HEAD
 TravelAgency/obj/Debug/net9.0/TravelAgency.AssemblyInfoInputs.cache
 /TravelAgency/obj/Debug/net9.0
 /TravelAgency/obj/Debug/net9.0
 *.json
+=======
+/TravelAgency/obj/Debug/net9.0
+/TravelAgency/obj/Debug
+>>>>>>> main
 /TravelAgency/obj/Debug
 /.vs
