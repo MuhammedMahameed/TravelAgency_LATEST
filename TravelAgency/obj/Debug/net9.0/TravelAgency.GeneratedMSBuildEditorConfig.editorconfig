@@ -1,97 +1,105 @@
 is_global = true
 build_property.TargetFramework = net9.0
+build_property.TargetFramework = net9.0
+build_property.TargetPlatformMinVersion = 
 build_property.TargetPlatformMinVersion = 
 build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
 build_property.ProjectTypeGuids = 
 build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = TravelAgency
 build_property.RootNamespace = TravelAgency
-build_property.ProjectDir = /Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/
+build_property.ProjectDir = C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = /Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency
+build_property.MSBuildProjectDirectory = C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Account/Login.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Mb2dpbi5jc2h0bWw=
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Account/Register.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9SZWdpc3Rlci5jc2h0bWw=
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Admin/AddTrip.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQWRkVHJpcC5jc2h0bWw=
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Admin/AddTrip.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRkVHJpcC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Admin/EditTrip.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vRWRpdFRyaXAuY3NodG1s
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Admin/EditTrip.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdFRyaXAuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Admin/Trips.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vVHJpcHMuY3NodG1s
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Admin/Trips.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVHJpcHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Booking/MyBookings.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va2luZy9NeUJvb2tpbmdzLmNzaHRtbA==
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Booking/MyBookings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va2luZ1xNeUJvb2tpbmdzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Home/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Home/Privacy.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Payment/Pay.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUGF5bWVudC9QYXkuY3NodG1s
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Payment/Pay.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxQYXkuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Payment/Success.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUGF5bWVudC9TdWNjZXNzLmNzaHRtbA==
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Payment/Success.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxTdWNjZXNzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Shared/Error.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL0Vycm9yLmNzaHRtbA==
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Shared/_ValidationScriptsPartial.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Trips/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJpcHMvRGV0YWlscy5jc2h0bWw=
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Trips/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJpcHNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Trips/Gallery.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJpcHMvR2FsbGVyeS5jc2h0bWw=
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Trips/Gallery.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJpcHNcR2FsbGVyeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Trips/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJpcHMvSW5kZXguY3NodG1s
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Trips/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJpcHNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/WaitingList/Status.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvV2FpdGluZ0xpc3QvU3RhdHVzLmNzaHRtbA==
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/WaitingList/Status.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV2FpdGluZ0xpc3RcU3RhdHVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/_ViewImports.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/_ViewStart.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/muhammedsalah/RiderProjects/TravelAgency_LATEST/TravelAgency/Views/Shared/_Layout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXQuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = b-l1buhkot88
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-di534o9izi
