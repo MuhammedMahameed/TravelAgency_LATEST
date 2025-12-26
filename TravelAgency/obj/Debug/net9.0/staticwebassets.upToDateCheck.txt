@@ -1,5 +1,73 @@
+<<<<<<< HEAD
 wwwroot\css\site-dark.css
 wwwroot\css\site.css
+=======
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery\dist\jquery.min.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\css\site.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery\dist\jquery.slim.min.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery\dist\jquery.slim.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery-validation\dist\jquery.validate.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery\dist\jquery.min.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery-validation\LICENSE.md
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery\dist\jquery.slim.min.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery-validation\dist\additional-methods.min.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\css\site-dark.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.min.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery\dist\jquery.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery-validation\dist\additional-methods.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery-validation\dist\jquery.validate.min.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery\LICENSE.txt
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\js\site.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\js\bootstrap.js
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css
+C:\Users\Bashar Abadi\Desktop\TravelAgenecy\TravelAgency_LATEST\TravelAgency\wwwroot\favicon.ico
+wwwroot\css\site.css
+wwwroot\css\site-dark.css
+>>>>>>> main
 wwwroot\favicon.ico
 wwwroot\images\trips\18bf6444-382b-4152-975e-74d31202f24a.jpg
 wwwroot\images\trips\5ac55a6f-fb0c-4455-bad7-cd1e7376df58.jpg
@@ -11,6 +79,17 @@ wwwroot\images\trips\d92f5e81-194b-41e6-93c0-483391bd6592.jpeg
 wwwroot\images\trips\def45bd8-947a-4c67-9017-d37783e98df9.jpeg
 wwwroot\images\trips\f18a2529-52c3-49b3-b366-0889b36bc444.jpeg
 wwwroot\js\site.js
+<<<<<<< HEAD
+=======
+wwwroot\lib\bootstrap\dist\css\bootstrap.css
+wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css
+wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map
+>>>>>>> main
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
@@ -35,6 +114,7 @@ wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css.map
 wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css.map
+<<<<<<< HEAD
 wwwroot\lib\bootstrap\dist\css\bootstrap.css
 wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
 wwwroot\lib\bootstrap\dist\css\bootstrap.min.css
@@ -43,6 +123,8 @@ wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css
 wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css.map
 wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css
 wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map
+=======
+>>>>>>> main
 wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js
 wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map
 wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js
@@ -56,6 +138,7 @@ wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
 wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
 wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
 wwwroot\lib\bootstrap\LICENSE
+<<<<<<< HEAD
 wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.js
 wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.min.js
 wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt
@@ -64,6 +147,8 @@ wwwroot\lib\jquery-validation\dist\additional-methods.min.js
 wwwroot\lib\jquery-validation\dist\jquery.validate.js
 wwwroot\lib\jquery-validation\dist\jquery.validate.min.js
 wwwroot\lib\jquery-validation\LICENSE.md
+=======
+>>>>>>> main
 wwwroot\lib\jquery\dist\jquery.js
 wwwroot\lib\jquery\dist\jquery.min.js
 wwwroot\lib\jquery\dist\jquery.min.map
@@ -71,6 +156,7 @@ wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
+<<<<<<< HEAD
 C:\Users\mhmds\OneDrive\Documents\GitHub\STAM\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery\LICENSE.txt
 C:\Users\mhmds\OneDrive\Documents\GitHub\STAM\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery\dist\jquery.slim.min.map
 C:\Users\mhmds\OneDrive\Documents\GitHub\STAM\TravelAgency_LATEST\TravelAgency\wwwroot\lib\jquery\dist\jquery.slim.min.js
@@ -134,3 +220,13 @@ C:\Users\mhmds\OneDrive\Documents\GitHub\STAM\TravelAgency_LATEST\TravelAgency\w
 C:\Users\mhmds\OneDrive\Documents\GitHub\STAM\TravelAgency_LATEST\TravelAgency\wwwroot\css\site.css
 C:\Users\mhmds\OneDrive\Documents\GitHub\STAM\TravelAgency_LATEST\TravelAgency\wwwroot\css\site-dark.css
 C:\Users\mhmds\OneDrive\Documents\GitHub\STAM\TravelAgency_LATEST\TravelAgency\wwwroot\favicon.ico
+=======
+wwwroot\lib\jquery-validation\dist\additional-methods.js
+wwwroot\lib\jquery-validation\dist\additional-methods.min.js
+wwwroot\lib\jquery-validation\dist\jquery.validate.js
+wwwroot\lib\jquery-validation\dist\jquery.validate.min.js
+wwwroot\lib\jquery-validation\LICENSE.md
+wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.js
+wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.min.js
+wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt
+>>>>>>> main

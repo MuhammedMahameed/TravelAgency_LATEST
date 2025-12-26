@@ -11,10 +11,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("5ae01cf6-4259-4a1e-a51f-9e6db60d96aa")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("TravelAgency")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+599e1346be8bc5db184b7efc007c268eebe01de6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b1826f414dfe6b99bd8538f833c4c96bff3a34b7")]
 [assembly: System.Reflection.AssemblyProductAttribute("TravelAgency")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TravelAgency")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
