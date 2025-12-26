@@ -9,6 +9,7 @@ wwwroot\images\trips\a41c93fb-a5de-4fce-b213-feae2b56ec01.jpg
 wwwroot\images\trips\acdc8bfe-94a0-4997-901f-8c3615f9c872.jpg
 wwwroot\images\trips\d6a85140-86ff-44e9-b273-155050560f02.jpeg
 wwwroot\images\trips\d92f5e81-194b-41e6-93c0-483391bd6592.jpeg
+wwwroot\images\trips\de9293ce-9012-4d85-80d4-ebe0a82f4b44.jpeg
 wwwroot\images\trips\def45bd8-947a-4c67-9017-d37783e98df9.jpeg
 wwwroot\images\trips\f18a2529-52c3-49b3-b366-0889b36bc444.jpeg
 wwwroot\js\site.js
