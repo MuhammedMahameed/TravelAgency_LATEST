@@ -14,7 +14,7 @@ public class TripsController : Controller
         _connStr = configuration.GetConnectionString("DefaultConnection");
     }
 
-    public IActionResult Gallery(string search, string category, string sort)
+    public IActionResult Gallery(string search, string category, string sort, decimal? minPrice, decimal? maxPrice)
     {
         var trips = new List<Trip>();
         using (SqlConnection conn = new SqlConnection(_connStr))
@@ -29,6 +29,16 @@ public class TripsController : Controller
             if (!string.IsNullOrEmpty(category))
             {
                 sql += " AND (Category LIKE @category)";
+            }
+
+            if (minPrice != null)
+            {
+                sql += " AND Price >= @minPrice";
+            }
+
+            if (maxPrice != null)
+            {
+                sql += " AND Price <= @maxPrice";
             }
 
             if (sort == "price_asc")
@@ -56,6 +66,16 @@ public class TripsController : Controller
                     command.Parameters.AddWithValue("@category", category);
                 }
 
+                if (minPrice != null)
+                {
+                    command.Parameters.AddWithValue("@minPrice", minPrice.Value);
+                }
+
+                if (maxPrice != null)
+                {
+                    command.Parameters.AddWithValue("@maxPrice", maxPrice.Value);
+                }
+
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -66,6 +86,10 @@ public class TripsController : Controller
                             Destination = reader["Destination"].ToString(),
                             Country = reader["Country"].ToString(),
                             Price = (decimal)reader["Price"],
+
+                            OldPrice = reader["OldPrice"] == DBNull.Value ? null : (decimal?)reader["OldPrice"],
+                            DiscountEndDate = reader["DiscountEndDate"] == DBNull.Value ? null : (DateTime?)reader["DiscountEndDate"],
+
                             AvailableRooms = (int)reader["AvailableRooms"],
                             Category = reader["Category"].ToString(),
                             StartDate = (DateTime)reader["StartDate"],
@@ -102,7 +126,6 @@ public class TripsController : Controller
                         "SELECT TripId, Pos FROM (SELECT TripId, UserId, ROW_NUMBER() OVER(PARTITION BY TripId ORDER BY JoinDate) AS Pos FROM WaitingList) w WHERE w.UserId=@uid",
                         conn);
 
-
                 posCmd.Parameters.AddWithValue("@uid", userId);
 
                 using var r2 = posCmd.ExecuteReader();
@@ -118,7 +141,6 @@ public class TripsController : Controller
                 MyPosition = myPositions.TryGetValue(t.TripId, out var p) ? p : (int?)null
             }).ToList();
 
-
             conn.Close();
 
             return View(vm);
@@ -131,13 +153,14 @@ public class TripsController : Controller
         using (SqlConnection conn = new SqlConnection(_connStr))
         {
             conn.Open();
-            var cmd = new SqlCommand(@"SELECT * FROM Trips WHERE TripId = @id",conn);
+            var cmd = new SqlCommand(@"SELECT * FROM Trips WHERE TripId = @id", conn);
             cmd.Parameters.AddWithValue("@id", id);
 
             using (var reader = cmd.ExecuteReader())
             {
-                if(!reader.Read())
+                if (!reader.Read())
                     return NotFound();
+
                 trip = new Trip
                 {
                     TripId = (int)reader["TripId"],
@@ -147,6 +170,10 @@ public class TripsController : Controller
                     StartDate = (DateTime)reader["StartDate"],
                     EndDate = (DateTime)reader["EndDate"],
                     Price = (decimal)reader["Price"],
+
+                    OldPrice = reader["OldPrice"] == DBNull.Value ? null : (decimal?)reader["OldPrice"],
+                    DiscountEndDate = reader["DiscountEndDate"] == DBNull.Value ? null : (DateTime?)reader["DiscountEndDate"],
+
                     AvailableRooms = (int)reader["AvailableRooms"],
                     Description = reader["Description"].ToString(),
                     ImagePath = reader["ImagePath"] == DBNull.Value
@@ -154,12 +181,13 @@ public class TripsController : Controller
                         : reader["ImagePath"].ToString()
                 };
             }
+
             conn.Close();
-            
         }
+
         return View(trip);
-        
     }
+
     // GET
     public IActionResult Index()
     {

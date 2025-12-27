@@ -174,6 +174,102 @@ public class AdminController : Controller
         }
     }
 
+    [HttpPost]
+    public IActionResult DeleteTrip(int id)
+    {
+        if (!AuthHelper.IsAdmin(HttpContext))
+            return RedirectToAction("Login", "Account");
+
+        using (var conn = new SqlConnection(_connStr))
+        {
+            conn.Open();
+
+            // 1) לא מוחקים טיול שיש לו הזמנות
+            var checkCmd = new SqlCommand(
+                "SELECT COUNT(*) FROM Bookings WHERE TripId = @id",
+                conn);
+            checkCmd.Parameters.AddWithValue("@id", id);
+
+            int bookingsCount = (int)checkCmd.ExecuteScalar();
+            if (bookingsCount > 0)
+            {
+                TempData["Error"] = "לא ניתן למחוק טיול שיש לו הזמנות.";
+                return RedirectToAction("Trips");
+            }
+
+            // 2) למחוק קודם מה-WaitingList (אם קיימים אנשים)
+            var delWaitCmd = new SqlCommand(
+                "DELETE FROM WaitingList WHERE TripId = @id",
+                conn);
+            delWaitCmd.Parameters.AddWithValue("@id", id);
+            delWaitCmd.ExecuteNonQuery();
+
+            // 3) למחוק את הטיול
+            var delTripCmd = new SqlCommand(
+                "DELETE FROM Trips WHERE TripId = @id",
+                conn);
+            delTripCmd.Parameters.AddWithValue("@id", id);
+
+            int rows = delTripCmd.ExecuteNonQuery();
+            if (rows == 0)
+            {
+                TempData["Error"] = "הטיול לא נמצא.";
+                return RedirectToAction("Trips");
+            }
+
+            TempData["Success"] = "הטיול נמחק בהצלחה.";
+            return RedirectToAction("Trips");
+        }
+    }
+
+    [HttpGet]
+    public IActionResult Discount(int id)
+    {
+        if (!AuthHelper.IsAdmin(HttpContext))
+            return RedirectToAction("Login", "Account");
+
+        ViewBag.TripId = id;
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult Discount(int tripId, decimal newPrice, DateTime endDate)
+    {
+        if (!AuthHelper.IsAdmin(HttpContext))
+            return RedirectToAction("Login", "Account");
+
+        // הגבלה: עד שבוע מהיום
+        if (endDate > DateTime.Now.AddDays(7))
+        {
+            TempData["Error"] = "הנחה יכולה להיות מקסימום לשבוע אחד.";
+            return RedirectToAction("Trips");
+        }
+
+        using (var conn = new SqlConnection(_connStr))
+        {
+            conn.Open();
+
+            // אם אין OldPrice עדיין - נשמור את המחיר הנוכחי כ-OldPrice
+            var cmd = new SqlCommand(@"
+            UPDATE Trips
+            SET OldPrice = CASE WHEN OldPrice IS NULL THEN Price ELSE OldPrice END,
+                Price = @newPrice,
+                DiscountEndDate = @endDate
+            WHERE TripId = @id
+        ", conn);
+
+            cmd.Parameters.AddWithValue("@newPrice", newPrice);
+            cmd.Parameters.AddWithValue("@endDate", endDate);
+            cmd.Parameters.AddWithValue("@id", tripId);
+
+            cmd.ExecuteNonQuery();
+            conn.Close();
+        }
+
+        TempData["Success"] = "ההנחה עודכנה בהצלחה.";
+        return RedirectToAction("Trips");
+    }
+
 
     // GET
     public IActionResult Index()
