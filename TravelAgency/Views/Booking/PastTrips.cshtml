@@ -1,0 +1,27 @@
+﻿@model List<TravelAgency.ViewModel.BookingViewModel>
+
+<h2>Past Trips</h2>
+
+@if (!Model.Any())
+{
+    <p>You have no past trips.</p>
+}
+else
+{
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>Destination</th>
+            <th>Country</th>
+            <th>Start Date</th>
+        </tr>
+
+        @foreach (var trip in Model)
+        {
+            <tr>
+                <td>@trip.Destination</td>
+                <td>@trip.Country</td>
+                <td>@trip.StartDate.ToShortDateString()</td>
+            </tr>
+        }
+    </table>
+}

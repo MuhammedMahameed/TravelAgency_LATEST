@@ -41,18 +41,31 @@ public class TripsController : Controller
                 sql += " AND Price <= @maxPrice";
             }
 
-            if (sort == "price_asc")
+            switch (sort)
             {
-                sql += " ORDER BY Price ASC";
+                case "price_asc":
+                    sql += " ORDER BY Price ASC";
+                    break;
+
+                case "price_desc":
+                    sql += " ORDER BY Price DESC";
+                    break;
+
+                case "date":
+                    sql += " ORDER BY StartDate ASC";
+                    break;
+
+                case "popular":
+                    sql += @" ORDER BY 
+            (SELECT COUNT(*) FROM Bookings b WHERE b.TripId = Trips.TripId) DESC";
+                    break;
+
+                default:
+                    sql += " ORDER BY TripId DESC";
+                    break;
             }
-            else if (sort == "price_desc")
-            {
-                sql += " ORDER BY Price DESC";
-            }
-            else if (sort == "date")
-            {
-                sql += " ORDER BY StartDate ASC";
-            }
+
+
 
             using (SqlCommand command = new SqlCommand(sql, conn))
             {

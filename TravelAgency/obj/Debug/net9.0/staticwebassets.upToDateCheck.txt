@@ -3,6 +3,7 @@ wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\images\trips\167b98e3-a912-446b-8fe8-d59cc4816ea5.jpeg
 wwwroot\images\trips\18bf6444-382b-4152-975e-74d31202f24a.jpg
+wwwroot\images\trips\58dd3cce-f0fa-4984-94ca-ac4e6282a45c.png
 wwwroot\images\trips\5ac55a6f-fb0c-4455-bad7-cd1e7376df58.jpg
 wwwroot\images\trips\88b5b2ff-6ffc-4353-956d-ef2748eb7adf.jpeg
 wwwroot\images\trips\903345c4-d646-46fc-830f-c4b4acb93b71.jpeg
@@ -11,6 +12,7 @@ wwwroot\images\trips\a41c93fb-a5de-4fce-b213-feae2b56ec01.jpg
 wwwroot\images\trips\d6a85140-86ff-44e9-b273-155050560f02.jpeg
 wwwroot\images\trips\d92f5e81-194b-41e6-93c0-483391bd6592.jpeg
 wwwroot\images\trips\def45bd8-947a-4c67-9017-d37783e98df9.jpeg
+wwwroot\images\trips\f14b2c8e-c8b5-44e1-beb7-326d7db7d182.jpg
 wwwroot\images\trips\f18a2529-52c3-49b3-b366-0889b36bc444.jpeg
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css

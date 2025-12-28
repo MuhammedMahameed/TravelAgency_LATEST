@@ -1,61 +1,40 @@
 @model List<TravelAgency.ViewModel.BookingViewModel>
 
 <h2>My Bookings</h2>
-@* *@
-@* @if (!Model.Any()) *@
-@* { *@
-@*     <p>No active bookings.</p> *@
-@* } *@
-@* else *@
-@* { *@
-@*     <ul> *@
-@*         @foreach (var b in Model) *@
-@*         { *@
-@*             <li> *@
-@*                 @b.Destination (@b.Country) - *@
-@*                 @((DateTime)b.StartDate) *@
-@*                 <a href="/Payment/Pay?bookingId=@b.BookingId">Pay</a> *@
-@*                 <form method="post" action="/Booking/Cancel" style="display:inline;"> *@
-@*                     <input type="hidden" name="bookingId" value="@b.BookingId" /> *@
-@*                     <button type="submit">Cancel</button> *@
-@*                 </form> *@
-@* *@
-@*             </li> *@
-@*         } *@
-@*     </ul> *@
-@* } *@
 
-<h2>My Bookings</h2>
+<a href="/Booking/PastTrips" class="btn btn-secondary mb-3">
+    View Past Trips
+</a>
 
 <table class="table table-striped">
     <thead>
-    <tr>
-        <th>Destination</th>
-        <th>Country</th>
-        <th>Date</th>
-        <th>Actions</th>
-    </tr>
+        <tr>
+            <th>Destination</th>
+            <th>Country</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
     </thead>
     <tbody>
-    @foreach (var b in Model)
-    {
-        <tr>
-            <td>@b.Destination</td>
-            <td>@b.Country</td>
-            <td>@b.StartDate.ToShortDateString()</td>
-            <td>
-                <a href="/Payment/Pay?bookingId=@b.BookingId" class="btn btn-success btn-sm">
-                    Pay
-                </a>
+        @foreach (var b in Model)
+        {
+            <tr>
+                <td>@b.Destination</td>
+                <td>@b.Country</td>
+                <td>@b.StartDate.ToShortDateString()</td>
+                <td>
+                    <a href="/Payment/Pay?bookingId=@b.BookingId" class="btn btn-success btn-sm">
+                        Pay
+                    </a>
 
-                <form method="post" action="/Booking/Cancel" class="d-inline">
-                    <input type="hidden" name="bookingId" value="@b.BookingId" />
-                    <button class="btn btn-danger btn-sm">
-                        Cancel
-                    </button>
-                </form>
-            </td>
-        </tr>
-    }
+                    <form method="post" action="/Booking/Cancel" class="d-inline">
+                        <input type="hidden" name="bookingId" value="@b.BookingId" />
+                        <button class="btn btn-danger btn-sm">
+                            Cancel
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

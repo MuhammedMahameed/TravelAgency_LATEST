@@ -4,6 +4,12 @@
 
 <a href="/Admin/AddTrip">➕ Add New Trip</a>
 
+<form method="post" action="/Admin/SendDepartureReminders" style="margin:15px 0;">
+    <button type="submit" class="btn btn-warning">
+        📧 Send 5-Day Departure Reminders
+    </button>
+</form>
+
 @if (TempData["Error"] != null)
 {
     <div style="color:red; margin:10px 0;">
@@ -45,7 +51,6 @@
                     </button>
                 </form>
             </td>
-
         </tr>
     }
 </table>
