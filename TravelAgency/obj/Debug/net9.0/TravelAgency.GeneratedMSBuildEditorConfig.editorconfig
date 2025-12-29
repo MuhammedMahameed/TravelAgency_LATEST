@@ -40,6 +40,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRkVHJpcC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Admin/AddUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRkVXNlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Admin/Discount.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGlzY291bnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -48,8 +52,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdFRyaXAuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Admin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Admin/Trips.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVHJpcHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Admin/UserBookings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNlckJvb2tpbmdzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Admin/Users.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNlcnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Bashar Abadi/Desktop/TravelAgenecy/TravelAgency_LATEST/TravelAgency/Views/Booking/MyBookings.cshtml]

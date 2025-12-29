@@ -1,4 +1,6 @@
-/* Global dark theme */
+/* =======================
+   GLOBAL DARK THEME
+   ======================= */
 body {
     background-color: #121212;
     color: #e0e0e0;
@@ -20,7 +22,7 @@ body {
     background-color: #1a1a1a;
 }
 
-/* Forms */
+/* Forms (GLOBAL DARK) */
 form-control,
 .form-select,
 textarea,
@@ -30,33 +32,34 @@ input {
     border: 1px solid #444;
 }
 
-/* Placeholder text */
-.form-control::placeholder,
-textarea::placeholder {
-    color: #aaa;
-}
+    /* Placeholder text */
+    .form-control::placeholder,
+    textarea::placeholder {
+        color: #aaa;
+    }
 
-/* Focus state */
-.form-control:focus,
-.form-select:focus,
-textarea:focus {
-    background-color: #1e1e1e !important;
-    color: #ffffff !important;
-    border-color: #8ab4f8;
-    box-shadow: 0 0 0 0.2rem rgba(138, 180, 248, 0.25);
-}
+    /* Focus state */
+    .form-control:focus,
+    .form-select:focus,
+    textarea:focus {
+        background-color: #1e1e1e !important;
+        color: #ffffff !important;
+        border-color: #8ab4f8;
+        box-shadow: 0 0 0 0.2rem rgba(138, 180, 248, 0.25);
+    }
 
-/* ===== FIX AUTOFILL (Chrome / Safari) ===== */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-textarea:-webkit-autofill,
-select:-webkit-autofill {
-    -webkit-text-fill-color: #e0e0e0 !important;
-    -webkit-box-shadow: 0 0 0px 1000px #1e1e1e inset !important;
-    transition: background-color 5000s ease-in-out 0s;
-}
-/* Buttons (minor tweaks) */
+    /* Autofill dark */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+        -webkit-text-fill-color: #e0e0e0 !important;
+        -webkit-box-shadow: 0 0 0px 1000px #1e1e1e inset !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
+/* Buttons */
 .btn-outline-light {
     border-color: #aaa;
     color: #e0e0e0;
@@ -67,6 +70,261 @@ a {
     color: #8ab4f8;
 }
 
-a:hover {
-    color: #a1c2fa;
+    a:hover {
+        color: #a1c2fa;
+    }
+
+/* =======================
+   ADMIN DASHBOARD
+   ======================= */
+.admin-card {
+    background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+    border-radius: 14px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.08);
 }
+
+    .admin-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        border-color: rgba(255,255,255,0.2);
+    }
+
+.btn-glow {
+    transition: all 0.3s ease;
+}
+
+    .btn-glow:hover {
+        box-shadow: 0 0 15px rgba(138,180,248,0.6);
+    }
+
+.gradient-text {
+    background: linear-gradient(90deg, #8ab4f8, #00e5ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* =================================================
+   LIGHT LOGIN PAGE — STRONG OVERRIDE (SAFE)
+   ================================================= */
+
+/* Full-page light background */
+.login-page {
+    min-height: calc(100vh - 120px);
+    background: linear-gradient(180deg, #f4f6fb 0%, #ffffff 60%, #f4f6fb 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 12px;
+}
+
+/* Card */
+.login-card {
+    background: #ffffff !important;
+    color: #0b1f44 !important;
+    border-radius: 18px;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.10);
+    width: 100%;
+    max-width: 420px;
+}
+
+/* Text */
+.login-title,
+.login-subtitle,
+.login-label {
+    color: #0b1f44 !important;
+}
+
+/* Inputs — FORCE LIGHT */
+.login-page input,
+.login-page textarea,
+.login-page select {
+    background-color: #ffffff !important;
+    color: #0b1f44 !important;
+    border: 1px solid rgba(0,0,0,0.15) !important;
+}
+
+    /* Focus */
+    .login-page input:focus {
+        background-color: #ffffff !important;
+        color: #0b1f44 !important;
+        border-color: #0d6efd !important;
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.15) !important;
+    }
+
+    /* Autofill FIX for light */
+    .login-page input:-webkit-autofill {
+        -webkit-text-fill-color: #0b1f44 !important;
+        -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+    }
+
+/* Footer */
+.login-footer {
+    background: #fbfbfd;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    color: rgba(11,31,68,0.75);
+}
+
+    .login-footer a {
+        color: #0d6efd;
+        font-weight: 700;
+    }
+
+
+/* =========================
+   LOGIN FULL LIGHT MODE
+   ========================= */
+
+/* Force white body ONLY on login */
+body.login-light {
+    background-color: #ffffff !important;
+    color: #0b1f44 !important;
+}
+
+    /* Light navbar on login */
+    body.login-light .navbar {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    body.login-light .navbar-brand {
+        color: #0b1f44 !important;
+    }
+
+    body.login-light .btn-outline-light {
+        color: #0b1f44 !important;
+        border-color: #0b1f44 !important;
+    }
+
+    /* Remove dark container feeling */
+    body.login-light .container {
+        background: transparent !important;
+    }
+
+    /* Login page background */
+    body.login-light .login-page {
+        background: #ffffff !important;
+    }
+
+    /* Inputs – force light */
+    body.login-light input,
+    body.login-light textarea,
+    body.login-light select {
+        background-color: #ffffff !important;
+        color: #0b1f44 !important;
+        border: 1px solid #d1d5db !important;
+    }
+
+        /* Autofill fix (light) */
+        body.login-light input:-webkit-autofill {
+            -webkit-text-fill-color: #0b1f44 !important;
+            -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+        }
+
+    /* Footer light */
+    body.login-light footer {
+        background-color: #ffffff !important;
+        color: #6b7280 !important;
+    }
+
+/* =======================
+   LIGHT USER TABLE FIX
+   ======================= */
+
+.user-table-light {
+    color: #0b1f44 !important;
+}
+
+    .user-table-light td,
+    .user-table-light th {
+        background-color: #ffffff !important;
+        color: #0b1f44 !important;
+        border-color: #e5e7eb !important;
+    }
+
+    .user-table-light tbody tr:hover {
+        background-color: #f3f4f6 !important;
+    }
+
+/* =========================
+   LIGHT GALLERY OVERRIDES
+   ========================= */
+
+/* Cards */
+body.login-light .card {
+    background-color: #ffffff !important;
+    color: #0b1f44 !important;
+    border: 1px solid #e5e7eb;
+}
+
+/* Card body & footer */
+body.login-light .card-body,
+body.login-light .card-footer {
+    background-color: #ffffff !important;
+    color: #0b1f44 !important;
+}
+
+/* Remove dark badges side-effect */
+body.login-light .badge.bg-secondary {
+    background-color: #6c757d !important;
+    color: #ffffff !important;
+}
+
+/* Inputs in gallery filters */
+body.login-light .form-control,
+body.login-light .form-select {
+    background-color: #ffffff !important;
+    color: #0b1f44 !important;
+    border: 1px solid #ced4da !important;
+}
+
+/* Fix fully booked / warnings */
+body.login-light .text-danger {
+    color: #dc3545 !important;
+}
+
+/* Images placeholder */
+body.login-light .card-img-top {
+    background-color: #f1f3f5;
+}
+
+/* Hover effect */
+body.login-light .card:hover {
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+    transition: all 0.25s ease;
+}
+
+
+
+/* Ensure page is white everywhere */
+body.login-light,
+body.login-light main,
+body.login-light header,
+body.login-light footer,
+body.login-light .container,
+body.login-light .container-fluid {
+    background-color: #ffffff !important;
+    color: #0b1f44 !important;
+}
+
+    /* Make gallery cards feel smaller & cleaner */
+    body.login-light .card-body {
+        padding: 0.75rem 0.9rem !important;
+        font-size: 0.92rem;
+    }
+
+    body.login-light .card-footer {
+        padding: 0.65rem 0.9rem !important;
+    }
+
+    /* Make headings always dark */
+    body.login-light h1,
+    body.login-light h2,
+    body.login-light h3,
+    body.login-light h4,
+    body.login-light h5,
+    body.login-light h6 {
+        color: #0b1f44 !important;
+    }

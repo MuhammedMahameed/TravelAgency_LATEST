@@ -1,10 +1,66 @@
 @model TravelAgency.Models.User
 
-<h2>Register</h2>
+@{
+    ViewData["Title"] = "Register";
+    ViewData["BodyClass"] = "login-light";
+}
 
-<form method="post">
-    Full Name: <input name="FullName" /><br />
-    Email: <input name="Email" type="email" /><br />
-    Password: <input name="Password" type="password" /><br />
-    <button type="submit">Register</button>
-</form>
+<div class="login-page container-fluid d-flex justify-content-center align-items-center">
+
+    <div class="login-card shadow-lg rounded-4 p-4" style="max-width:420px; width:100%;">
+
+        <h2 class="fw-bold text-center mb-1 login-title">Create account</h2>
+        <p class="text-muted text-center mb-4">
+            Join Travel Agency and start booking trips
+        </p>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger text-center">
+                Please fix the errors and try again
+            </div>
+        }
+
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label fw-semibold login-label">Full Name</label>
+                <input asp-for="FullName"
+                       class="form-control form-control-lg"
+                       placeholder="Your full name"
+                       required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold login-label">Email</label>
+                <input asp-for="Email"
+                       type="email"
+                       class="form-control form-control-lg"
+                       placeholder="name@example.com"
+                       required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold login-label">Password</label>
+                <input asp-for="Password"
+                       type="password"
+                       class="form-control form-control-lg"
+                       placeholder="Choose a password"
+                       required />
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary btn-lg w-100 mt-2">
+                Register
+            </button>
+        </form>
+
+        <div class="text-center mt-4 login-footer">
+            <span class="text-muted">Already have an account?</span>
+            <a href="/Account/Login" class="fw-bold text-decoration-none ms-1">
+                Login
+            </a>
+        </div>
+
+    </div>
+
+</div>

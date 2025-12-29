@@ -1,0 +1,25 @@
+﻿@model List<TravelAgency.ViewModel.BookingViewModel>
+
+<h2>User Booking History</h2>
+
+<table border="1">
+    <tr>
+        <th>Destination</th>
+        <th>Country</th>
+        <th>Date</th>
+        <th>Status</th>
+    </tr>
+
+    @foreach (var b in Model)
+    {
+        <tr>
+            <td>@b.Destination</td>
+            <td>@b.Country</td>
+            <td>@b.StartDate.ToShortDateString()</td>
+            <td>@b.Status</td>
+        </tr>
+    }
+</table>
+
+<br />
+<a href="/Admin/Users">Back</a>

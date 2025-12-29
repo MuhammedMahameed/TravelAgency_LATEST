@@ -39,7 +39,7 @@ public class WaitingListController : Controller
             conn.Close();
             
         }
-        return RedirectToAction("Status", new{tripId});
+        return RedirectToAction("Gallery", "Trips");
     }
 
     public IActionResult Status(int tripId)

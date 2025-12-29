@@ -324,6 +324,192 @@ namespace TravelAgency.Controllers
             return RedirectToAction("Trips");
         }
 
+        // ======================= USERS MANAGEMENT =======================
+
+        public IActionResult Users()
+        {
+            if (!AuthHelper.IsAdmin(HttpContext))
+                return RedirectToAction("Login", "Account");
+
+            var users = new List<User>();
+
+            using (var conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+                var cmd = new SqlCommand(
+                    "SELECT UserId, FullName, Email, Status FROM Users ORDER BY UserId DESC", conn);
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    users.Add(new User
+                    {
+                        UserId = (int)reader["UserId"],
+                        FullName = reader["FullName"].ToString(),
+                        Email = reader["Email"].ToString(),
+                        Status = reader["Status"].ToString()
+                    });
+                }
+                conn.Close();
+            }
+
+            return View(users);
+        }
+
+        [HttpGet]
+        public IActionResult AddUser()
+        {
+            if (!AuthHelper.IsAdmin(HttpContext))
+                return RedirectToAction("Login", "Account");
+
+            return View(new User());
+        }
+
+        [HttpPost]
+        public IActionResult AddUser(string fullName, string email, string password)
+        {
+            if (!AuthHelper.IsAdmin(HttpContext))
+                return RedirectToAction("Login", "Account");
+
+            if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                TempData["Error"] = "All fields are required.";
+                return RedirectToAction("AddUser");
+            }
+
+            string hashed = PasswordHelper.Hash(password);
+
+            using (var conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+
+                // בדיקה שלא קיים אימייל
+                var checkCmd = new SqlCommand("SELECT COUNT(*) FROM Users WHERE Email=@e", conn);
+                checkCmd.Parameters.AddWithValue("@e", email);
+                int exists = (int)checkCmd.ExecuteScalar();
+                if (exists > 0)
+                {
+                    TempData["Error"] = "Email already exists.";
+                    return RedirectToAction("AddUser");
+                }
+
+                var cmd = new SqlCommand(@"
+            INSERT INTO Users (FullName, Email, PasswordHash, Role, Status)
+            VALUES (@n, @e, @p, 'User', 'Active')", conn);
+
+                cmd.Parameters.AddWithValue("@n", fullName);
+                cmd.Parameters.AddWithValue("@e", email);
+                cmd.Parameters.AddWithValue("@p", hashed);
+
+                cmd.ExecuteNonQuery();
+                conn.Close();
+            }
+
+            TempData["Success"] = "User added successfully.";
+            return RedirectToAction("Users");
+        }
+
+
+        [HttpPost]
+        public IActionResult ToggleUserStatus(int userId)
+        {
+            if (!AuthHelper.IsAdmin(HttpContext))
+                return RedirectToAction("Login", "Account");
+
+            using (var conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+                var cmd = new SqlCommand(@"
+            UPDATE Users
+            SET Status = CASE WHEN Status='Active' THEN 'Blocked' ELSE 'Active' END
+            WHERE UserId=@uid", conn);
+
+                cmd.Parameters.AddWithValue("@uid", userId);
+                cmd.ExecuteNonQuery();
+                conn.Close();
+            }
+
+            TempData["Success"] = "User status updated.";
+            return RedirectToAction("Users");
+        }
+
+        // Removing users (לפי דרישה) – נעשה בצורה בטוחה:
+        // אם יש הזמנות -> לא מוחקים פיזית, אלא Status='Blocked' (זה עדיין "removing" מהמערכת).
+        [HttpPost]
+        public IActionResult RemoveUser(int userId)
+        {
+            if (!AuthHelper.IsAdmin(HttpContext))
+                return RedirectToAction("Login", "Account");
+
+            using (var conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+
+                var hasBookingsCmd = new SqlCommand("SELECT COUNT(*) FROM Bookings WHERE UserId=@uid", conn);
+                hasBookingsCmd.Parameters.AddWithValue("@uid", userId);
+                int bookings = (int)hasBookingsCmd.ExecuteScalar();
+
+                if (bookings > 0)
+                {
+                    // Soft remove
+                    var blockCmd = new SqlCommand("UPDATE Users SET Status='Blocked' WHERE UserId=@uid", conn);
+                    blockCmd.Parameters.AddWithValue("@uid", userId);
+                    blockCmd.ExecuteNonQuery();
+
+                    TempData["Error"] = "User has bookings, so the account was blocked instead of deleted.";
+                    return RedirectToAction("Users");
+                }
+
+                // אם אין הזמנות — מוחקים פיזית (removing)
+                var delCmd = new SqlCommand("DELETE FROM Users WHERE UserId=@uid", conn);
+                delCmd.Parameters.AddWithValue("@uid", userId);
+                delCmd.ExecuteNonQuery();
+
+                conn.Close();
+            }
+
+            TempData["Success"] = "User removed successfully.";
+            return RedirectToAction("Users");
+        }
+
+        // Booking history של משתמש
+        public IActionResult UserBookings(int id)
+        {
+            if (!AuthHelper.IsAdmin(HttpContext))
+                return RedirectToAction("Login", "Account");
+
+            var list = new List<TravelAgency.ViewModel.BookingViewModel>();
+
+            using (var conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+                var cmd = new SqlCommand(@"
+            SELECT t.Destination, t.Country, t.StartDate, b.Status
+            FROM Bookings b
+            JOIN Trips t ON b.TripId = t.TripId
+            WHERE b.UserId=@uid
+            ORDER BY t.StartDate DESC", conn);
+
+                cmd.Parameters.AddWithValue("@uid", id);
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    list.Add(new TravelAgency.ViewModel.BookingViewModel
+                    {
+                        Destination = reader["Destination"].ToString(),
+                        Country = reader["Country"].ToString(),
+                        StartDate = (DateTime)reader["StartDate"],
+                        Status = reader["Status"].ToString()
+                    });
+                }
+                conn.Close();
+            }
+
+            return View(list);
+        }
+
+
 
         public IActionResult Index()
         {

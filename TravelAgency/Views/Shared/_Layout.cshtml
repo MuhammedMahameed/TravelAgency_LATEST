@@ -1,249 +1,117 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 @using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Hosting
 
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TravelAgency</title>
     <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/TravelAgency.styles.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/TravelAgency.styles.css" asp-append-version="true" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/site-dark.css" asp-append-version="true"/>
-
+    <link rel="stylesheet" href="~/css/site-dark.css" asp-append-version="true" />
 </head>
-<body>
-<header>
-    @* <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"> *@
-    @*     <div class="container-fluid"> *@
-    @*         <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">TravelAgency</a> *@
-    @*         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" *@
-    @*                 aria-expanded="false" aria-label="Toggle navigation"> *@
-    @*             <span class="navbar-toggler-icon"></span> *@
-    @*         </button> *@
-    @*         <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between"> *@
-    @*             <ul class="navbar-nav flex-grow-1"> *@
-    @*                 <li class="nav-item"> *@
-    @*                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a> *@
-    @*                 </li> *@
-    @*                 <li class="nav-item"> *@
-    @*                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> *@
-    @*                 </li> *@
-    @*             </ul> *@
-    @*         </div> *@
-    @*     </div> *@
-    @* </nav> *@
-    <p style="color:red;">
-        DEBUG —
-        UserId: @Context.Session.GetInt32("UserId"),
-        Role: @Context.Session.GetString("Role")
-    </p>
-    @* <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4"> *@
-    @*     <div class="container"> *@
-    @*         <a class="navbar-brand" href="/Trips/Gallery">Travel Agency</a> *@
-    @* *@
-    @*         <div class="collapse navbar-collapse"> *@
-    @*             <ul class="navbar-nav me-auto"> *@
-    @* *@
-    @*                 $1$ USER NAV #1# *@
-    @*                 @if (Context.Session.GetInt32("UserId") != null && *@
-    @*                      Context.Session.GetString("Role") == "User") *@
-    @*                 { *@
-    @*                     <li class="nav-item"> *@
-    @*                         <a class="nav-link" href="/Trips/Gallery">Trips</a> *@
-    @*                     </li> *@
-    @*                     <li class="nav-item"> *@
-    @*                         <a class="nav-link" href="/Booking/MyBookings">My Bookings</a> *@
-    @*                     </li> *@
-    @*                 } *@
-    @* *@
-    @*                 $1$ ADMIN NAV #1# *@
-    @*                 @if (Context.Session.GetInt32("UserId") != null && *@
-    @*                      Context.Session.GetString("Role") == "Admin") *@
-    @*                 { *@
-    @*                     <li class="nav-item"> *@
-    @*                         <a class="nav-link" href="/Admin/Trips">Manage Trips</a> *@
-    @*                     </li> *@
-    @*                     <li class="nav-item"> *@
-    @*                         <a class="nav-link" href="/Admin/Bookings">All Bookings</a> *@
-    @*                     </li> *@
-    @*                 } *@
-    @*             </ul> *@
-    @* *@
-    @*             <ul class="navbar-nav"> *@
-    @*                 @if (Context.Session.GetInt32("UserId") != null) *@
-    @*                 { *@
-    @*                     <li class="nav-item"> *@
-    @*                         <span class="navbar-text me-2"> *@
-    @*                             Hello, @Context.Session.GetString("FullName") *@
-    @*                         </span> *@
-    @*                     </li> *@
-    @*                     <li class="nav-item"> *@
-    @*                         <a class="btn btn-outline-light btn-sm" href="/Account/Logout"> *@
-    @*                             Logout *@
-    @*                         </a> *@
-    @*                     </li> *@
-    @*                 } *@
-    @*                 else *@
-    @*                 { *@
-    @*                     <li class="nav-item"> *@
-    @*                         <a class="btn btn-outline-light btn-sm me-2" href="/Account/Login"> *@
-    @*                             Login *@
-    @*                         </a> *@
-    @*                     </li> *@
-    @*                     <li class="nav-item"> *@
-    @*                         <a class="btn btn-outline-light btn-sm" href="/Account/Register"> *@
-    @*                             Register *@
-    @*                         </a> *@
-    @*                     </li> *@
-    @*                 } *@
-    @*             </ul> *@
-    @*         </div> *@
-    @*     </div> *@
-@*     $1$ </nav> #1# *@
-@*     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4"> *@
-@*     <div class="container"> *@
-@*         <a class="navbar-brand" href="/Trips/Gallery">Travel Agency</a> *@
-@* *@
-@*         <!-- ✅ TOGGLER (THIS WAS MISSING) --> *@
-@*         <button class="navbar-toggler" type="button" *@
-@*                 data-bs-toggle="collapse" *@
-@*                 data-bs-target="#mainNavbar"> *@
-@*             <span class="navbar-toggler-icon"></span> *@
-@*         </button> *@
-@* *@
-@*         <!-- COLLAPSIBLE CONTENT --> *@
-@*         <div class="collapse navbar-collapse" id="mainNavbar"> *@
-@*             <ul class="navbar-nav me-auto"> *@
-@* *@
-@*                 @if (Context.Session.GetInt32("UserId") != null) *@
-@*                 { *@
-@*                     var role = Context.Session.GetString("Role"); *@
-@* *@
-@*                     if (role == "User") *@
-@*                     { *@
-@*                         <li class="nav-item"> *@
-@*                             <a class="nav-link" href="/Trips/Gallery">Trips</a> *@
-@*                         </li> *@
-@*                         <li class="nav-item"> *@
-@*                             <a class="nav-link" href="/Booking/MyBookings">My Bookings</a> *@
-@*                         </li> *@
-@*                     } *@
-@* *@
-@*                     if (role == "Admin") *@
-@*                     { *@
-@*                         <li class="nav-item"> *@
-@*                             <a class="nav-link" href="/Admin/Trips">Manage Trips</a> *@
-@*                         </li> *@
-@*                     } *@
-@*                 } *@
-@*             </ul> *@
-@* *@
-@*             <ul class="navbar-nav"> *@
-@*                 @if (Context.Session.GetInt32("UserId") != null) *@
-@*                 { *@
-@*                     <li class="nav-item"> *@
-@*                         <span class="navbar-text me-2 text-white"> *@
-@*                             Hello, @Context.Session.GetString("FullName") *@
-@*                         </span> *@
-@*                     </li> *@
-@*                     <li class="nav-item"> *@
-@*                         <a class="btn btn-outline-light btn-sm" href="/Account/Logout"> *@
-@*                             Logout *@
-@*                         </a> *@
-@*                     </li> *@
-@*                 } *@
-@*                 else *@
-@*                 { *@
-@*                     <li class="nav-item"> *@
-@*                         <a class="btn btn-outline-light btn-sm me-2" href="/Account/Login"> *@
-@*                             Login *@
-@*                         </a> *@
-@*                     </li> *@
-@*                     <li class="nav-item"> *@
-@*                         <a class="btn btn-outline-light btn-sm" href="/Account/Register"> *@
-@*                             Register *@
-@*                         </a> *@
-@*                     </li> *@
-@*                 } *@
-@*             </ul> *@
-@*         </div> *@
-@*     </div> *@
-@* </nav> *@
-    <nav class="navbar navbar-dark bg-dark mb-4">
-        <div class="container d-flex justify-content-between align-items-center">
 
-            <!-- Brand -->
-            <a class="navbar-brand" href="/Trips/Gallery">Travel Agency</a>
+<body class="@ViewData["BodyClass"]">
+    <header>
 
-            <!-- LEFT: Role-based navigation buttons -->
-            <div class="d-flex gap-2">
-                @if (Context.Session.GetInt32("UserId") != null)
-                {
-                    var role = Context.Session.GetString("Role");
+        @* ================= DEBUG (DEV ONLY) =================
+        @if (Context.RequestServices.GetService<IWebHostEnvironment>()!.IsDevelopment())
+        {
+            <p style="color:red; text-align:center; margin:0;">
+                DEBUG —
+                UserId: @Context.Session.GetInt32("UserId"),
+                Role: @Context.Session.GetString("Role")
+            </p>
+        } *@
 
-                    if (role == "User")
+        @* ================= ACTIVE NAVBAR ================= *@
+        <nav class="navbar navbar-dark bg-dark mb-4">
+            <div class="container d-flex justify-content-between align-items-center">
+
+                <!-- Brand -->
+                <a class="navbar-brand fw-bold" href="/Trips/Gallery">
+                    Travel Agency
+                </a>
+
+                <!-- LEFT: Role-based navigation -->
+                <div class="d-flex gap-2">
+                    @if (Context.Session.GetInt32("UserId") != null)
                     {
-                        <a class="btn btn-outline-light btn-sm" href="/Trips/Gallery">
-                            Trips
-                        </a>
-                        <a class="btn btn-outline-light btn-sm" href="/Booking/MyBookings">
-                            My Bookings
+                        var role = Context.Session.GetString("Role");
+
+                        if (role == "User")
+                        {
+                            <a class="btn btn-outline-light btn-sm btn-glow" href="/Trips/Gallery">
+                                Trips
+                            </a>
+                            <a class="btn btn-outline-light btn-sm btn-glow" href="/Booking/MyBookings">
+                                My Bookings
+                            </a>
+                        }
+
+                        if (role == "Admin")
+                        {
+                            <a class="btn btn-outline-warning btn-sm btn-glow" href="/Admin/Trips">
+                                Manage Trips
+                            </a>
+
+                            <a class="btn btn-outline-info btn-sm btn-glow" href="/Admin/Users">
+                                User Management
+                            </a>
+                        }
+                    }
+                </div>
+
+                <!-- RIGHT: Auth -->
+                <div class="d-flex gap-2 align-items-center">
+                    @if (Context.Session.GetInt32("UserId") != null)
+                    {
+                        <span class="text-white me-2">
+                            Hello, @Context.Session.GetString("FullName")
+                        </span>
+
+                        <a class="btn btn-danger btn-sm btn-glow" href="/Account/Logout">
+                            Logout
                         </a>
                     }
-
-                    if (role == "Admin")
+                    else
                     {
-                        <a class="btn btn-outline-warning btn-sm" href="/Admin/Trips">
-                            Manage Trips
+                        <a class="btn btn-outline-light btn-sm btn-glow" href="/Account/Login">
+                            Login
+                        </a>
+                        <a class="btn btn-outline-light btn-sm btn-glow" href="/Account/Register">
+                            Register
                         </a>
                     }
-                }
+                </div>
             </div>
+        </nav>
 
-            <!-- RIGHT: Auth buttons -->
-            <div class="d-flex gap-2 align-items-center">
-                @if (Context.Session.GetInt32("UserId") != null)
-                {
-                    <span class="text-white me-2">
-                        Hello, @Context.Session.GetString("FullName")
-                    </span>
+    </header>
 
-                    <a class="btn btn-danger btn-sm" href="/Account/Logout">
-                        Logout
-                    </a>
-                }
-                else
-                {
-                    <a class="btn btn-outline-light btn-sm" href="/Account/Login">
-                        Login
-                    </a>
-                    <a class="btn btn-outline-light btn-sm" href="/Account/Register">
-                        Register
-                    </a>
-                }
-            </div>
-        </div>
-    </nav>
-
-</header>
-<div class="container">
-    <main role="main" class="pb-3">
-        @RenderBody()
-    </main>
-</div>
-
-<footer class="border-top footer text-muted">
     <div class="container">
-        &copy; 2025 - TravelAgency - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
     </div>
-</footer>
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
-@await RenderSectionAsync("Scripts", required: false)
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - TravelAgency -
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

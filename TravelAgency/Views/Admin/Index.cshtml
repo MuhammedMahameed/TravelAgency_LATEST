@@ -1,0 +1,82 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+    ViewData["BodyClass"] = "login-light";
+}
+
+<div class="login-page container-fluid">
+
+    <div class="container py-4">
+
+        <h1 class="fw-bold text-center mb-4 login-title">
+            👑 Admin Dashboard
+        </h1>
+
+        <p class="text-center text-muted mb-5">
+            Manage the system from one central place
+        </p>
+
+        <div class="row g-4 justify-content-center">
+
+            <!-- Manage Trips -->
+            <div class="col-md-6 col-lg-4">
+                <div class="login-card p-4 h-100 text-center">
+                    <h5 class="fw-bold mb-2">✈️ Manage Trips</h5>
+                    <p class="text-muted">
+                        Add, edit, delete trips and manage availability.
+                    </p>
+                    <a href="/Admin/Trips"
+                       class="btn btn-warning btn-lg w-100 mt-3">
+                        Go to Trips
+                    </a>
+                </div>
+            </div>
+
+            <!-- User Management -->
+            <div class="col-md-6 col-lg-4">
+                <div class="login-card p-4 h-100 text-center">
+                    <h5 class="fw-bold mb-2">👥 User Management</h5>
+                    <p class="text-muted">
+                        View users, Manage accounts and see bookings.
+                    </p>
+                    <a href="/Admin/Users"
+                       class="btn btn-info btn-lg w-100 mt-3">
+                        Manage Users
+                    </a>
+                </div>
+            </div>
+
+            <!-- Discounts -->
+            <div class="col-md-6 col-lg-4">
+                <div class="login-card p-4 h-100 text-center">
+                    <h5 class="fw-bold mb-2">💸 Discounts</h5>
+                    <p class="text-muted">
+                        Set limited-time discounts for trips.
+                    </p>
+                    <a href="/Admin/Trips"
+                       class="btn btn-success btn-lg w-100 mt-3">
+                        Manage Discounts
+                    </a>
+                </div>
+            </div>
+
+            <!-- Send Reminders -->
+            <div class="col-md-6 col-lg-4">
+                <div class="login-card p-4 h-100 text-center">
+                    <h5 class="fw-bold mb-2">📧 Send Reminders</h5>
+                    <p class="text-muted">
+                        Send email reminders for upcoming trips.
+                    </p>
+                    <form method="post" action="/Admin/SendDepartureReminders">
+                        <button type="submit"
+                                class="btn btn-secondary btn-lg w-100 mt-3">
+                            Send Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

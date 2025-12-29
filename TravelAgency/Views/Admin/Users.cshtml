@@ -1,0 +1,112 @@
+﻿@model List<TravelAgency.Models.User>
+
+@{
+    ViewData["Title"] = "User Management";
+    ViewData["BodyClass"] = "login-light";
+}
+
+<div class="login-page container-fluid">
+
+    <div class="container py-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold login-title mb-0">👥 User Management</h2>
+
+            <a href="/Admin/AddUser"
+               class="btn btn-success btn-lg">
+                ➕ Add New User
+            </a>
+        </div>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger text-center">
+                @TempData["Error"]
+            </div>
+        }
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success text-center">
+                @TempData["Success"]
+            </div>
+        }
+
+        <!-- LIGHT TABLE WRAPPER -->
+        <div class="bg-white rounded-4 shadow-sm p-3">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 user-table-light">
+
+                    <thead>
+                        <tr class="table-light">
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th style="width:360px;">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var u in Model)
+                        {
+                            <tr>
+                                <td>@u.UserId</td>
+                                <td class="fw-semibold">@u.FullName</td>
+                                <td>@u.Email</td>
+                                <td>
+                                    @if (u.Status == "Active")
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Blocked</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a href="/Admin/UserBookings/@u.UserId"
+                                       class="btn btn-outline-primary btn-sm me-1">
+                                        View Bookings
+                                    </a>
+
+                                    <form method="post"
+                                          action="/Admin/ToggleUserStatus"
+                                          class="d-inline">
+                                        <input type="hidden"
+                                               name="userId"
+                                               value="@u.UserId" />
+
+                                        <button type="submit"
+                                                class="btn btn-outline-warning btn-sm me-1">
+                                            @(u.Status == "Active" ? "Block" : "Unblock")
+                                        </button>
+                                    </form>
+
+                                    <form method="post"
+                                          action="/Admin/RemoveUser"
+                                          class="d-inline">
+                                        <input type="hidden"
+                                               name="userId"
+                                               value="@u.UserId" />
+
+                                        <button type="submit"
+                                                class="btn btn-outline-danger btn-sm"
+                                                onclick="return confirm('Remove this user?');">
+                                            Remove
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

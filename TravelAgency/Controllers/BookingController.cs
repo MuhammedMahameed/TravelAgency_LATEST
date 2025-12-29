@@ -22,6 +22,7 @@ public class BookingController : Controller
         }
 
         int userId = HttpContext.Session.GetInt32("UserId").Value;
+        string? userEmail = null;
 
         using (SqlConnection connection = new SqlConnection(_connStr))
         {
@@ -30,6 +31,7 @@ public class BookingController : Controller
             {
                 try
                 {
+                    // ===== Limit to 3 active future bookings =====
                     var countCmd = new SqlCommand(@"
                         SELECT COUNT(*)
                         FROM Bookings b
@@ -50,14 +52,14 @@ public class BookingController : Controller
                         return Content("You cannot book more than 3 upcoming trips.");
                     }
 
-                    var waitCmd = new SqlCommand(
-                        @"SELECT TOP 1 UserId FROM WaitingList
-                          WHERE TripId=@tid
-                          ORDER BY JoinDate",
+                    // ===== Waiting list priority =====
+                    var waitCmd = new SqlCommand(@"
+                        SELECT TOP 1 UserId FROM WaitingList
+                        WHERE TripId = @tid
+                        ORDER BY JoinDate",
                         connection, transaction);
 
                     waitCmd.Parameters.AddWithValue("@tid", id);
-
                     var first = waitCmd.ExecuteScalar();
 
                     if (first != null && (int)first != userId)
@@ -66,13 +68,15 @@ public class BookingController : Controller
                         return Content("You are not first in the waiting list.");
                     }
 
-                    var roomCmd = new SqlCommand(
-                        @"SELECT AvailableRooms FROM Trips WITH (UPDLOCK) WHERE TripId = @tid",
+                    // ===== Lock trip row and check rooms =====
+                    var roomCmd = new SqlCommand(@"
+                        SELECT AvailableRooms FROM Trips WITH (UPDLOCK)
+                        WHERE TripId = @tid",
                         connection, transaction);
 
                     roomCmd.Parameters.AddWithValue("@tid", id);
-
                     var roomsObj = roomCmd.ExecuteScalar();
+
                     if (roomsObj == null)
                     {
                         transaction.Rollback();
@@ -80,15 +84,17 @@ public class BookingController : Controller
                     }
 
                     int rooms = (int)roomsObj;
+
                     if (rooms <= 0)
                     {
                         transaction.Rollback();
                         return RedirectToAction("Join", "WaitingList", new { tripId = id });
                     }
 
-                    var bookCmd = new SqlCommand(
-                        @"INSERT INTO Bookings (UserId, TripId, Status)
-                          VALUES (@uid, @tid, @status)",
+                    // ===== Create booking =====
+                    var bookCmd = new SqlCommand(@"
+                        INSERT INTO Bookings (UserId, TripId, Status)
+                        VALUES (@uid, @tid, @status)",
                         connection, transaction);
 
                     bookCmd.Parameters.AddWithValue("@uid", userId);
@@ -96,51 +102,35 @@ public class BookingController : Controller
                     bookCmd.Parameters.AddWithValue("@status", "Active");
                     bookCmd.ExecuteNonQuery();
 
-                    var updateCmd = new SqlCommand(
-                        @"UPDATE Trips
-                          SET AvailableRooms = AvailableRooms - 1
-                          WHERE TripId=@tid",
+                    // ===== Update rooms =====
+                    var updateCmd = new SqlCommand(@"
+                        UPDATE Trips
+                        SET AvailableRooms = AvailableRooms - 1
+                        WHERE TripId = @tid",
                         connection, transaction);
 
                     updateCmd.Parameters.AddWithValue("@tid", id);
                     updateCmd.ExecuteNonQuery();
 
-                    var delCmd = new SqlCommand(
-                        @"DELETE FROM WaitingList
-                          WHERE TripId=@tid AND UserId=@uid",
+                    // ===== Remove from waiting list =====
+                    var delCmd = new SqlCommand(@"
+                        DELETE FROM WaitingList
+                        WHERE TripId = @tid AND UserId = @uid",
                         connection, transaction);
 
                     delCmd.Parameters.AddWithValue("@tid", id);
                     delCmd.Parameters.AddWithValue("@uid", userId);
                     delCmd.ExecuteNonQuery();
 
+                    // ===== Get user email BEFORE closing =====
+                    var emailCmd = new SqlCommand(
+                        "SELECT Email FROM Users WHERE UserId = @uid",
+                        connection, transaction);
+
+                    emailCmd.Parameters.AddWithValue("@uid", userId);
+                    userEmail = emailCmd.ExecuteScalar()?.ToString();
+
                     transaction.Commit();
-                    connection.Close();
-
-                    try
-                    {
-                        var emailCmd = new SqlCommand("SELECT Email FROM Users WHERE UserId = @uid", connection);
-                        emailCmd.Parameters.AddWithValue("@uid", userId);
-
-                        var userEmailObj = emailCmd.ExecuteScalar();
-                        var userEmail = userEmailObj?.ToString();
-
-                        if (!string.IsNullOrEmpty(userEmail))
-                        {
-                            EmailHelper.Send(
-                                userEmail,
-                                "Booking Confirmation",
-                                $"Your booking was successful! Trip ID: {id}"
-                            );
-                        }
-                    }
-                    catch
-                    {
-                        // אם שליחת המייל נכשלה – לא להפיל את ההזמנה
-                    }
-
-
-                    return RedirectToAction("MyBookings");
                 }
                 catch
                 {
@@ -149,6 +139,25 @@ public class BookingController : Controller
                 }
             }
         }
+
+        // ===== Send email (outside transaction) =====
+        try
+        {
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                EmailHelper.Send(
+                    userEmail,
+                    "Booking Confirmation",
+                    $"Your booking was successful! Trip ID: {id}"
+                );
+            }
+        }
+        catch
+        {
+            // Email failure should not break booking
+        }
+
+        return RedirectToAction("MyBookings");
     }
 
     public IActionResult MyBookings()
@@ -162,11 +171,11 @@ public class BookingController : Controller
         using (SqlConnection connection = new SqlConnection(_connStr))
         {
             connection.Open();
-            var cmd = new SqlCommand(
-                @"SELECT b.BookingId, t.Destination, t.Country, t.StartDate, b.Status
-                  FROM Bookings b
-                  JOIN Trips t ON b.TripId = t.TripId
-                  WHERE b.UserId=@uid AND b.Status=@status",
+            var cmd = new SqlCommand(@"
+                SELECT b.BookingId, t.Destination, t.Country, t.StartDate, b.Status
+                FROM Bookings b
+                JOIN Trips t ON b.TripId = t.TripId
+                WHERE b.UserId = @uid AND b.Status = @status",
                 connection);
 
             cmd.Parameters.AddWithValue("@uid", userId);
@@ -180,13 +189,12 @@ public class BookingController : Controller
                     BookingId = (int)reader["BookingId"],
                     Destination = reader["Destination"].ToString(),
                     Country = reader["Country"].ToString(),
-                    StartDate = (DateTime)reader["StartDate"],
+                    StartDate = (DateTime)reader["StartDate"]
                 });
             }
-
-            connection.Close();
-            return View(list);
         }
+
+        return View(list);
     }
 
     [HttpPost]
@@ -203,12 +211,11 @@ public class BookingController : Controller
             using var transaction = connection.BeginTransaction();
             try
             {
-                var getCmd = new SqlCommand(
-                    @"SELECT TripId
-                      FROM Bookings
-                      WHERE BookingId = @bid
-                      AND UserId = @uid
-                      AND Status = @status",
+                var getCmd = new SqlCommand(@"
+                    SELECT TripId FROM Bookings
+                    WHERE BookingId = @bid
+                    AND UserId = @uid
+                    AND Status = @status",
                     connection, transaction);
 
                 getCmd.Parameters.AddWithValue("@bid", bookingId);
@@ -224,29 +231,28 @@ public class BookingController : Controller
 
                 int tripId = (int)tripObj;
 
-                var cancelCmd = new SqlCommand(
-                    @"UPDATE Bookings
-                      SET Status = @cancelled
-                      WHERE BookingId = @bid
-                      AND UserId = @uid
-                      AND Status = @status",
+                var cancelCmd = new SqlCommand(@"
+                    UPDATE Bookings
+                    SET Status = @cancelled
+                    WHERE BookingId = @bid
+                    AND UserId = @uid",
                     connection, transaction);
 
                 cancelCmd.Parameters.AddWithValue("@cancelled", "Cancelled");
                 cancelCmd.Parameters.AddWithValue("@bid", bookingId);
                 cancelCmd.Parameters.AddWithValue("@uid", userId);
-                cancelCmd.Parameters.AddWithValue("@status", "Active");
                 cancelCmd.ExecuteNonQuery();
 
-                var roomCmd = new SqlCommand(
-                    @"UPDATE Trips
-                      SET AvailableRooms = AvailableRooms + 1
-                      WHERE TripId = @tid",
+                var roomCmd = new SqlCommand(@"
+                    UPDATE Trips
+                    SET AvailableRooms = AvailableRooms + 1
+                    WHERE TripId = @tid",
                     connection, transaction);
 
                 roomCmd.Parameters.AddWithValue("@tid", tripId);
                 roomCmd.ExecuteNonQuery();
 
+                // ===== Notify first in waiting list =====
                 try
                 {
                     var waitCmd = new SqlCommand(@"
@@ -258,9 +264,7 @@ public class BookingController : Controller
                         connection, transaction);
 
                     waitCmd.Parameters.AddWithValue("@tid", tripId);
-
-                    var emailObj = waitCmd.ExecuteScalar();
-                    var email = emailObj?.ToString();
+                    var email = waitCmd.ExecuteScalar()?.ToString();
 
                     if (!string.IsNullOrEmpty(email))
                     {
@@ -271,14 +275,9 @@ public class BookingController : Controller
                         );
                     }
                 }
-                catch
-                {
-                }
-
+                catch { }
 
                 transaction.Commit();
-                connection.Close();
-
                 return RedirectToAction("MyBookings");
             }
             catch (Exception ex)
@@ -302,11 +301,11 @@ public class BookingController : Controller
             connection.Open();
 
             var cmd = new SqlCommand(@"
-            SELECT b.BookingId, t.Destination, t.Country, t.StartDate
-            FROM Bookings b
-            JOIN Trips t ON b.TripId = t.TripId
-            WHERE b.UserId = @uid
-            AND t.StartDate < GETDATE()", connection);
+                SELECT b.BookingId, t.Destination, t.Country, t.StartDate
+                FROM Bookings b
+                JOIN Trips t ON b.TripId = t.TripId
+                WHERE b.UserId = @uid
+                AND t.StartDate < GETDATE()", connection);
 
             cmd.Parameters.AddWithValue("@uid", userId);
 
@@ -321,13 +320,10 @@ public class BookingController : Controller
                     StartDate = (DateTime)reader["StartDate"]
                 });
             }
-
-            connection.Close();
         }
 
         return View(list);
     }
-
 
     public IActionResult Index()
     {

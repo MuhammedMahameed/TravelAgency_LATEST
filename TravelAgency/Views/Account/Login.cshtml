@@ -1,12 +1,55 @@
-<h2>Login</h2>
-
-@if (ViewBag.Error != null)
-{
-    <p style="color:red">@ViewBag.Error</p>
+@{
+    ViewData["Title"] = "Login";
+    ViewData["BodyClass"] = "login-light";
 }
 
-<form method="post">
-    Email: <input name="email" /><br />
-    Password: <input name="password" type="password" /><br />
-    <button type="submit">Login</button>
-</form>
+
+<div class="login-page container-fluid d-flex justify-content-center align-items-center">
+
+    <div class="login-card shadow-lg rounded-4 p-4" style="max-width:420px; width:100%;">
+
+        <h2 class="fw-bold text-center mb-1">Welcome back</h2>
+        <p class="text-muted text-center mb-4">
+            Login to continue to Travel Agency
+        </p>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger text-center">
+                @ViewBag.Error
+            </div>
+        }
+
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Email</label>
+                <input name="email" type="email"
+                       class="form-control form-control-lg"
+                       placeholder="name@example.com"
+                       required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Password</label>
+                <input name="password" type="password"
+                       class="form-control form-control-lg"
+                       placeholder="Enter your password"
+                       required />
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary btn-lg w-100 mt-2">
+                Login
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <span class="text-muted">Don’t have an account?</span>
+            <a href="/Account/Register" class="fw-bold text-decoration-none ms-1">
+                Create one
+            </a>
+        </div>
+
+    </div>
+
+</div>
