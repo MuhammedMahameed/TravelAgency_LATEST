@@ -14,3 +14,6 @@ TravelAgency/obj/Debug/net9.0/TravelAgency.AssemblyInfoInputs.cache
 >>>>>>> main
 /TravelAgency/obj/Debug
 /.vs
+.DS_Store
+/.idea/.idea.TravelAgency_LATEST/.idea
+/TravelAgency/bin
