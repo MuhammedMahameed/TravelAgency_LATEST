@@ -23,6 +23,7 @@ public class BookingController : Controller
 
         int userId = HttpContext.Session.GetInt32("UserId").Value;
         string? userEmail = null;
+        int newBookingId = 0;
 
         using (SqlConnection connection = new SqlConnection(_connStr))
         {
@@ -31,6 +32,7 @@ public class BookingController : Controller
             {
                 try
                 {
+                    
                     // ===== Limit to 3 active future bookings =====
                     var countCmd = new SqlCommand(@"
                         SELECT COUNT(*)
@@ -49,7 +51,8 @@ public class BookingController : Controller
                     if (activeBookings >= 3)
                     {
                         transaction.Rollback();
-                        return Content("You cannot book more than 3 upcoming trips.");
+                        TempData["activeBookingsMessage"] = "You cannot book more than 3 upcoming trips.";
+                        return RedirectToAction("MyBookings");
                     }
 
                     // ===== Waiting list priority =====
@@ -94,12 +97,14 @@ public class BookingController : Controller
                     // ===== Create booking =====
                     var bookCmd = new SqlCommand(@"
                         INSERT INTO Bookings (UserId, TripId, Status)
+                        OUTPUT INSERTED.BookingId
                         VALUES (@uid, @tid, @status)",
                         connection, transaction);
 
                     bookCmd.Parameters.AddWithValue("@uid", userId);
                     bookCmd.Parameters.AddWithValue("@tid", id);
                     bookCmd.Parameters.AddWithValue("@status", "Active");
+                    newBookingId = (int)bookCmd.ExecuteScalar();
                     bookCmd.ExecuteNonQuery();
 
                     // ===== Update rooms =====
@@ -129,7 +134,6 @@ public class BookingController : Controller
 
                     emailCmd.Parameters.AddWithValue("@uid", userId);
                     userEmail = emailCmd.ExecuteScalar()?.ToString();
-
                     transaction.Commit();
                 }
                 catch
@@ -139,10 +143,11 @@ public class BookingController : Controller
                 }
             }
         }
-
+            
         // ===== Send email (outside transaction) =====
         try
         {
+            
             if (!string.IsNullOrEmpty(userEmail))
             {
                 EmailHelper.Send(
@@ -157,7 +162,7 @@ public class BookingController : Controller
             // Email failure should not break booking
         }
 
-        return RedirectToAction("MyBookings");
+        return RedirectToAction("Pay", "Payment", new { bookingId = newBookingId });
     }
 
     public IActionResult MyBookings()
@@ -172,7 +177,7 @@ public class BookingController : Controller
         {
             connection.Open();
             var cmd = new SqlCommand(@"
-                SELECT b.BookingId, t.Destination, t.Country, t.StartDate, b.Status
+                SELECT b.BookingId, t.Destination, t.Country, t.StartDate, b.Status, b.IsPaid
                 FROM Bookings b
                 JOIN Trips t ON b.TripId = t.TripId
                 WHERE b.UserId = @uid AND b.Status = @status",
@@ -189,7 +194,8 @@ public class BookingController : Controller
                     BookingId = (int)reader["BookingId"],
                     Destination = reader["Destination"].ToString(),
                     Country = reader["Country"].ToString(),
-                    StartDate = (DateTime)reader["StartDate"]
+                    StartDate = (DateTime)reader["StartDate"],
+                    IsPaid = (bool)reader["IsPaid"]
                 });
             }
         }
@@ -212,7 +218,7 @@ public class BookingController : Controller
             try
             {
                 var getCmd = new SqlCommand(@"
-                    SELECT TripId FROM Bookings
+                    SELECT TripId, IsPaid FROM Bookings
                     WHERE BookingId = @bid
                     AND UserId = @uid
                     AND Status = @status",
@@ -222,14 +228,30 @@ public class BookingController : Controller
                 getCmd.Parameters.AddWithValue("@uid", userId);
                 getCmd.Parameters.AddWithValue("@status", "Active");
 
-                var tripObj = getCmd.ExecuteScalar();
-                if (tripObj == null)
-                {
-                    transaction.Rollback();
-                    return Content("Booking not found (or already cancelled).");
-                }
+                int tripId;
+                bool wasPaid;
 
-                int tripId = (int)tripObj;
+                using (var reader = getCmd.ExecuteReader())
+                {
+                    if (!reader.Read())
+                    {
+                        transaction.Rollback();
+                        return Content("Booking not found (or already cancelled).");
+                    }
+
+                    tripId = (int)reader["TripId"];
+                    wasPaid = (bool)reader["IsPaid"];
+                }
+                // Get destination for email
+                var destCmd = new SqlCommand(@"
+                    SELECT Destination
+                    FROM Trips
+                    WHERE TripId = @tid",
+                    connection, transaction);
+
+                destCmd.Parameters.AddWithValue("@tid", tripId);
+                string destination = destCmd.ExecuteScalar()?.ToString() ?? "your trip";
+
 
                 var cancelCmd = new SqlCommand(@"
                     UPDATE Bookings
@@ -242,7 +264,71 @@ public class BookingController : Controller
                 cancelCmd.Parameters.AddWithValue("@bid", bookingId);
                 cancelCmd.Parameters.AddWithValue("@uid", userId);
                 cancelCmd.ExecuteNonQuery();
+                
+                if (wasPaid)
+                {
+                    // 1) Mark booking unpaid
+                    var unpaidCmd = new SqlCommand(@"
+                        UPDATE Bookings
+                        SET IsPaid = 0, PaidAt = NULL
+                        WHERE BookingId = @bid",
+                        connection, transaction);
 
+                    unpaidCmd.Parameters.AddWithValue("@bid", bookingId);
+                    unpaidCmd.ExecuteNonQuery();
+
+                    // 2) Insert a refund record into Payments (keep history)
+                    var amountCmd = new SqlCommand(@"
+                        SELECT t.Price
+                        FROM Bookings b
+                        JOIN Trips t ON b.TripId = t.TripId
+                        WHERE b.BookingId = @bid",
+                        connection, transaction);
+
+                    amountCmd.Parameters.AddWithValue("@bid", bookingId);
+                    var amountObj = amountCmd.ExecuteScalar();
+                    decimal amount = amountObj == null ? 0m : (decimal)amountObj;
+
+                    var refundCmd = new SqlCommand(@"
+                    INSERT INTO Payments (BookingId, Amount, Status)
+                    VALUES (@bid, @amount, @status)",
+                        connection, transaction);
+
+                    refundCmd.Parameters.AddWithValue("@bid", bookingId);
+                    refundCmd.Parameters.AddWithValue("@amount", amount);
+                    refundCmd.Parameters.AddWithValue("@status", "Refunded");
+                    refundCmd.ExecuteNonQuery();
+
+                    // 3) Email the user about refund (simulated)
+                    try
+                    {
+                        var userEmailCmd = new SqlCommand(@"
+                        SELECT u.Email
+                        FROM Users u
+                        JOIN Bookings b ON u.UserId = b.UserId
+                        WHERE b.BookingId = @bid",
+                            connection, transaction);
+
+                        userEmailCmd.Parameters.AddWithValue("@bid", bookingId);
+                        var userEmail = userEmailCmd.ExecuteScalar()?.ToString();
+
+                        if (!string.IsNullOrEmpty(userEmail))
+                        {
+                            EmailHelper.Send(
+                                userEmail,
+                                "Booking Cancellation",
+                                $"Your booking to {destination} has been cancelled. Since you already paid, a refund will be issued to your original payment method."
+                            );
+                        }
+                    }
+                    catch { }
+                }
+                
+                
+                
+                
+                
+                
                 var roomCmd = new SqlCommand(@"
                     UPDATE Trips
                     SET AvailableRooms = AvailableRooms + 1
@@ -278,6 +364,8 @@ public class BookingController : Controller
                 catch { }
 
                 transaction.Commit();
+                
+                TempData["PaymentMessage"] = "Booking cancelled successfully.";
                 return RedirectToAction("MyBookings");
             }
             catch (Exception ex)

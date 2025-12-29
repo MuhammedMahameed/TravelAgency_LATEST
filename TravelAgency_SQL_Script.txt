@@ -13,7 +13,8 @@ CREATE TABLE Trips (
     AvailableRooms INT NOT NULL,
     Category NVARCHAR(50),
     MinAge INT,
-    Description NVARCHAR(MAX)
+    Description NVARCHAR(MAX),
+    ImagePath Nvarchar(MAX)
 );
 
 CREATE TABLE Users (
@@ -55,4 +56,7 @@ CREATE TABLE Payments (
         FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId)
 );
 
+ALTER TABLE Bookings
+ADD IsPaid BIT NOT NULL DEFAULT 0,
+    PaidAt DATETIME2 NULL;
 

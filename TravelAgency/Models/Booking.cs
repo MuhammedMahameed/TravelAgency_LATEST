@@ -8,4 +8,5 @@ public class Booking
     public int TripId { get; set; }
     public DateTime BookingDate { get; set; }
     public string Status { get; set; } = "Active";
+    public bool IsPaid { get; set; }
 }

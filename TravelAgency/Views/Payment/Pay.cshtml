@@ -1,13 +1,30 @@
-<h2>Payment</h2>
-
-<p>This is a simulated payment.</p>
-
-<form method="post" action="/Payment/Process">
+<form method="post" asp-controller="Payment" asp-action="Process">
     <input type="hidden" name="bookingId" value="@ViewBag.BookingId" />
 
-    Card Number: <input disabled value="**** **** **** 1234" /><br />
-    Expiry: <input disabled value="12/26" /><br />
-    CVV: <input disabled value="***" /><br />
+    <div class="mb-2">
+        <label>Cardholder Name</label>
+        <input name="cardholder" class="form-control" required />
+    </div>
 
-    <button type="submit">Pay Now</button>
+    <div class="mb-2">
+        <label>Card Number</label>
+        <input name="cardNumber" class="form-control" inputmode="numeric" autocomplete="cc-number" required />
+    </div>
+
+    <div class="row">
+        <div class="col mb-2">
+            <label>MM</label>
+            <input name="expMonth" class="form-control" inputmode="numeric" required />
+        </div>
+        <div class="col mb-2">
+            <label>YY</label>
+            <input name="expYear" class="form-control" inputmode="numeric" required />
+        </div>
+        <div class="col mb-2">
+            <label>CVV</label>
+            <input name="cvv" class="form-control" inputmode="numeric" autocomplete="cc-csc" required />
+        </div>
+    </div>
+
+    <button class="btn btn-primary">Pay Now</button>
 </form>

@@ -18,17 +18,7 @@
 
 <body class="@ViewData["BodyClass"]">
     <header>
-
-        @* ================= DEBUG (DEV ONLY) =================
-        @if (Context.RequestServices.GetService<IWebHostEnvironment>()!.IsDevelopment())
-        {
-            <p style="color:red; text-align:center; margin:0;">
-                DEBUG —
-                UserId: @Context.Session.GetInt32("UserId"),
-                Role: @Context.Session.GetString("Role")
-            </p>
-        } *@
-
+        
         @* ================= ACTIVE NAVBAR ================= *@
         <nav class="navbar navbar-dark bg-dark mb-4">
             <div class="container d-flex justify-content-between align-items-center">
@@ -81,12 +71,14 @@
                     }
                     else
                     {
+                        
                         <a class="btn btn-outline-light btn-sm btn-glow" href="/Account/Login">
                             Login
                         </a>
                         <a class="btn btn-outline-light btn-sm btn-glow" href="/Account/Register">
                             Register
                         </a>
+                        
                     }
                 </div>
             </div>
@@ -113,5 +105,17 @@
     @await RenderSectionAsync("Scripts", required: false)
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-</body>
+    @if (TempData["activeBookingsMessage"] != null)
+    {
+        <script>
+            alert("@TempData["activeBookingsMessage"]")
+        </script>
+    }
+    @if (TempData["PaymentMessage"] != null)
+    {
+        <script>
+        alert("@TempData["PaymentMessage"]");
+    </script>
+    }
+    </body>
 </html>
