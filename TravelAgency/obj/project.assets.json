@@ -3859,31 +3859,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\mhmds\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "/Users/muhammedsalah/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mhmds\\OneDrive\\Documents\\GitHub\\STAM\\TravelAgency_LATEST\\TravelAgency\\TravelAgency.csproj",
+      "projectUniqueName": "/Users/muhammedsalah/Documents/GitHub/TravelAgency_LATEST/TravelAgency/TravelAgency.csproj",
       "projectName": "TravelAgency",
-      "projectPath": "C:\\Users\\mhmds\\OneDrive\\Documents\\GitHub\\STAM\\TravelAgency_LATEST\\TravelAgency\\TravelAgency.csproj",
-      "packagesPath": "C:\\Users\\mhmds\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mhmds\\OneDrive\\Documents\\GitHub\\STAM\\TravelAgency_LATEST\\TravelAgency\\obj\\",
+      "projectPath": "/Users/muhammedsalah/Documents/GitHub/TravelAgency_LATEST/TravelAgency/TravelAgency.csproj",
+      "packagesPath": "/Users/muhammedsalah/.nuget/packages/",
+      "outputPath": "/Users/muhammedsalah/Documents/GitHub/TravelAgency_LATEST/TravelAgency/obj/",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\mhmds\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/Users/muhammedsalah/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -3902,7 +3895,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.100"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net9.0": {
@@ -3942,8 +3935,16 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file /Users/muhammedsalah/Documents/GitHub/TravelAgency_LATEST/TravelAgency/obj/project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0."
+    }
+  ]
 }

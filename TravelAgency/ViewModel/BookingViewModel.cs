@@ -6,4 +6,7 @@ public class BookingViewModel
     public string Destination { get; set; }
     public string Country { get; set; }
     public DateTime StartDate { get; set; }
+
+    public string Status { get; set; } = string.Empty;
+
 }

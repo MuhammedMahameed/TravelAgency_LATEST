@@ -31,8 +31,9 @@ public class AccountController : Controller
         {
             connection.Open();
             var cmd = new SqlCommand(
-                @"INSERT INTO Users(FullName,Email,PasswordHash,Role) Values(@name,@email,@pass, 'User')", connection);
-            
+                @"INSERT INTO Users(FullName,Email,PasswordHash,Role,Status) 
+                  VALUES(@name,@email,@pass, 'User', 'Active')", connection);
+
             cmd.Parameters.AddWithValue("@name", user.FullName);
             cmd.Parameters.AddWithValue("@email", user.Email);
             cmd.Parameters.AddWithValue("@pass", PasswordHelper.Hash(user.Password));
@@ -53,6 +54,9 @@ public class AccountController : Controller
     [HttpPost]
     public IActionResult Login(string email, string password)
     {
+        string role = "User";   
+        string status = "Active";
+
         using (SqlConnection connection = new SqlConnection(_connStr))
         {
             connection.Open();
@@ -61,18 +65,38 @@ public class AccountController : Controller
             cmd.Parameters.AddWithValue("@email", email);
             cmd.Parameters.AddWithValue("@pass", PasswordHelper.Hash(password));
 
-            var reader = cmd.ExecuteReader();
-            if (!reader.Read())
+            using (var reader = cmd.ExecuteReader())
             {
-                ViewBag.Error = "Username or password is incorrect";
-                return View();
+                if (!reader.Read())
+                {
+                    ViewBag.Error = "Username or password is incorrect";
+                    return View();
+                }
+
+                status = reader["Status"]?.ToString() ?? "Active";
+                role = reader["Role"]?.ToString() ?? "User";
+
+                if (status == "Blocked")
+                {
+                    ViewBag.Error = "Your account is blocked. Please contact the admin.";
+                    return View();
+                }
+
+                HttpContext.Session.SetInt32("UserId", (int)reader["UserId"]);
+                HttpContext.Session.SetString("FullName", reader["FullName"]?.ToString() ?? "");
+                HttpContext.Session.SetString("Role", role);
+                HttpContext.Session.SetString("Status", status);
             }
-            HttpContext.Session.SetInt32("UserId", (int)reader["UserId"]);
-            HttpContext.Session.SetString("FullName", reader["FullName"].ToString());
-            HttpContext.Session.SetString("Role", reader["Role"].ToString());
+
             connection.Close();
         }
-        return RedirectToAction("Index", "Home");
+
+        if (role == "Admin")
+        {
+            return RedirectToAction("Index", "Admin");
+        }
+
+        return RedirectToAction("Gallery", "Trips");
     }
 
     public IActionResult Logout()
@@ -80,6 +104,7 @@ public class AccountController : Controller
         HttpContext.Session.Clear();
         return RedirectToAction("Login");
     }
+
     // GET
     public IActionResult Index()
     {

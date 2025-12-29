@@ -1,247 +1,228 @@
 @model List<TravelAgency.ViewModel.TripGalleryItemVM>
+@using Microsoft.AspNetCore.Http
 
-
-<h2>Trip Gallery</h2>
-
-@* <form method="get"> *@
-@*     Search: *@
-@*     <input name="search" value="@Context.Request.Query["search"]" /> *@
-@* *@
-@*     Category: *@
-@*     <select name="category"> *@
-@*         <option value="">All</option> *@
-@*         <option>Family</option> *@
-@*         <option>Honeymoon</option> *@
-@*         <option>Adventure</option> *@
-@*         <option>Cruise</option> *@
-@*         <option>Luxury</option> *@
-@*     </select> *@
-@* *@
-@*     Sort: *@
-@*     <select name="sort"> *@
-@*         <option value="">None</option> *@
-@*         <option value="price_asc">Price ↑</option> *@
-@*         <option value="price_desc">Price ↓</option> *@
-@*         <option value="date">Date</option> *@
-@*     </select> *@
-@* *@
-@*     <button type="submit">Apply</button> *@
-@* </form> *@
-
-<form method="get" class="row g-2 mb-4">
-    <div class="col-md-4">
-        <input name="search" class="form-control" placeholder="Search..."
-               value="@Context.Request.Query["search"]" />
-    </div>
-
-    <div class="col-md-3">
-        <select name="category" class="form-select">
-            <option value="">All categories</option>
-            <option>Family</option>
-            <option>Honeymoon</option>
-            <option>Adventure</option>
-            <option>Cruise</option>
-            <option>Luxury</option>
-        </select>
-    </div>
-
-    <div class="col-md-3">
-        <select name="sort" class="form-select">
-            <option value="">Sort</option>
-            <option value="price_asc">Price ↑</option>
-            <option value="price_desc">Price ↓</option>
-            <option value="date">Date</option>
-        </select>
-    </div>
-
-    <div class="col-md-2">
-        <button class="btn btn-dark w-100">Apply</button>
-    </div>
-</form>
-
-<hr />
-
-@if (!Model.Any())
-{
-    <p>No trips found.</p>
+@{
+    ViewData["Title"] = "Trip Gallery";
+    ViewData["BodyClass"] = "login-light";
 }
-<div class="row">
-@foreach (var item in Model)
-{
-    var t = item.Trip;
 
-    <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm">
-            <a href="/Trips/Details/@t.TripId" class="text-decoration-none text-light">
-                @if (!string.IsNullOrEmpty(t.ImagePath))
-                {
-                    <img src="@t.ImagePath"
-                         class="card-img-top"
-                         style="height:200px; object-fit:cover;" />
-                }
-                else
-                {
-                    <div style="height:200px; background:#333;
-                    display:flex; align-items:center; justify-content:center;">
-                        <span class="text-muted">No image</span>
-                    </div>
-                }
+<div class="login-page container-fluid">
 
-                <div class="card-body">
-                    <h5 class="card-title">@t.Destination, @t.Country</h5>
-                </div>
-            </a>
+    <div class="container py-4">
 
-            <div class="card-body">
+        <h1 class="fw-bold text-center mb-2 login-title">🌍 Trip Gallery</h1>
+        <p class="text-center text-muted mb-4">
+            Browse our travel packages and book your next adventure
+        </p>
 
-                <h5 class="card-title">@t.Destination, @t.Country</h5>
+        <!-- FILTERS -->
+        <form method="get" class="row g-2 mb-4 justify-content-center">
 
-                <span class="badge bg-secondary">@t.Category</span>
-
-                <p class="mt-2 mb-1">
-                    <strong>Start Date:</strong> @t.StartDate.ToShortDateString()
-                    
-                </p>
-                <p>
-                    <strong>End Date:</strong> @t.EndDate.ToShortDateString()
-                    
-                </p>
-                <p class="mb-1">
-                    <strong>Price:</strong> ₪@t.Price
-                </p>
-
-                <p>
-                    <strong>Available Rooms:</strong> @t.AvailableRooms
-                </p>
-
-                @if (item.WaitingCount > 0)
-                {
-                    <span class="badge bg-warning text-dark">
-                        @item.WaitingCount waiting
-                    </span>
-                }
+            <div class="col-md-3 col-sm-6">
+                <input name="search"
+                       class="form-control form-control-sm"
+                       placeholder="Search destination..."
+                       value="@Context.Request.Query["search"]" />
             </div>
 
-            <div class="card-footer bg-white">
-                @* Actions *@
-                @if (t.AvailableRooms > 0)
-                {
-                    if (item.WaitingCount == 0 || item.IsMyTurn)
-                    {
-                        <a href="/Booking/Start/@t.TripId" class="btn btn-primary btn-sm">
-                            Book
-                        </a>
-                    }
-                    else
-                    {
-                        <span class="text-warning">
-                            Waiting list active
-                        </span>
-                    }
-                }
-                else
-                {
-                    <span class="text-danger">Fully booked</span>
-                }
+            <div class="col-md-2 col-sm-3">
+                <input name="minPrice"
+                       type="number"
+                       step="0.01"
+                       class="form-control form-control-sm"
+                       placeholder="Min ₪"
+                       value="@Context.Request.Query["minPrice"]" />
+            </div>
 
-                @if (Context.Session.GetInt32("UserId") != null)
-                {
-                    if (item.IAmInWaitingList)
-                    {
-                        <div class="mt-2">
-                            <span class="text-muted">
-                                Your position: <strong>@item.MyPosition</strong>
+            <div class="col-md-2 col-sm-3">
+                <input name="maxPrice"
+                       type="number"
+                       step="0.01"
+                       class="form-control form-control-sm"
+                       placeholder="Max ₪"
+                       value="@Context.Request.Query["maxPrice"]" />
+            </div>
+
+            <div class="col-md-2 col-sm-4">
+                <select name="category" class="form-select form-select-sm">
+                    <option value="">All categories</option>
+                    <option>Family</option>
+                    <option>Honeymoon</option>
+                    <option>Adventure</option>
+                    <option>Cruise</option>
+                    <option>Luxury</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 col-sm-4">
+                <select name="sort" class="form-select form-select-sm">
+                    <option value="">Sort</option>
+                    <option value="price_asc">Price ↑</option>
+                    <option value="price_desc">Price ↓</option>
+                    <option value="date">Date</option>
+                    <option value="popular">Most Popular</option>
+                </select>
+            </div>
+
+            <div class="col-md-1 col-sm-4">
+                <button class="btn btn-primary btn-sm w-100">
+                    Apply
+                </button>
+            </div>
+        </form>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-warning text-center">
+                No trips found.
+            </div>
+        }
+
+        <!-- CARDS -->
+        <div class="row g-3">
+
+            @foreach (var item in Model)
+            {
+                var t = item.Trip;
+
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="card h-100 shadow-sm border-0 rounded-3">
+
+                        <!-- IMAGE -->
+                        <a href="/Trips/Details/@t.TripId" class="text-decoration-none">
+                            @if (!string.IsNullOrEmpty(t.ImagePath))
+                            {
+                                <img src="@t.ImagePath"
+                                     class="card-img-top"
+                                     style="height:150px; object-fit:cover;" />
+                            }
+                            else
+                            {
+                                <div style="height:150px; background:#f1f3f5;
+                                                    display:flex; align-items:center; justify-content:center;">
+                                    <span class="text-muted small">No image</span>
+                                </div>
+                            }
+                        </a>
+
+                        <div class="card-body py-2 px-3">
+
+                            <h6 class="fw-bold mb-1">
+                                @t.Destination, @t.Country
+                            </h6>
+
+                            <span class="badge bg-light text-dark border mb-1">
+                                @t.Category
                             </span>
 
-                            <form method="post" action="/WaitingList/Leave" class="d-inline">
-                                <input type="hidden" name="tripId" value="@t.TripId"/>
-                                <button class="btn btn-outline-danger btn-sm">
-                                    Leave
-                                </button>
-                            </form>
-                        </div>
-                    }
-                    else if (t.AvailableRooms <= 0 || item.WaitingCount > 0)
-                    {
-                        <form method="post" action="/WaitingList/Join">
-                            <input type="hidden" name="tripId" value="@t.TripId"/>
-                            <button class="btn btn-outline-secondary btn-sm mt-2">
-                                Join Waiting List
-                            </button>
-                        </form>
-                    }
-                }
-            </div>
-        </div>
-    </div>
-}
-</div>
+                            <div class="small text-muted mb-1">
+                                📅 @t.StartDate.ToShortDateString() – @t.EndDate.ToShortDateString()
+                            </div>
 
-@* <div class="row"> *@
-@* @foreach (var item in Model) *@
-@* { *@
-@*     var t = item.Trip; *@
-@* *@
-@*     <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;"> *@
-@*         <h3>@t.Destination, @t.Country</h3> *@
-@*         <p>Category: @t.Category</p> *@
-@*         <p>Start Date: @t.StartDate.ToShortDateString()</p> *@
-@*         <p>Price: ₪@t.Price</p> *@
-@*         <p>Available Rooms: @t.AvailableRooms</p> *@
-@* *@
-@*         @if (item.WaitingCount > 0) *@
-@*         { *@
-@*             <p><b>Waiting list:</b> @item.WaitingCount people</p> *@
-@*         } *@
-@* *@
-@*         $1$ Actions #1# *@
-@*         @if (t.AvailableRooms > 0) *@
-@*         { *@
-@*             if (item.WaitingCount == 0 || item.IsMyTurn) *@
-@*             { *@
-@*                 <a href="/Booking/Start/@t.TripId">Book</a> *@
-@*             } *@
-@*             else *@
-@*             { *@
-@*                 <span style="color:orange;">Waiting list active (only first can book)</span> *@
-@*             } *@
-@*         } *@
-@*         else *@
-@*         { *@
-@*             <span style="color:red;">Fully booked</span> *@
-@*         } *@
-@* *@
-@*         $1$ Waiting list UI #1# *@
-@*         @if (Context.Session.GetInt32("UserId") != null) *@
-@*         { *@
-@*             @if (item.IAmInWaitingList) *@
-@*             { *@
-@*                 <p style="margin-top:8px;"> *@
-@*                     You are in the waiting list. Position: <b>@item.MyPosition</b> *@
-@* *@
-@*                     <a href="/WaitingList/Status?tripId=@t.TripId">View</a> *@
-@* *@
-@*                     <form method="post" action="/WaitingList/Leave" style="display:inline;"> *@
-@*                         <input type="hidden" name="tripId" value="@t.TripId" /> *@
-@*                         <button type="submit">Leave waiting list</button> *@
-@*                     </form> *@
-@*                 </p> *@
-@*             } *@
-@*             else if (t.AvailableRooms <= 0 || item.WaitingCount > 0) *@
-@*             { *@
-@*                 <form method="post" action="/WaitingList/Join" style="display:inline;"> *@
-@*                     <input type="hidden" name="tripId" value="@t.TripId" /> *@
-@*                     <button type="submit">Join Waiting List</button> *@
-@*                 </form> *@
-@*             } *@
-@*         } *@
-@*         else *@
-@*         { *@
-@*             if (t.AvailableRooms <= 0 || item.WaitingCount > 0) *@
-@*             { *@
-@*                 <p>(Login to join the waiting list)</p> *@
-@*             } *@
-@*         } *@
-@*     </div> *@
-@* } *@
-@* </div> *@
+                            @{
+                                bool onSale =
+                                t.OldPrice != null &&
+                                t.DiscountEndDate != null &&
+                                t.DiscountEndDate > DateTime.Now;
+                            }
+
+                            <div class="small mb-1">
+                                <strong>Price:</strong>
+                                @if (onSale)
+                                {
+                                    <span class="text-muted text-decoration-line-through">
+                                        ₪@t.OldPrice
+                                    </span>
+                                    <span class="text-danger fw-bold ms-1">
+                                        ₪@t.Price
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="fw-semibold">₪@t.Price</span>
+                                }
+                            </div>
+
+                            <div class="small">
+                                <strong>Rooms:</strong> @t.AvailableRooms
+                            </div>
+
+                            @if (item.WaitingCount > 0)
+                            {
+                                <span class="badge bg-warning text-dark mt-1">
+                                    @item.WaitingCount waiting
+                                </span>
+                            }
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="card-footer bg-white border-0 px-3 pb-3 pt-2">
+
+                            @if (t.AvailableRooms > 0)
+                            {
+                                if (item.WaitingCount == 0 || item.IsMyTurn)
+                                {
+                                    <a href="/Booking/Start/@t.TripId"
+                                       class="btn btn-primary btn-sm w-100">
+                                        Book
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-warning small">
+                                        Waiting list active
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-danger small">
+                                    Fully booked
+                                </span>
+                            }
+
+                            @if (Context.Session.GetInt32("UserId") != null)
+                            {
+                                if (item.IAmInWaitingList)
+                                {
+                                    <div class="mt-1 text-muted small">
+                                        Position:
+                                        <strong>@item.MyPosition</strong>
+
+                                        <form method="post"
+                                              action="/WaitingList/Leave"
+                                              class="d-inline ms-1">
+                                            <input type="hidden"
+                                                   name="tripId"
+                                                   value="@t.TripId" />
+                                            <button class="btn btn-outline-danger btn-sm py-0 px-2">
+                                                Leave
+                                            </button>
+                                        </form>
+                                    </div>
+                                }
+                                else if (t.AvailableRooms <= 0 || item.WaitingCount > 0)
+                                {
+                                    <form method="post"
+                                          action="/WaitingList/Join"
+                                          class="mt-1">
+                                        <input type="hidden"
+                                               name="tripId"
+                                               value="@t.TripId" />
+                                        <button class="btn btn-outline-secondary btn-sm w-100">
+                                            Join Waiting List
+                                        </button>
+                                    </form>
+                                }
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
