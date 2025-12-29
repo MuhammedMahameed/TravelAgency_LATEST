@@ -1,19 +1,17 @@
+# .NET build output
+**/bin/
+**/obj/
+
+# Visual Studio / Rider
 .vs/
-bin/
-obj/
 .idea/
-TravelAgency/appsettings.json
-<<<<<<< HEAD
-TravelAgency/obj/Debug/net9.0/TravelAgency.AssemblyInfoInputs.cache
-/TravelAgency/obj/Debug/net9.0
-/TravelAgency/obj/Debug/net9.0
-*.json
-=======
-/TravelAgency/obj/Debug/net9.0
-/TravelAgency/obj/Debug
->>>>>>> main
-/TravelAgency/obj/Debug
-/.vs
+
+# User-specific
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS junk
 .DS_Store
-/.idea/.idea.TravelAgency_LATEST/.idea
-/TravelAgency/bin
+/TravelAgency/obj/Debug/net9.0
