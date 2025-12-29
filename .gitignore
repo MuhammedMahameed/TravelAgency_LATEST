@@ -1,8 +1,17 @@
+# .NET build output
 **/bin/
 **/obj/
+
+# Visual Studio / Rider
 .vs/
 .idea/
-**/.DS_Store
-bin/
-obj/
-.vs/
+
+# User-specific
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS junk
+.DS_Store
+/TravelAgency/obj/Debug/net9.0
