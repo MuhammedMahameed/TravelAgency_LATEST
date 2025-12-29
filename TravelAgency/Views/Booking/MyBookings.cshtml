@@ -23,9 +23,18 @@
                 <td>@b.Country</td>
                 <td>@b.StartDate.ToShortDateString()</td>
                 <td>
-                    <a href="/Payment/Pay?bookingId=@b.BookingId" class="btn btn-success btn-sm">
-                        Pay
-                    </a>
+                    @if (b.IsPaid)
+                    {
+                        <span class="badge bg-success">Paid</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Unpaid</span>
+                        <a href="/Payment/Pay?bookingId=@b.BookingId"
+                           class="btn btn-success btn-sm ms-2">
+                            Pay
+                        </a>
+                    }
 
                     <form method="post" action="/Booking/Cancel" class="d-inline">
                         <input type="hidden" name="bookingId" value="@b.BookingId" />
