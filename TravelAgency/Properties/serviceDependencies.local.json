@@ -5,14 +5,14 @@
     },
     "mssql1": {
       "secretStore": "LocalSecretsFile",
+      "resourceId": null,
       "type": "mssql.onprem",
-      "connectionId": "ConnectionStrings:DefaultConnection1",
-      "dynamicId": null
+      "connectionId": "ConnectionStrings:DefaultConnection1"
     },
     "mssql2": {
       "secretStore": "LocalSecretsFile",
       "type": "mssql.onprem",
-      "connectionId": "ConnectionStrings:DatabaseConnection",
+      "connectionId": "ConnectionStrings:DefaultConnection2",
       "dynamicId": null
     }
   }

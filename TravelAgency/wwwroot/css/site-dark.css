@@ -32,32 +32,32 @@ input {
     border: 1px solid #444;
 }
 
-    /* Placeholder text */
-    .form-control::placeholder,
-    textarea::placeholder {
-        color: #aaa;
-    }
+/* Placeholder text */
+.form-control::placeholder,
+textarea::placeholder {
+    color: #aaa;
+}
 
-    /* Focus state */
-    .form-control:focus,
-    .form-select:focus,
-    textarea:focus {
-        background-color: #1e1e1e !important;
-        color: #ffffff !important;
-        border-color: #8ab4f8;
-        box-shadow: 0 0 0 0.2rem rgba(138, 180, 248, 0.25);
-    }
+/* Focus state */
+.form-control:focus,
+.form-select:focus,
+textarea:focus {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    border-color: #8ab4f8;
+    box-shadow: 0 0 0 0.2rem rgba(138, 180, 248, 0.25);
+}
 
-    /* Autofill dark */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus,
-    textarea:-webkit-autofill,
-    select:-webkit-autofill {
-        -webkit-text-fill-color: #e0e0e0 !important;
-        -webkit-box-shadow: 0 0 0px 1000px #1e1e1e inset !important;
-        transition: background-color 5000s ease-in-out 0s;
-    }
+/* Autofill dark */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+    -webkit-text-fill-color: #e0e0e0 !important;
+    -webkit-box-shadow: 0 0 0px 1000px #1e1e1e inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
 
 /* Buttons */
 .btn-outline-light {
@@ -70,9 +70,9 @@ a {
     color: #8ab4f8;
 }
 
-    a:hover {
-        color: #a1c2fa;
-    }
+a:hover {
+    color: #a1c2fa;
+}
 
 /* =======================
    ADMIN DASHBOARD
@@ -84,19 +84,19 @@ a {
     border: 1px solid rgba(255,255,255,0.08);
 }
 
-    .admin-card:hover {
-        transform: translateY(-6px) scale(1.02);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-        border-color: rgba(255,255,255,0.2);
-    }
+.admin-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    border-color: rgba(255,255,255,0.2);
+}
 
 .btn-glow {
     transition: all 0.3s ease;
 }
 
-    .btn-glow:hover {
-        box-shadow: 0 0 15px rgba(138,180,248,0.6);
-    }
+.btn-glow:hover {
+    box-shadow: 0 0 15px rgba(138,180,248,0.6);
+}
 
 .gradient-text {
     background: linear-gradient(90deg, #8ab4f8, #00e5ff);
@@ -105,7 +105,7 @@ a {
 }
 
 /* =================================================
-   LIGHT LOGIN PAGE ï¿½ STRONG OVERRIDE (SAFE)
+   LIGHT LOGIN PAGE � STRONG OVERRIDE (SAFE)
    ================================================= */
 
 /* Full-page light background */
@@ -136,7 +136,7 @@ a {
     color: #0b1f44 !important;
 }
 
-/* Inputs ï¿½ FORCE LIGHT */
+/* Inputs � FORCE LIGHT */
 .login-page input,
 .login-page textarea,
 .login-page select {
@@ -145,19 +145,19 @@ a {
     border: 1px solid rgba(0,0,0,0.15) !important;
 }
 
-    /* Focus */
-    .login-page input:focus {
-        background-color: #ffffff !important;
-        color: #0b1f44 !important;
-        border-color: #0d6efd !important;
-        box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.15) !important;
-    }
+/* Focus */
+.login-page input:focus {
+    background-color: #ffffff !important;
+    color: #0b1f44 !important;
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.15) !important;
+}
 
-    /* Autofill FIX for light */
-    .login-page input:-webkit-autofill {
-        -webkit-text-fill-color: #0b1f44 !important;
-        -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
-    }
+/* Autofill FIX for light */
+.login-page input:-webkit-autofill {
+    -webkit-text-fill-color: #0b1f44 !important;
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+}
 
 /* Footer */
 .login-footer {
@@ -166,10 +166,10 @@ a {
     color: rgba(11,31,68,0.75);
 }
 
-    .login-footer a {
-        color: #0d6efd;
-        font-weight: 700;
-    }
+.login-footer a {
+    color: #0d6efd;
+    font-weight: 700;
+}
 
 
 /* =========================
@@ -182,51 +182,51 @@ body.login-light {
     color: #0b1f44 !important;
 }
 
-    /* Light navbar on login */
-    body.login-light .navbar {
-        background-color: #ffffff !important;
-        border-bottom: 1px solid #e5e7eb;
-    }
+/* Light navbar on login */
+body.login-light .navbar {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e5e7eb;
+}
 
-    body.login-light .navbar-brand {
-        color: #0b1f44 !important;
-    }
+body.login-light .navbar-brand {
+    color: #0b1f44 !important;
+}
 
-    body.login-light .btn-outline-light {
-        color: #0b1f44 !important;
-        border-color: #0b1f44 !important;
-    }
+body.login-light .btn-outline-light {
+    color: #0b1f44 !important;
+    border-color: #0b1f44 !important;
+}
 
-    /* Remove dark container feeling */
-    body.login-light .container {
-        background: transparent !important;
-    }
+/* Remove dark container feeling */
+body.login-light .container {
+    background: transparent !important;
+}
 
-    /* Login page background */
-    body.login-light .login-page {
-        background: #ffffff !important;
-    }
+/* Login page background */
+body.login-light .login-page {
+    background: #ffffff !important;
+}
 
-    /* Inputs ï¿½ force light */
-    body.login-light input,
-    body.login-light textarea,
-    body.login-light select {
-        background-color: #ffffff !important;
-        color: #0b1f44 !important;
-        border: 1px solid #d1d5db !important;
-    }
+/* Inputs � force light */
+body.login-light input,
+body.login-light textarea,
+body.login-light select {
+    background-color: #ffffff !important;
+    color: #0b1f44 !important;
+    border: 1px solid #d1d5db !important;
+}
 
-        /* Autofill fix (light) */
-        body.login-light input:-webkit-autofill {
-            -webkit-text-fill-color: #0b1f44 !important;
-            -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
-        }
+/* Autofill fix (light) */
+body.login-light input:-webkit-autofill {
+    -webkit-text-fill-color: #0b1f44 !important;
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+}
 
-    /* Footer light */
-    body.login-light footer {
-        background-color: #ffffff !important;
-        color: #6b7280 !important;
-    }
+/* Footer light */
+body.login-light footer {
+    background-color: #ffffff !important;
+    color: #6b7280 !important;
+}
 
 /* =======================
    LIGHT USER TABLE FIX
@@ -236,16 +236,16 @@ body.login-light {
     color: #0b1f44 !important;
 }
 
-    .user-table-light td,
-    .user-table-light th {
-        background-color: #ffffff !important;
-        color: #0b1f44 !important;
-        border-color: #e5e7eb !important;
-    }
+.user-table-light td,
+.user-table-light th {
+    background-color: #ffffff !important;
+    color: #0b1f44 !important;
+    border-color: #e5e7eb !important;
+}
 
-    .user-table-light tbody tr:hover {
-        background-color: #f3f4f6 !important;
-    }
+.user-table-light tbody tr:hover {
+    background-color: #f3f4f6 !important;
+}
 
 /* =========================
    LIGHT GALLERY OVERRIDES
@@ -309,22 +309,22 @@ body.login-light .container-fluid {
     color: #0b1f44 !important;
 }
 
-    /* Make gallery cards feel smaller & cleaner */
-    body.login-light .card-body {
-        padding: 0.75rem 0.9rem !important;
-        font-size: 0.92rem;
-    }
+/* Make gallery cards feel smaller & cleaner */
+body.login-light .card-body {
+    padding: 0.75rem 0.9rem !important;
+    font-size: 0.92rem;
+}
 
-    body.login-light .card-footer {
-        padding: 0.65rem 0.9rem !important;
-    }
+body.login-light .card-footer {
+    padding: 0.65rem 0.9rem !important;
+}
 
-    /* Make headings always dark */
-    body.login-light h1,
-    body.login-light h2,
-    body.login-light h3,
-    body.login-light h4,
-    body.login-light h5,
-    body.login-light h6 {
-        color: #0b1f44 !important;
-    }
+/* Make headings always dark */
+body.login-light h1,
+body.login-light h2,
+body.login-light h3,
+body.login-light h4,
+body.login-light h5,
+body.login-light h6 {
+    color: #0b1f44 !important;
+}
