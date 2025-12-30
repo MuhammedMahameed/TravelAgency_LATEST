@@ -105,7 +105,6 @@ public class BookingController : Controller
                     bookCmd.Parameters.AddWithValue("@tid", id);
                     bookCmd.Parameters.AddWithValue("@status", "Active");
                     newBookingId = (int)bookCmd.ExecuteScalar();
-                    bookCmd.ExecuteNonQuery();
 
                     // ===== Update rooms =====
                     var updateCmd = new SqlCommand(@"
@@ -162,6 +161,151 @@ public class BookingController : Controller
             // Email failure should not break booking
         }
 
+        // After creating the booking, redirect the user to their bookings page
+        // so they can review bookings and proceed with payment from there.
+        return RedirectToAction("MyBookings");
+    }
+
+    // Similar to Start but after booking redirects user directly to payment page
+    public IActionResult BookNow(int id)
+    {
+        if (!AuthHelper.IsLoggedIn(HttpContext))
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        int userId = HttpContext.Session.GetInt32("UserId").Value;
+        string? userEmail = null;
+        int newBookingId = 0;
+
+        using (SqlConnection connection = new SqlConnection(_connStr))
+        {
+            connection.Open();
+            using (var transaction = connection.BeginTransaction())
+            {
+                try
+                {
+                    // limit to 3 active future bookings
+                    var countCmd = new SqlCommand(@"
+                        SELECT COUNT(*)
+                        FROM Bookings b
+                        JOIN Trips t ON b.TripId = t.TripId
+                        WHERE b.UserId = @uid
+                        AND b.Status = @status
+                        AND t.StartDate > GETDATE()",
+                        connection, transaction);
+
+                    countCmd.Parameters.AddWithValue("@uid", userId);
+                    countCmd.Parameters.AddWithValue("@status", "Active");
+
+                    int activeBookings = (int)countCmd.ExecuteScalar();
+
+                    if (activeBookings >= 3)
+                    {
+                        transaction.Rollback();
+                        TempData["activeBookingsMessage"] = "You cannot book more than 3 upcoming trips.";
+                        return RedirectToAction("MyBookings");
+                    }
+
+                    // waiting list priority
+                    var waitCmd = new SqlCommand(@"
+                        SELECT TOP 1 UserId FROM WaitingList
+                        WHERE TripId = @tid
+                        ORDER BY JoinDate",
+                        connection, transaction);
+
+                    waitCmd.Parameters.AddWithValue("@tid", id);
+                    var first = waitCmd.ExecuteScalar();
+
+                    if (first != null && (int)first != userId)
+                    {
+                        transaction.Rollback();
+                        return Content("You are not first in the waiting list.");
+                    }
+
+                    // lock trip row and check rooms
+                    var roomCmd = new SqlCommand(@"
+                        SELECT AvailableRooms FROM Trips WITH (UPDLOCK)
+                        WHERE TripId = @tid",
+                        connection, transaction);
+
+                    roomCmd.Parameters.AddWithValue("@tid", id);
+                    var roomsObj = roomCmd.ExecuteScalar();
+
+                    if (roomsObj == null)
+                    {
+                        transaction.Rollback();
+                        return Content("Trip not found.");
+                    }
+
+                    int rooms = (int)roomsObj;
+
+                    if (rooms <= 0)
+                    {
+                        transaction.Rollback();
+                        return RedirectToAction("Join", "WaitingList", new { tripId = id });
+                    }
+
+                    // create booking
+                    var bookCmd = new SqlCommand(@"
+                        INSERT INTO Bookings (UserId, TripId, Status)
+                        OUTPUT INSERTED.BookingId
+                        VALUES (@uid, @tid, @status)",
+                        connection, transaction);
+
+                    bookCmd.Parameters.AddWithValue("@uid", userId);
+                    bookCmd.Parameters.AddWithValue("@tid", id);
+                    bookCmd.Parameters.AddWithValue("@status", "Active");
+                    newBookingId = (int)bookCmd.ExecuteScalar();
+
+                    // update rooms
+                    var updateCmd = new SqlCommand(@"
+                        UPDATE Trips
+                        SET AvailableRooms = AvailableRooms - 1
+                        WHERE TripId = @tid",
+                        connection, transaction);
+
+                    updateCmd.Parameters.AddWithValue("@tid", id);
+                    updateCmd.ExecuteNonQuery();
+
+                    // remove from waiting list
+                    var delCmd = new SqlCommand(@"
+                        DELETE FROM WaitingList
+                        WHERE TripId = @tid AND UserId = @uid",
+                        connection, transaction);
+
+                    delCmd.Parameters.AddWithValue("@tid", id);
+                    delCmd.Parameters.AddWithValue("@uid", userId);
+                    delCmd.ExecuteNonQuery();
+
+                    // get user email
+                    var emailCmd = new SqlCommand(
+                        "SELECT Email FROM Users WHERE UserId = @uid",
+                        connection, transaction);
+
+                    emailCmd.Parameters.AddWithValue("@uid", userId);
+                    userEmail = emailCmd.ExecuteScalar()?.ToString();
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    return Content("Booking failed. Please try again.");
+                }
+            }
+        }
+            
+        // send email
+        try
+        {
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                EmailHelper.Send(userEmail, "Booking Confirmation", $"Your booking was successful! Trip ID: {id}");
+            }
+        }
+        catch { }
+
+        // redirect to payment for immediate payment
         return RedirectToAction("Pay", "Payment", new { bookingId = newBookingId });
     }
 
@@ -323,8 +467,6 @@ public class BookingController : Controller
                     }
                     catch { }
                 }
-                
-                
                 
                 
                 

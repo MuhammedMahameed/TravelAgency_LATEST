@@ -21,13 +21,17 @@
             </div>
         }
 
-        <form method="post">
+        <form method="post" asp-controller="Account" asp-action="Register">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
             <div class="mb-3">
                 <label class="form-label fw-semibold login-label">Full Name</label>
                 <input asp-for="FullName"
                        class="form-control form-control-lg"
-                       placeholder="Your full name"
-                       required />
+                       placeholder="Your full name" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
@@ -35,8 +39,8 @@
                 <input asp-for="Email"
                        type="email"
                        class="form-control form-control-lg"
-                       placeholder="name@example.com"
-                       required />
+                       placeholder="name@example.com" />
+                <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
@@ -44,8 +48,8 @@
                 <input asp-for="Password"
                        type="password"
                        class="form-control form-control-lg"
-                       placeholder="Choose a password"
-                       required />
+                       placeholder="Choose a password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
             <button type="submit"
@@ -64,3 +68,7 @@
     </div>
 
 </div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
