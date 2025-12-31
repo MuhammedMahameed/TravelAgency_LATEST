@@ -3,6 +3,13 @@ using Microsoft.Data.SqlClient;
 using TravelAgency.Models;
 using TravelAgency.Helpers;
 
+// ? added (does not remove anything)
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
 namespace TravelAgency.Controllers
 {
     public class AdminController : Controller
@@ -42,16 +49,23 @@ namespace TravelAgency.Controllers
         }
 
         [HttpGet]
+        [HttpGet]
         public IActionResult AddTrip()
         {
             if (!AuthHelper.IsAdmin(HttpContext))
                 return RedirectToAction("Login", "Account");
 
-            return View(new Trip());
+            var t = new Trip();
+            t.StartDate = DateTime.Today;
+            t.EndDate = DateTime.Today.AddDays(1); // או 3 ימים, מה שאתה רוצה
+            return View(t);
         }
 
+
+        // - main image: imageFile (same name you already use)
+        // - additional images: galleryImages (multiple)
         [HttpPost]
-        public IActionResult AddTrip(Trip trip, IFormFile? imageFile)
+        public IActionResult AddTrip(Trip trip, IFormFile? imageFile, List<IFormFile>? galleryImages)
         {
             if (!AuthHelper.IsAdmin(HttpContext))
                 return RedirectToAction("Login", "Account");
@@ -62,14 +76,31 @@ namespace TravelAgency.Controllers
                     ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
             }
 
+            // SQL Server datetime valid range starts at 1753-01-01
+            var sqlMin = new DateTime(1753, 1, 1);
+
+            if (trip.StartDate == default(DateTime) || trip.EndDate == default(DateTime) ||
+                trip.StartDate < sqlMin || trip.EndDate < sqlMin)
+            {
+                TempData["Error"] = "יש לבחור Start Date ו-End Date תקינים.";
+                return View(trip);
+            }
+
+            if (trip.EndDate <= trip.StartDate)
+            {
+                TempData["Error"] = "End date must be after start date";
+                return View(trip);
+            }
+
+            // Ensure folder exists
+            var imagesPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/trips");
+            if (!Directory.Exists(imagesPath))
+                Directory.CreateDirectory(imagesPath);
+
+            // Save MAIN image (existing behavior)
             if (imageFile != null && imageFile.Length > 0)
             {
                 var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
-                var imagesPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/trips");
-
-                if (!Directory.Exists(imagesPath))
-                    Directory.CreateDirectory(imagesPath);
-
                 var fullPath = Path.Combine(imagesPath, fileName);
                 using var stream = new FileStream(fullPath, FileMode.Create);
                 imageFile.CopyTo(stream);
@@ -77,12 +108,16 @@ namespace TravelAgency.Controllers
                 trip.ImagePath = "/images/trips/" + fileName;
             }
 
+            int newTripId;
+
             using (var conn = new SqlConnection(_connStr))
             {
                 conn.Open();
+
                 var cmd = new SqlCommand(@"
                     INSERT INTO Trips
                     (Destination, Country, StartDate, EndDate, Price, AvailableRooms, Category, MinAge, Description, ImagePath)
+                    OUTPUT INSERTED.TripId
                     VALUES
                     (@Destination, @Country, @StartDate, @EndDate, @Price, @Rooms, @Category, @MinAge, @Description, @ImagePath)", conn);
 
@@ -92,15 +127,45 @@ namespace TravelAgency.Controllers
                 cmd.Parameters.AddWithValue("@EndDate", trip.EndDate);
                 cmd.Parameters.AddWithValue("@Price", trip.Price);
                 cmd.Parameters.AddWithValue("@Rooms", trip.AvailableRooms);
-                cmd.Parameters.AddWithValue("@Category", trip.Category);
+
+                cmd.Parameters.AddWithValue("@Category", (object?)trip.Category ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@MinAge", (object?)trip.MinAge ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@Description", trip.Description);
+                cmd.Parameters.AddWithValue("@Description", (object?)trip.Description ?? DBNull.Value);
+
                 cmd.Parameters.AddWithValue("@ImagePath", (object?)trip.ImagePath ?? DBNull.Value);
 
-                cmd.ExecuteNonQuery();
+                newTripId = (int)cmd.ExecuteScalar();
+
+                if (galleryImages != null && galleryImages.Count > 0)
+                {
+                    foreach (var img in galleryImages)
+                    {
+                        if (img == null || img.Length == 0) continue;
+
+                        var fileName = Guid.NewGuid() + Path.GetExtension(img.FileName);
+                        var fullPath = Path.Combine(imagesPath, fileName);
+
+                        using (var stream = new FileStream(fullPath, FileMode.Create))
+                        {
+                            img.CopyTo(stream);
+                        }
+
+                        var dbPath = "/images/trips/" + fileName;
+
+                        var imgCmd = new SqlCommand(@"
+                            INSERT INTO TripImages (TripId, ImagePath)
+                            VALUES (@tid, @path)", conn);
+
+                        imgCmd.Parameters.AddWithValue("@tid", newTripId);
+                        imgCmd.Parameters.AddWithValue("@path", dbPath);
+                        imgCmd.ExecuteNonQuery();
+                    }
+                }
+
                 conn.Close();
             }
 
+            TempData["Success"] = "Trip added successfully.";
             return RedirectToAction("Trips");
         }
 
@@ -234,6 +299,9 @@ namespace TravelAgency.Controllers
                     TempData["Error"] = "לא ניתן למחוק טיול שיש לו הזמנות.";
                     return RedirectToAction("Trips");
                 }
+
+                new SqlCommand("DELETE FROM TripImages WHERE TripId=@id", conn)
+                { Parameters = { new SqlParameter("@id", id) } }.ExecuteNonQuery();
 
                 new SqlCommand("DELETE FROM WaitingList WHERE TripId=@id", conn)
                 { Parameters = { new SqlParameter("@id", id) } }.ExecuteNonQuery();
@@ -409,7 +477,6 @@ namespace TravelAgency.Controllers
             return RedirectToAction("Users");
         }
 
-
         [HttpPost]
         public IActionResult ToggleUserStatus(int userId)
         {
@@ -508,8 +575,6 @@ namespace TravelAgency.Controllers
 
             return View(list);
         }
-
-
 
         public IActionResult Index()
         {

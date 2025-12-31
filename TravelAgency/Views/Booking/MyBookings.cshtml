@@ -1,49 +1,144 @@
 @model List<TravelAgency.ViewModel.BookingViewModel>
+@inject IConfiguration Configuration
+@using Microsoft.Data.SqlClient
 
-<h2>My Bookings</h2>
+@{
+    ViewData["Title"] = "My Bookings";
+    var BLUE = "#6BA7E6";
+    var WHITE = "#ffffff";
+}
 
-<a href="/Booking/PastTrips" class="btn btn-secondary mb-3">
-    View Past Trips
-</a>
-
-<table class="table table-striped">
-    <thead>
-    <tr>
-        <th>Destination</th>
-        <th>Country</th>
-        <th>Date</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var b in Model)
-    {
-        <tr>
-            <td>@b.Destination</td>
-            <td>@b.Country</td>
-            <td>@b.StartDate.ToShortDateString()</td>
-            <td>
-                @if (b.IsPaid)
-                {
-                    <span class="badge bg-success">Paid</span>
-                }
-                else
-                {
-                    <span class="badge bg-warning text-dark">Unpaid</span>
-                    <a href="/Payment/Pay?bookingId=@b.BookingId"
-                       class="btn btn-success btn-sm ms-2">
-                        Pay
-                    </a>
-                }
-
-                <form method="post" action="/Booking/Cancel" class="d-inline">
-                    <input type="hidden" name="bookingId" value="@b.BookingId" />
-                    <button class="btn btn-danger btn-sm">
-                        Cancel
-                    </button>
-                </form>
-            </td>
-        </tr>
+<style>
+    body {
+        background-color: @WHITE;
     }
-    </tbody>
-</table>
+
+    .bookings-container {
+        background-color: @WHITE;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        color: @BLUE;
+        font-weight: 700;
+    }
+
+    thead {
+        background-color: @BLUE;
+        color: white;
+    }
+
+    .btn-outline-primary, .btn-outline-warning {
+        border-width: 2px;
+        font-weight: 500;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+</style>
+
+<div class="container my-4 bookings-container">
+    <h2 class="text-center mb-4">My Bookings</h2>
+
+    <div class="text-center mb-3">
+        <a href="/Booking/PastTrips" class="btn btn-outline-primary">View Past Trips</a>
+    </div>
+
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Trip</th>
+                <th>Destination</th>
+                <th>Country</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in Model)
+            {
+                string? imgPath = null;
+                string? desc = null;
+                int tripId = 0;
+                var connStr = Configuration.GetConnectionString("DefaultConnection");
+
+                using (var conn = new SqlConnection(connStr))
+                {
+                    conn.Open();
+                    using (var cmd = new SqlCommand(@"
+                        SELECT t.TripId, t.ImagePath, t.Description
+                        FROM Bookings b
+                        JOIN Trips t ON b.TripId = t.TripId
+                        WHERE b.BookingId = @bid", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@bid", b.BookingId);
+                        using var r = cmd.ExecuteReader();
+                        if (r.Read())
+                        {
+                            tripId = (int)r["TripId"];
+                            imgPath = r["ImagePath"] == DBNull.Value ? null : r["ImagePath"].ToString();
+                            desc = r["Description"] == DBNull.Value ? null : r["Description"].ToString();
+                        }
+                    }
+                }
+
+                <tr>
+                    <td style="width:150px;">
+                        @if (!string.IsNullOrEmpty(imgPath))
+                        {
+                            <img src="@imgPath" style="width:140px; height:85px; object-fit:cover; border-radius:10px;" />
+                        }
+                        else
+                        {
+                            <div class="bg-light d-flex align-items-center justify-content-center"
+                                 style="width:140px; height:85px; border-radius:10px;">
+                                <span class="text-muted">No image</span>
+                            </div>
+                        }
+                    </td>
+
+                    <td>
+                        <div class="fw-bold">@b.Destination</div>
+                        @if (!string.IsNullOrEmpty(desc))
+                        {
+                            <div class="text-muted" style="font-size:0.9rem;">
+                                @(desc.Length > 70 ? desc.Substring(0, 70) + "..." : desc)
+                            </div>
+                        }
+                    </td>
+
+                    <td>@b.Country</td>
+                    <td>@b.StartDate.ToShortDateString()</td>
+
+                    <td>
+                        @if (b.IsPaid)
+                        {
+                            <span class="badge bg-success">Paid</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Unpaid</span>
+                            <a href="/Payment/Pay?bookingId=@b.BookingId" class="btn btn-success btn-sm ms-1">Pay</a>
+                        }
+
+                        <form method="post" action="/Booking/Cancel" class="d-inline">
+                            <input type="hidden" name="bookingId" value="@b.BookingId" />
+                            <button class="btn btn-danger btn-sm ms-1">Cancel</button>
+                        </form>
+
+                        @if (tripId != 0)
+                        {
+                            <a href="/Trips/Details/@tripId" class="btn btn-outline-primary btn-sm ms-1">Details</a>
+                            <a href="/Trips/Details/@tripId#reviews" class="btn btn-outline-warning btn-sm ms-1">
+                                Rate / Review
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

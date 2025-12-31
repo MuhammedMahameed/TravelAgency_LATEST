@@ -4,6 +4,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddHostedService<TravelAgency.Helpers.ReminderService>();
 builder.Services.AddSession();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 app.UseSession();

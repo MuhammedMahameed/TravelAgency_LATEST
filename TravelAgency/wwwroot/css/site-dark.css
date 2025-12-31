@@ -1,10 +1,10 @@
-/* =======================
-   GLOBAL DARK THEME
-   ======================= */
+
+/* ==== DISABLE DARK MODE BY DEFAULT ==== */
 body {
-    background-color: #121212;
-    color: #e0e0e0;
+    background-color: #ffffff !important;
+    color: #0b1f44 !important;
 }
+
 
 /* Cards */
 .card {
@@ -327,4 +327,411 @@ body.login-light h4,
 body.login-light h5,
 body.login-light h6 {
     color: #0b1f44 !important;
+}
+
+
+.review {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+    .review strong {
+        color: #8ab4f8;
+    }
+
+.text-warning {
+    color: gold !important;
+}
+
+
+/* ===== TravelAgency: White + Blue theme for Details page ===== */
+:root {
+    --ta-blue: #6BA7E6;
+    --ta-white: #ffffff;
+    --ta-soft: #f8fbff;
+    --ta-border: rgba(0,0,0,0.08);
+}
+
+body {
+    background: var(--ta-white);
+}
+
+/* Wrapper */
+.ta-details-wrap {
+    background: var(--ta-white);
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+    border: 1px solid var(--ta-border);
+}
+
+.ta-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ta-details-title {
+    color: var(--ta-blue);
+    font-weight: 800;
+    margin: 0;
+}
+
+.ta-badge-blue {
+    background: var(--ta-blue);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: .85rem;
+}
+
+.ta-hr {
+    border: none;
+    border-top: 1px solid var(--ta-border);
+    margin: 16px 0;
+}
+
+/* Hero image */
+.ta-details-hero {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 16px;
+    margin-bottom: 16px;
+}
+
+/* Info cards */
+.ta-info-card {
+    background: var(--ta-soft);
+    border: 1px solid var(--ta-border);
+    border-radius: 12px;
+    padding: 14px;
+}
+
+/* Description */
+.ta-details-desc {
+    font-size: 1.05rem;
+    margin-bottom: 0;
+}
+
+/* Actions */
+.ta-actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.ta-btn-blue {
+    background: var(--ta-blue) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 10px 16px;
+}
+
+    .ta-btn-blue:hover {
+        filter: brightness(0.95);
+    }
+
+.ta-btn-outline-blue {
+    border: 2px solid var(--ta-blue) !important;
+    color: var(--ta-blue) !important;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 10px 16px;
+    background: transparent !important;
+}
+
+    .ta-btn-outline-blue:hover {
+        background: rgba(107,167,230,0.12) !important;
+    }
+
+.ta-danger {
+    color: #d9534f;
+    font-weight: 700;
+}
+
+/* Reviews */
+.ta-section-title {
+    color: var(--ta-blue);
+    font-weight: 800;
+}
+
+.ta-reviews-box {
+    background: var(--ta-white);
+    border: 1px solid var(--ta-border);
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.ta-review {
+    background: var(--ta-soft);
+    border: 1px solid var(--ta-border);
+    border-radius: 12px;
+}
+
+.ta-stars {
+    color: #f2b01e;
+    font-size: 1.15rem;
+}
+
+
+
+/* ===== Override dark boxes in light mode ===== */
+.review, .ta-review {
+    background-color: #f8fbff !important; /* לבן-כחול עדין */
+    color: #0b1f44 !important; /* כחול כהה */
+    border: 1px solid rgba(0,0,0,0.1) !important;
+    border-radius: 10px !important;
+    padding: 12px !important;
+}
+
+    .review strong, .ta-review strong {
+        color: #0b1f44 !important;
+    }
+
+    .review small, .ta-review small {
+        color: #6c757d !important;
+    }
+
+.text-warning {
+    color: #f2b01e !important; /* כוכבים זהב */
+}
+
+/* תיבות טקסט של הוספת ביקורת */
+input, textarea, select {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #cccccc !important;
+}
+
+    input::placeholder,
+    textarea::placeholder {
+        color: #888 !important;
+    }
+
+/* Trip Details - Carousel */
+#tripGallery {
+    max-width: 1100px;
+    margin: 0 auto 20px auto;
+}
+
+    #tripGallery .carousel-inner {
+        border-radius: 14px;
+        overflow: hidden;
+        background: #f3f6ff; /* רקע בהיר */
+        border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    /* קובע גובה קבוע יפה */
+    #tripGallery .carousel-item img {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+    }
+
+
+    /* החיצים לבנים וברורים */
+    #tripGallery .carousel-control-prev-icon,
+    #tripGallery .carousel-control-next-icon {
+        filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+    }
+
+
+/* ====== Trip Gallery Styling ====== */
+.gallery-container {
+    background: linear-gradient(180deg, #f4f8ff 0%, #ffffff 100%);
+    min-height: 100vh;
+    padding: 40px 0;
+}
+
+.gallery-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+    .gallery-header h1 {
+        font-weight: 700;
+        color: #0d47a1;
+        font-size: 2.5rem;
+    }
+
+    .gallery-header p {
+        color: #555;
+        font-size: 1.1rem;
+    }
+
+.trip-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.25s ease-in-out;
+    background: #fff;
+}
+
+    .trip-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.12);
+    }
+
+    .trip-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+.trip-info {
+    padding: 16px 20px;
+}
+
+    .trip-info h5 {
+        font-weight: 700;
+        color: #003366;
+        margin-bottom: 6px;
+    }
+
+    .trip-info .category-tag {
+        background: #e8f0ff;
+        color: #0d47a1;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        padding: 2px 8px;
+        margin-bottom: 8px;
+        display: inline-block;
+    }
+
+    .trip-info p {
+        margin: 3px 0;
+        color: #444;
+    }
+
+.price-tag {
+    font-weight: 600;
+    color: #007bff;
+}
+
+.book-btn {
+    display: block;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 0 0 16px 16px;
+    padding: 12px;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+    .book-btn:hover {
+        background-color: #0056b3;
+    }
+
+
+/* ===============================
+   TravelAgency - Modern Navbar
+   =============================== */
+
+.ta-navbar {
+    background: linear-gradient(90deg, #0b4aa2 0%, #1976d2 45%, #1e88e5 100%);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.10);
+    border-bottom: 1px solid rgba(255,255,255,0.18);
+}
+
+.ta-navbar-inner {
+    min-height: 68px;
+}
+
+.ta-brand {
+    color: #fff !important;
+    font-size: 1.35rem;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ta-toggler {
+    border: 1px solid rgba(255,255,255,0.45) !important;
+}
+
+    .ta-toggler .navbar-toggler-icon {
+        filter: invert(1);
+    }
+
+.ta-hello {
+    color: rgba(255,255,255,0.92);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.ta-navbtn {
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1.1;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+    .ta-navbtn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 18px rgba(0,0,0,0.14);
+    }
+
+.ta-navbtn-outline {
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.50) !important;
+    background: rgba(255,255,255,0.10) !important;
+}
+
+    .ta-navbtn-outline:hover {
+        background: rgba(255,255,255,0.18) !important;
+        border-color: rgba(255,255,255,0.70) !important;
+    }
+
+.ta-navbtn-solid {
+    color: #0b4aa2 !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(255,255,255,0.85) !important;
+}
+
+    .ta-navbtn-solid:hover {
+        background: #f3f8ff !important;
+    }
+
+.ta-navbtn-danger {
+    color: #fff !important;
+    background: #e53935 !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+}
+
+.ta-navbtn-warning {
+    color: #2b2100 !important;
+    background: #ffc107 !important;
+    border: 1px solid rgba(0,0,0,0.06) !important;
+}
+
+.ta-navbtn-info {
+    color: #00324a !important;
+    background: #4dd0e1 !important;
+    border: 1px solid rgba(0,0,0,0.06) !important;
+}
+
+/* מרווח עליון כדי לא להיכנס מתחת ל-navbar */
+.ta-page-offset {
+    padding-top: 84px;
+}
+
+/* במובייל: רווחים */
+@media (max-width: 991.98px) {
+    .ta-left, .ta-right {
+        padding-bottom: 10px;
+    }
 }

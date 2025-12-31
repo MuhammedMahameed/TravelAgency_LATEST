@@ -6,18 +6,84 @@
     ViewData["BodyClass"] = "login-light";
 }
 
-<div class="login-page container-fluid">
+<link rel="stylesheet" href="~/css/gallery.css" />
 
+<div class="login-page container-fluid">
     <div class="container py-4">
 
-        <h1 class="fw-bold text-center mb-2 login-title">🌍 Trip Gallery</h1>
-        <p class="text-center text-muted mb-4">
-            Browse our travel packages and book your next adventure
-        </p>
+        <div class="gallery-header">
+            <h1>🌍 Trip Gallery</h1>
+            <p>Browse our travel packages and book your next adventure</p>
+        </div>
+
+       
+        <div class="hero-wrap">
+            <div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel" data-bs-interval="3500">
+
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                </div>
+
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/images/trips/hero-paris.jpg" alt="Paris">
+                        @* <div class="carousel-caption d-none d-md-block">
+                            <div class="hero-caption">
+                                <h3>Paris, France</h3>
+                                <p>Romantic streets • iconic sights • unforgettable moments</p>
+                            </div>
+                        </div> *@
+                    </div>
+
+                    <div class="carousel-item">
+                        <img src="/images/trips/hero-rome.jpg" alt="Rome">
+                        @* <div class="carousel-caption d-none d-md-block">
+                            <div class="hero-caption">
+                                <h3>Rome, Italy</h3>
+                                <p>History • culture • amazing food</p>
+                            </div>
+                        </div> *@
+                    </div>
+
+                    <div class="carousel-item">
+                        <img src="/images/trips/hero-tokyo.jpg" alt="Tokyo">
+                        @* <div class="carousel-caption d-none d-md-block">
+                            <div class="hero-caption">
+                                <h3>Tokyo, Japan</h3>
+                                <p>Tradition meets innovation • a city like no other</p>
+                            </div>
+                        </div> *@
+                    </div>
+
+                    <div class="carousel-item">
+                        <img src="/images/trips/hero-newyork.jpg" alt="Dubai">
+                        @* <div class="carousel-caption d-none d-md-block">
+                            <div class="hero-caption">
+                                <h3>Dubai, UAE</h3>
+                                <p>Luxury • skyline • desert adventures</p>
+                            </div>
+                        </div> *@
+                    </div>
+                </div>
+
+                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+
+                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+
+            </div>
+        </div>
 
         <!-- FILTERS -->
         <form method="get" class="row g-2 mb-4 justify-content-center">
-
             <div class="col-md-3 col-sm-6">
                 <input name="search"
                        class="form-control form-control-sm"
@@ -79,41 +145,27 @@
         }
 
         <!-- CARDS -->
-        <div class="row g-3">
-
+        <div class="row g-4">
             @foreach (var item in Model)
             {
                 var t = item.Trip;
 
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="card h-100 shadow-sm border-0 rounded-3">
-
-                        <!-- IMAGE -->
+                    <div class="trip-card h-100">
                         <a href="/Trips/Details/@t.TripId" class="text-decoration-none">
                             @if (!string.IsNullOrEmpty(t.ImagePath))
                             {
-                                <img src="@t.ImagePath"
-                                     class="card-img-top"
-                                     style="height:150px; object-fit:cover;" />
+                                <img src="@t.ImagePath" alt="@t.Destination" />
                             }
                             else
                             {
-                                <div style="height:150px; background:#f1f3f5;
-                                                    display:flex; align-items:center; justify-content:center;">
-                                    <span class="text-muted small">No image</span>
-                                </div>
+                                <img src="/images/default-trip.jpg" alt="No image" />
                             }
                         </a>
 
-                        <div class="card-body py-2 px-3">
-
-                            <h6 class="fw-bold mb-1">
-                                @t.Destination, @t.Country
-                            </h6>
-
-                            <span class="badge bg-light text-dark border mb-1">
-                                @t.Category
-                            </span>
+                        <div class="trip-info p-3">
+                            <span class="badge mb-2">@t.Category</span>
+                            <h6>@t.Destination, @t.Country</h6>
 
                             <div class="small text-muted mb-1">
                                 📅 @t.StartDate.ToShortDateString() – @t.EndDate.ToShortDateString()
@@ -139,7 +191,7 @@
                                 }
                                 else
                                 {
-                                    <span class="fw-semibold">₪@t.Price</span>
+                                    <span class="price-highlight">₪@t.Price</span>
                                 }
                             </div>
 
@@ -156,15 +208,14 @@
                         </div>
 
                         <!-- ACTIONS -->
-                        <div class="card-footer bg-white border-0 px-3 pb-3 pt-2">
-
+                        <div class="card-footer text-center py-3">
                             @if (t.AvailableRooms > 0)
                             {
                                 if (item.WaitingCount == 0 || item.IsMyTurn)
                                 {
                                     <a href="/Booking/Start/@t.TripId"
-                                       class="btn btn-primary btn-sm w-100">
-                                        Book
+                                       class="btn btn-primary btn-sm w-75">
+                                        Book Now
                                     </a>
                                 }
                                 else
@@ -185,7 +236,7 @@
                             {
                                 if (item.IAmInWaitingList)
                                 {
-                                    <div class="mt-1 text-muted small">
+                                    <div class="mt-2 text-muted small">
                                         Position:
                                         <strong>@item.MyPosition</strong>
 
@@ -205,24 +256,20 @@
                                 {
                                     <form method="post"
                                           action="/WaitingList/Join"
-                                          class="mt-1">
+                                          class="mt-2">
                                         <input type="hidden"
                                                name="tripId"
                                                value="@t.TripId" />
-                                        <button class="btn btn-outline-secondary btn-sm w-100">
+                                        <button class="btn btn-outline-secondary btn-sm w-75">
                                             Join Waiting List
                                         </button>
                                     </form>
                                 }
                             }
                         </div>
-
                     </div>
                 </div>
             }
-
         </div>
-
     </div>
-
 </div>
