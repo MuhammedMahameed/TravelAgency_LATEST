@@ -10,4 +10,8 @@ public class TripGalleryItemVM
     public bool IAmInWaitingList => MyPosition.HasValue;
     public bool IsMyTurn => MyPosition == 1;
     public string? ImagePath { get; set; }
+
+    // New: indicates whether the current logged-in user already has an active booking for this trip
+    public bool IsBookedByMe { get; set; }
+    public int? MyBookingId { get; set; }
 }

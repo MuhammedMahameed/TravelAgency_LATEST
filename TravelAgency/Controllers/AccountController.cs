@@ -38,6 +38,20 @@ public class AccountController : Controller
             cmd.Parameters.AddWithValue("@email", user.Email);
             cmd.Parameters.AddWithValue("@pass", PasswordHelper.Hash(user.Password));
 
+            using (var transaction = connection.BeginTransaction())
+            {
+                var isExsistCMD = new SqlCommand(
+                @"SELECT COUNT(*) FROM Users WHERE Email = @email", connection,transaction);
+                isExsistCMD.Parameters.AddWithValue("@email", user.Email);
+                int count = (int)isExsistCMD.ExecuteScalar();
+                if (count > 0)
+                {
+                    transaction.Rollback();
+                    TempData["UserAlreadyExists"] =  "Email is already registered.";
+                    return RedirectToAction("LogIn");
+                }
+            }
+
             cmd.ExecuteNonQuery();
             connection.Close();
         }

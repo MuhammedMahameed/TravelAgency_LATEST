@@ -29,12 +29,14 @@
                 <label class="form-label fw-bold">Start Date</label>
                 <input asp-for="StartDate" type="date" class="form-control" required
                        value="@(Model.StartDate.Year <= 1900 ? DateTime.Today.ToString("yyyy-MM-dd") : Model.StartDate.ToString("yyyy-MM-dd"))" />
+                <small class="text-muted">Display: @((Model.StartDate.Year <= 1900) ? DateTime.Today.ToString("dd/MM/yyyy") : Model.StartDate.ToString("dd/MM/yyyy"))</small>
             </div>
 
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">End Date</label>
                 <input asp-for="EndDate" type="date" class="form-control" required
                        value="@(Model.EndDate.Year <= 1900 ? DateTime.Today.AddDays(1).ToString("yyyy-MM-dd") : Model.EndDate.ToString("yyyy-MM-dd"))" />
+                <small class="text-muted">Display: @((Model.EndDate.Year <= 1900) ? DateTime.Today.AddDays(1).ToString("dd/MM/yyyy") : Model.EndDate.ToString("dd/MM/yyyy"))</small>
             </div>
         </div>
 

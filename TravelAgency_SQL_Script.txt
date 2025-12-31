@@ -68,3 +68,20 @@ ALTER TABLE Users
 ADD Status NVARCHAR(20) NOT NULL
 Default 'Active';
 
+CREATE TABLE Reviews (
+    ReviewId INT IDENTITY(1,1) PRIMARY KEY,
+    TripId INT NOT NULL,
+    UserId INT NOT NULL,
+    Rating INT CHECK (Rating BETWEEN 1 AND 5),
+    Comment NVARCHAR(500),
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (TripId) REFERENCES Trips(TripId),
+    FOREIGN KEY (UserId) REFERENCES Users(UserId)
+);
+
+CREATE TABLE TripImages (
+    ImageId INT IDENTITY(1,1) PRIMARY KEY,
+    TripId INT NOT NULL,
+    ImagePath NVARCHAR(500) NOT NULL,
+    FOREIGN KEY (TripId) REFERENCES Trips(TripId)
+);

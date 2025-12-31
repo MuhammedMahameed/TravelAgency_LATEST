@@ -39,8 +39,7 @@ public class BookingController : Controller
                         FROM Bookings b
                         JOIN Trips t ON b.TripId = t.TripId
                         WHERE b.UserId = @uid
-                        AND b.Status = @status
-                        AND t.StartDate > GETDATE()",
+                        AND b.Status = @status",
                         connection, transaction);
 
                     countCmd.Parameters.AddWithValue("@uid", userId);
