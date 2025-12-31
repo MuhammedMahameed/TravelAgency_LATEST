@@ -148,7 +148,7 @@
                             <h6>@t.Destination, @t.Country</h6>
 
                             <div class="small text-muted mb-1">
-                                📅 @t.StartDate.ToShortDateString() – @t.EndDate.ToShortDateString()
+                                📅 @t.StartDate.ToString("dd/MM/yyyy") – @t.EndDate.ToString("dd/MM/yyyy")
                             </div>
 
                             @{
@@ -191,7 +191,12 @@
                         <div class="card-footer text-center py-3">
                             @if (t.AvailableRooms > 0)
                             {
-                                if (item.WaitingCount == 0 || item.IsMyTurn)
+                                if (item.IsBookedByMe)
+                                {
+                                    <button class="btn btn-success btn-sm w-75" disabled>Booked</button>
+                                    <a href="/Booking/MyBookings" class="btn btn-outline-primary btn-sm mt-2 w-75">My Bookings</a>
+                                }
+                                else if (item.WaitingCount == 0 || item.IsMyTurn)
                                 {
                                     <a href="/Booking/Start/@t.TripId"
                                        class="btn btn-primary btn-sm w-75">
@@ -232,7 +237,7 @@
                                         </form>
                                     </div>
                                 }
-                                else if (t.AvailableRooms <= 0 || item.WaitingCount > 0)
+                                else if (!item.IsBookedByMe && (t.AvailableRooms <= 0 || item.WaitingCount > 0))
                                 {
                                     <form method="post"
                                           action="/WaitingList/Join"

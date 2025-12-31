@@ -176,6 +176,7 @@ namespace TravelAgency.Controllers
                 return RedirectToAction("Login", "Account");
 
             Trip trip = null;
+            var gallery = new List<TripImage>();
             using (var conn = new SqlConnection(_connStr))
             {
                 conn.Open();
@@ -196,22 +197,78 @@ namespace TravelAgency.Controllers
                         AvailableRooms = (int)reader["AvailableRooms"],
                         Category = reader["Category"].ToString(),
                         MinAge = reader["MinAge"] as int?,
-                        Description = reader["Description"].ToString()
+                        Description = reader["Description"].ToString(),
+                        ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"].ToString()
                     };
                 }
+                reader.Close();
+
+                // load gallery images
+                var imgCmd = new SqlCommand("SELECT ImageId, ImagePath FROM TripImages WHERE TripId=@id", conn);
+                imgCmd.Parameters.AddWithValue("@id", id);
+                using var r2 = imgCmd.ExecuteReader();
+                while (r2.Read())
+                {
+                    gallery.Add(new TripImage
+                    {
+                        ImageId = (int)r2["ImageId"],
+                        TripId = id,
+                        ImagePath = r2["ImagePath"].ToString()
+                    });
+                }
+
                 conn.Close();
             }
+
+            ViewBag.Gallery = gallery;
             return View(trip);
         }
 
         [HttpPost]
-        public IActionResult EditTrip(Trip trip)
+        public IActionResult EditTrip(Trip trip, IFormFile? imageFile, List<IFormFile>? galleryImages, int[]? deleteImageIds, int? setMainImageId)
         {
             if (!AuthHelper.IsAdmin(HttpContext))
                 return RedirectToAction("Login", "Account");
 
+            // If model is invalid, reload gallery/main image and return view so validation messages show
             if (!ModelState.IsValid)
+            {
+                var gallery = new List<TripImage>();
+                string? existingMainPath = null;
+                using (var conn = new SqlConnection(_connStr))
+                {
+                    conn.Open();
+                    var imgCmd = new SqlCommand("SELECT ImageId, ImagePath FROM TripImages WHERE TripId=@id", conn);
+                    imgCmd.Parameters.AddWithValue("@id", trip.TripId);
+                    using var r2 = imgCmd.ExecuteReader();
+                    while (r2.Read())
+                    {
+                        gallery.Add(new TripImage
+                        {
+                            ImageId = (int)r2["ImageId"],
+                            TripId = trip.TripId,
+                            ImagePath = r2["ImagePath"].ToString()
+                        });
+                    }
+                    r2.Close();
+                    // load main image path
+                    var mainCmd = new SqlCommand("SELECT ImagePath FROM Trips WHERE TripId=@id", conn);
+                    mainCmd.Parameters.AddWithValue("@id", trip.TripId);
+                    var obj = mainCmd.ExecuteScalar();
+                    existingMainPath = obj == DBNull.Value || obj == null ? null : obj.ToString();
+
+                    conn.Close();
+                }
+
+                ViewBag.Gallery = gallery;
+                ViewBag.ExistingMainPath = existingMainPath;
                 return View(trip);
+            }
+
+            // Ensure folder exists
+            var imagesPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/trips");
+            if (!Directory.Exists(imagesPath))
+                Directory.CreateDirectory(imagesPath);
 
             using (var conn = new SqlConnection(_connStr))
             {
@@ -223,6 +280,61 @@ namespace TravelAgency.Controllers
                 {
                     oldCmd.Parameters.AddWithValue("@id", trip.TripId);
                     oldRooms = (int)oldCmd.ExecuteScalar();
+                }
+
+                // read existing main image path so we can delete it if replaced/removed
+                string? existingMainPath = null;
+                using (var mainCmd = new SqlCommand("SELECT ImagePath FROM Trips WHERE TripId=@id", conn))
+                {
+                    mainCmd.Parameters.AddWithValue("@id", trip.TripId);
+                    var obj = mainCmd.ExecuteScalar();
+                    existingMainPath = obj == DBNull.Value || obj == null ? null : obj.ToString();
+                }
+
+                // determine requested main image path (from gallery) if provided
+                string? requestedMainPath = null;
+                if (setMainImageId.HasValue)
+                {
+                    // ensure not trying to set a main image that is marked for deletion
+                    if (deleteImageIds == null || !deleteImageIds.Contains(setMainImageId.Value))
+                    {
+                        using var smCmd = new SqlCommand("SELECT ImagePath FROM TripImages WHERE ImageId=@iid AND TripId=@tid", conn);
+                        smCmd.Parameters.AddWithValue("@iid", setMainImageId.Value);
+                        smCmd.Parameters.AddWithValue("@tid", trip.TripId);
+                        var smObj = smCmd.ExecuteScalar();
+                        requestedMainPath = smObj == DBNull.Value || smObj == null ? null : smObj.ToString();
+                    }
+                }
+
+                // handle deletions of gallery images (both DB and filesystem)
+                if (deleteImageIds != null && deleteImageIds.Length > 0)
+                {
+                    foreach (var imgId in deleteImageIds)
+                    {
+                        // get path
+                        var pCmd = new SqlCommand("SELECT ImagePath FROM TripImages WHERE ImageId=@id", conn);
+                        pCmd.Parameters.AddWithValue("@id", imgId);
+                        var pathObj = pCmd.ExecuteScalar();
+                        if (pathObj != null && pathObj != DBNull.Value)
+                        {
+                            var rel = pathObj.ToString();
+                            // if this gallery image is currently set as main, clear main image
+                            if (!string.IsNullOrEmpty(existingMainPath) && string.Equals(existingMainPath, rel, StringComparison.OrdinalIgnoreCase))
+                            {
+                                var clearCmd = new SqlCommand("UPDATE Trips SET ImagePath = NULL WHERE TripId=@id", conn);
+                                clearCmd.Parameters.AddWithValue("@id", trip.TripId);
+                                clearCmd.ExecuteNonQuery();
+                                existingMainPath = null;
+                            }
+
+                            var full = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", rel.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                            try { if (System.IO.File.Exists(full)) System.IO.File.Delete(full); } catch { }
+                        }
+
+                        var delCmd = new SqlCommand("DELETE FROM TripImages WHERE ImageId=@id", conn);
+                        delCmd.Parameters.AddWithValue("@id", imgId);
+                        delCmd.ExecuteNonQuery();
+                    }
                 }
 
                 var cmd = new SqlCommand(@"
@@ -247,9 +359,125 @@ namespace TravelAgency.Controllers
                 cmd.Parameters.AddWithValue("@Rooms", trip.AvailableRooms);
                 cmd.Parameters.AddWithValue("@Category", trip.Category);
                 cmd.Parameters.AddWithValue("@MinAge", (object?)trip.MinAge ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@Description", trip.Description);
+                cmd.Parameters.AddWithValue("@Description", trip.Description ?? string.Empty);
 
                 cmd.ExecuteNonQuery();
+
+                // handle main image upload (replace existing)
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    // delete previous main image file if any, but only if it's not referenced in TripImages
+                    if (!string.IsNullOrEmpty(existingMainPath))
+                    {
+                        bool referencedInGallery = false;
+                        using (var refCmd = new SqlCommand("SELECT COUNT(*) FROM TripImages WHERE ImagePath=@path", conn))
+                        {
+                            refCmd.Parameters.AddWithValue("@path", existingMainPath);
+                            var cnt = (int)refCmd.ExecuteScalar();
+                            referencedInGallery = cnt > 0;
+                        }
+
+                        if (!referencedInGallery)
+                        {
+                            var prevFull = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingMainPath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                            try { if (System.IO.File.Exists(prevFull)) System.IO.File.Delete(prevFull); } catch { }
+                        }
+                    }
+
+                    var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
+                    var fullPath = Path.Combine(imagesPath, fileName);
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        imageFile.CopyTo(stream);
+                    }
+
+                    var dbPath = "/images/trips/" + fileName;
+                    var imgUpdate = new SqlCommand("UPDATE Trips SET ImagePath=@img WHERE TripId=@id", conn);
+                    imgUpdate.Parameters.AddWithValue("@img", dbPath);
+                    imgUpdate.Parameters.AddWithValue("@id", trip.TripId);
+                    imgUpdate.ExecuteNonQuery();
+
+                    existingMainPath = dbPath; // update for later logic
+                }
+                else if (!string.IsNullOrEmpty(requestedMainPath))
+                {
+                    // set main image to the selected gallery image
+                    // delete previous main file if it's different and not referenced by gallery
+                    if (!string.IsNullOrEmpty(existingMainPath) && !string.Equals(existingMainPath, requestedMainPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        bool referencedInGallery = false;
+                        using (var refCmd = new SqlCommand("SELECT COUNT(*) FROM TripImages WHERE ImagePath=@path", conn))
+                        {
+                            refCmd.Parameters.AddWithValue("@path", existingMainPath);
+                            var cnt = (int)refCmd.ExecuteScalar();
+                            referencedInGallery = cnt > 0;
+                        }
+
+                        if (!referencedInGallery)
+                        {
+                            var prevFull = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingMainPath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                            try { if (System.IO.File.Exists(prevFull)) System.IO.File.Delete(prevFull); } catch { }
+                        }
+                    }
+
+                    var setCmd = new SqlCommand("UPDATE Trips SET ImagePath=@img WHERE TripId=@id", conn);
+                    setCmd.Parameters.AddWithValue("@img", requestedMainPath);
+                    setCmd.Parameters.AddWithValue("@id", trip.TripId);
+                    setCmd.ExecuteNonQuery();
+
+                    existingMainPath = requestedMainPath;
+                }
+
+                else if (Request.Form["deleteMainImage"].FirstOrDefault() == "true")
+                {
+                    // delete main image if requested and not replaced
+                    if (!string.IsNullOrEmpty(existingMainPath))
+                    {
+                        // delete file only if not referenced in gallery
+                        bool referencedInGallery = false;
+                        using (var refCmd = new SqlCommand("SELECT COUNT(*) FROM TripImages WHERE ImagePath=@path", conn))
+                        {
+                            refCmd.Parameters.AddWithValue("@path", existingMainPath);
+                            var cnt = (int)refCmd.ExecuteScalar();
+                            referencedInGallery = cnt > 0;
+                        }
+
+                        if (!referencedInGallery)
+                        {
+                            var prevFull = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingMainPath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                            try { if (System.IO.File.Exists(prevFull)) System.IO.File.Delete(prevFull); } catch { }
+                        }
+
+                        var clearCmd = new SqlCommand("UPDATE Trips SET ImagePath = NULL WHERE TripId=@id", conn);
+                        clearCmd.Parameters.AddWithValue("@id", trip.TripId);
+                        clearCmd.ExecuteNonQuery();
+
+                        existingMainPath = null;
+                    }
+                }
+
+                // handle new gallery images
+                if (galleryImages != null && galleryImages.Count > 0)
+                {
+                    foreach (var img in galleryImages)
+                    {
+                        if (img == null || img.Length == 0) continue;
+
+                        var fileName = Guid.NewGuid() + Path.GetExtension(img.FileName);
+                        var fullPath = Path.Combine(imagesPath, fileName);
+
+                        using (var stream = new FileStream(fullPath, FileMode.Create))
+                        {
+                            img.CopyTo(stream);
+                        }
+
+                        var dbPath = "/images/trips/" + fileName;
+                        var imgCmd = new SqlCommand(@"INSERT INTO TripImages (TripId, ImagePath) VALUES (@tid, @path)", conn);
+                        imgCmd.Parameters.AddWithValue("@tid", trip.TripId);
+                        imgCmd.Parameters.AddWithValue("@path", dbPath);
+                        imgCmd.ExecuteNonQuery();
+                    }
+                }
 
                 if (trip.AvailableRooms > oldRooms)
                 {
@@ -500,7 +728,7 @@ namespace TravelAgency.Controllers
             return RedirectToAction("Users");
         }
 
-        // Removing users (לפי דרישה) – נעשה בצורה בטוחה:
+        // Removing users (לפי דרישה) – נעשה בצורה btוחה:
         // אם יש הזמנות -> לא מוחקים פיזית, אלא Status='Blocked' (זה עדיין "removing" מהמערכת).
         [HttpPost]
         public IActionResult RemoveUser(int userId)

@@ -2,18 +2,172 @@
 
 <h2>Edit Trip</h2>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data" asp-action="EditTrip" asp-controller="Admin">
     <input type="hidden" name="TripId" value="@Model.TripId" />
 
-    Destination: <input name="Destination" value="@Model.Destination" /><br />
-    Country: <input name="Country" value="@Model.Country" /><br />
-    Start Date: <input type="date" name="StartDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" /><br />
-    End Date: <input type="date" name="EndDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" /><br />
-    Price: <input type="number" step="0.01" name="Price" value="@Model.Price" /><br />
-    Available Rooms: <input type="number" name="AvailableRooms" value="@Model.AvailableRooms" /><br />
-    Category: <input name="Category" value="@Model.Category" /><br />
-    Min Age: <input type="number" name="MinAge" value="@Model.MinAge" /><br />
-    Description: <textarea name="Description">@Model.Description</textarea><br />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
 
-    <button type="submit">Update</button>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Destination</label>
+                <input name="Destination" value="@Model.Destination" class="form-control" />
+                @Html.ValidationMessageFor(m => m.Destination, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Country</label>
+                <input name="Country" value="@Model.Country" class="form-control" />
+                @Html.ValidationMessageFor(m => m.Country, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Start Date</label>
+                    <input type="date" name="StartDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" class="form-control" />
+                    @Html.ValidationMessageFor(m => m.StartDate, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">End Date</label>
+                    <input type="date" name="EndDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" class="form-control" />
+                    @Html.ValidationMessageFor(m => m.EndDate, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Category</label>
+                <input name="Category" value="@Model.Category" class="form-control" />
+                @Html.ValidationMessageFor(m => m.Category, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Price</label>
+                <input type="number" step="0.01" name="Price" value="@Model.Price" class="form-control" />
+                @Html.ValidationMessageFor(m => m.Price, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Available Rooms</label>
+                <input type="number" name="AvailableRooms" value="@Model.AvailableRooms" class="form-control" />
+                @Html.ValidationMessageFor(m => m.AvailableRooms, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Min Age</label>
+                <input type="number" name="MinAge" value="@(Model.MinAge?.ToString() ?? "")" class="form-control" />
+                @Html.ValidationMessageFor(m => m.MinAge, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Description</label>
+                <textarea name="Description" class="form-control" rows="3">@Model.Description</textarea>
+                @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Replace Main Image (optional)</label>
+                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Add Gallery Images (optional)</label>
+                <input type="file" name="galleryImages" class="form-control" accept="image/*" multiple />
+            </div>
+
+            @if (ViewBag.Gallery != null && ((List<TravelAgency.Models.TripImage>)ViewBag.Gallery).Any())
+            {
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Existing Gallery</label>
+                    <div class="row g-2">
+                        @foreach (var img in (List<TravelAgency.Models.TripImage>)ViewBag.Gallery)
+                        {
+                            <div class="col-4 text-center mb-2">
+                                <img src="@img.ImagePath" class="img-thumbnail" style="height:100px; object-fit:cover; width:100%;" />
+                                <div class="form-check mt-1">
+                                    <input class="form-check-input delete-checkbox" type="checkbox" name="deleteImageIds" value="@img.ImageId" id="del_@img.ImageId" />
+                                    <label class="form-check-label" for="del_@img.ImageId">Delete</label>
+                                </div>
+                                <div class="form-check mt-1">
+                                    <input class="form-check-input" type="radio" name="setMainImageId" value="@img.ImageId" id="main_@img.ImageId" />
+                                    <label class="form-check-label" for="main_@img.ImageId">Set as main</label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Main Image</h5>
+                    @if (!string.IsNullOrEmpty(Model.ImagePath))
+                    {
+                        <img src="@Model.ImagePath" class="img-fluid img-thumbnail mb-2" style="max-height:240px; object-fit:cover; width:100%;" />
+                        <div class="form-check">
+                            <input class="form-check-input delete-main" type="checkbox" name="deleteMainImage" id="deleteMainImage" value="true" />
+                            <label class="form-check-label" for="deleteMainImage">Remove main image</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted">No main image</div>
+                    }
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Gallery Quick View</h5>
+                    @if (ViewBag.Gallery != null && ((List<TravelAgency.Models.TripImage>)ViewBag.Gallery).Any())
+                    {
+                        <div class="d-flex flex-column gap-2">
+                            @foreach (var img in (List<TravelAgency.Models.TripImage>)ViewBag.Gallery)
+                            {
+                                <img src="@img.ImagePath" class="img-fluid img-thumbnail" style="height:80px; object-fit:cover; width:100%;" />
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted">No gallery images</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        (function(){
+            // confirm when deleting gallery images
+            document.querySelectorAll('.delete-checkbox').forEach(function(chk){
+                chk.addEventListener('change', function(e){
+                    if(this.checked){
+                        if(!confirm('Delete this gallery image?')){
+                            this.checked = false;
+                        }
+                    }
+                });
+            });
+
+            // confirm when deleting main image
+            var mainChk = document.querySelector('.delete-main');
+            if(mainChk){
+                mainChk.addEventListener('change', function(){
+                    if(this.checked){
+                        if(!confirm('Remove the main image?')){
+                            this.checked = false;
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+}

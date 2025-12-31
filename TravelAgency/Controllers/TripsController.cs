@@ -154,6 +154,29 @@ public class TripsController : Controller
                 MyPosition = myPositions.TryGetValue(t.TripId, out var p) ? p : (int?)null
             }).ToList();
 
+            // New: detect which trips the current user already booked
+            if (uidObj != null)
+            {
+                int userId = uidObj.Value;
+                var bookedCmd = new SqlCommand(@"SELECT BookingId, TripId FROM Bookings WHERE UserId=@uid AND Status='Active'", conn);
+                bookedCmd.Parameters.AddWithValue("@uid", userId);
+                using var br = bookedCmd.ExecuteReader();
+                var bookings = new Dictionary<int, int>();
+                while (br.Read())
+                {
+                    bookings[(int)br["TripId"]] = (int)br["BookingId"];
+                }
+
+                foreach (var item in vm)
+                {
+                    if (bookings.TryGetValue(item.Trip.TripId, out var bid))
+                    {
+                        item.IsBookedByMe = true;
+                        item.MyBookingId = bid;
+                    }
+                }
+            }
+
             conn.Close();
 
             return View(vm);
@@ -193,6 +216,62 @@ public class TripsController : Controller
                         ? null
                         : reader["ImagePath"].ToString()
                 };
+            }
+
+            // detect if current user already has an active booking for this trip
+            var uidObj = HttpContext.Session.GetInt32("UserId");
+            if (uidObj != null)
+            {
+                var checkCmd = new SqlCommand("SELECT BookingId FROM Bookings WHERE TripId=@tid AND UserId=@uid AND Status='Active'", conn);
+                checkCmd.Parameters.AddWithValue("@tid", id);
+                checkCmd.Parameters.AddWithValue("@uid", uidObj.Value);
+                var obj = checkCmd.ExecuteScalar();
+                if (obj != null && obj != DBNull.Value)
+                {
+                    ViewBag.IsBooked = true;
+                    ViewBag.MyBookingId = (int)obj;
+                }
+                else
+                {
+                    ViewBag.IsBooked = false;
+                }
+
+                // also detect if there are waiting entries for this trip (for details view)
+                var waitCountCmd = new SqlCommand("SELECT COUNT(*) FROM WaitingList WHERE TripId=@tid", conn);
+                waitCountCmd.Parameters.AddWithValue("@tid", id);
+                var wcnt = (int)waitCountCmd.ExecuteScalar();
+                ViewBag.HasWaiting = wcnt > 0;
+
+                // detect if current user is in waiting list for this trip and their position
+                var userInWaitCmd = new SqlCommand("SELECT COUNT(*) FROM WaitingList WHERE TripId=@tid AND UserId=@uid", conn);
+                userInWaitCmd.Parameters.AddWithValue("@tid", id);
+                userInWaitCmd.Parameters.AddWithValue("@uid", uidObj.Value);
+                var inCount = (int)userInWaitCmd.ExecuteScalar();
+                if (inCount > 0)
+                {
+                    ViewBag.IsInWaiting = true;
+
+                    // compute position
+                    var posCmd = new SqlCommand(@"
+                        SELECT COUNT(*) FROM WaitingList w
+                        WHERE w.TripId = @tid AND w.JoinDate <= (
+                            SELECT JoinDate FROM WaitingList WHERE TripId=@tid AND UserId=@uid
+                        )", conn);
+                    posCmd.Parameters.AddWithValue("@tid", id);
+                    posCmd.Parameters.AddWithValue("@uid", uidObj.Value);
+                    var pos = (int)posCmd.ExecuteScalar();
+                    ViewBag.WaitPosition = pos;
+                }
+                else
+                {
+                    ViewBag.IsInWaiting = false;
+                    ViewBag.WaitPosition = null;
+                }
+            }
+            else
+            {
+                ViewBag.IsBooked = false;
+                ViewBag.HasWaiting = false;
             }
 
             conn.Close();

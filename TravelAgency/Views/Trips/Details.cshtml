@@ -95,8 +95,8 @@
     <div class="row">
         <div class="col-md-6">
             <p><strong>Category:</strong> @Model.Category</p>
-            <p><strong>Start Date:</strong> @Model.StartDate.ToShortDateString()</p>
-            <p><strong>End Date:</strong> @Model.EndDate.ToShortDateString()</p>
+            <p><strong>Start Date:</strong> @Model.StartDate.ToString("dd/MM/yyyy")</p>
+            <p><strong>End Date:</strong> @Model.EndDate.ToString("dd/MM/yyyy")</p>
         </div>
 
         <div class="col-md-6">
@@ -112,18 +112,48 @@
     <div class="mt-3">
         @if (Model.AvailableRooms > 0)
         {
-            <a href="/Booking/BookNow/@Model.TripId" class="btn btn-primary">
-                Book Now
-            </a>
+            if (ViewBag.IsBooked == true)
+            {
+                <button class="btn btn-success" disabled>Booked</button>
+                <a class="btn btn-outline-primary ms-2" href="/Booking/MyBookings">My Bookings</a>
+            }
+            else
+            {
+                <a href="/Booking/BookNow/@Model.TripId" class="btn btn-primary">
+                    Book Now
+                </a>
+            }
         }
         else
         {
             <span class="text-danger">Fully booked</span>
         }
 
-        <a href="/Trips/Gallery" class="btn btn-secondary ms-2">
-            Back to Gallery
-        </a>
+        @* Hide Join Waiting/Back buttons when user already booked *@
+        @if (ViewBag.IsBooked != true)
+        {
+            <a href="/Trips/Gallery" class="btn btn-secondary ms-2">
+                Back to Gallery
+            </a>
+            @if (Context.Session.GetInt32("UserId") != null)
+            {
+                if (ViewBag.IsInWaiting == true)
+                {
+                    <form method="post" action="/WaitingList/Leave" class="d-inline ms-2">
+                        <input type="hidden" name="tripId" value="@Model.TripId" />
+                        <button class="btn btn-outline-danger">Leave Waiting List</button>
+                    </form>
+                    <span class="ms-2 text-muted">Position: <strong>@ViewBag.WaitPosition</strong></span>
+                }
+                else if (Model.AvailableRooms <= 0 || ViewBag.HasWaiting == true)
+                {
+                    <form method="post" action="/WaitingList/Join" class="d-inline ms-2">
+                        <input type="hidden" name="tripId" value="@Model.TripId" />
+                        <button class="btn btn-outline-secondary">Join Waiting List</button>
+                    </form>
+                }
+            }
+        }
     </div>
 
     <!-- =========================
