@@ -1,100 +1,101 @@
 ﻿@model List<TravelAgency.Models.User>
 
-@{
-    ViewData["Title"] = "User Management";
-    ViewData["BodyClass"] = "login-light";
-}
+<link rel="stylesheet" href="~/css/admin-trips.css" />
 
-<div class="login-page container-fluid">
+<div class="login-page container-fluid py-4">
+    <div class="container admin-page">
 
-    <div class="container py-4">
+        <!-- ===== HEADER ===== -->
+        <div class="admin-header d-flex justify-content-between align-items-center flex-wrap mb-4 pt-4">
+            <h2 class="admin-title d-flex align-items-center">
+                <i class="bi bi-people-fill text-primary me-2"></i>
+                User Management
+            </h2>
+        </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold login-title mb-0">👥 User Management</h2>
-
-            <a href="/Admin/AddUser"
-               class="btn btn-success btn-lg">
-                ➕ Add New User
+        <!-- ===== CONTROLS ===== -->
+        <div class="admin-controls d-flex flex-wrap align-items-center gap-3 mb-4">
+            <a href="/Admin/AddUser" class="btn btn-outline-success fw-semibold">
+                <i class="bi bi-person-plus-fill"></i> Add New User
             </a>
         </div>
 
+        <!-- ===== ALERTS ===== -->
         @if (TempData["Error"] != null)
         {
-            <div class="alert alert-danger text-center">
-                @TempData["Error"]
+            <div class="alert alert-danger shadow-sm mb-3">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
             </div>
         }
-
         @if (TempData["Success"] != null)
         {
-            <div class="alert alert-success text-center">
-                @TempData["Success"]
+            <div class="alert alert-success shadow-sm mb-3">
+                <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
             </div>
         }
 
-        <!-- LIGHT TABLE WRAPPER -->
-        <div class="bg-white rounded-4 shadow-sm p-3">
-
+        <!-- ===== TABLE ===== -->
+        <div class="admin-card border-0 p-4 rounded-4 bg-white shadow-sm">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0 user-table-light">
-
-                    <thead>
-                        <tr class="table-light">
-                            <th>ID</th>
+                <!-- חשוב: אין table-hover כדי שלא יהיה HOVER -->
+                <table class="table align-middle admin-table mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
                             <th>Full Name</th>
                             <th>Email</th>
                             <th>Status</th>
-                            <th style="width:360px;">Actions</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         @foreach (var u in Model)
                         {
+                            var isActive = (u.Status ?? "").Equals("Active", StringComparison.OrdinalIgnoreCase);
+
                             <tr>
-                                <td>@u.UserId</td>
+                                <td class="text-muted">@u.UserId</td>
+
                                 <td class="fw-semibold">@u.FullName</td>
-                                <td>@u.Email</td>
+
                                 <td>
-                                    @if (u.Status == "Active")
+                                    <span class="text-muted">@u.Email</span>
+                                </td>
+
+                                <td>
+                                    @if (isActive)
                                     {
-                                        <span class="badge bg-success">Active</span>
+                                        <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle status-badge">
+                                            Active
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-danger">Blocked</span>
+                                        <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle status-badge">
+                                            Blocked
+                                        </span>
                                     }
                                 </td>
-                                <td>
-                                    <a href="/Admin/UserBookings/@u.UserId"
-                                       class="btn btn-outline-primary btn-sm me-1">
-                                        View Bookings
+
+                                <td class="text-center">
+                                    <a href="/Admin/UserBookings/@u.UserId" class="btn btn-sm btn-outline-info me-1">
+                                        <i class="bi bi-clock-history"></i> Bookings
                                     </a>
 
-                                    <form method="post"
-                                          action="/Admin/ToggleUserStatus"
-                                          class="d-inline">
-                                        <input type="hidden"
-                                               name="userId"
-                                               value="@u.UserId" />
-
-                                        <button type="submit"
-                                                class="btn btn-outline-warning btn-sm me-1">
-                                            @(u.Status == "Active" ? "Block" : "Unblock")
+                                    <form asp-action="ToggleUserStatus" asp-controller="Admin" method="post" class="d-inline">
+                                        <input type="hidden" name="userId" value="@u.UserId" />
+                                        <button type="submit" class="btn btn-sm @(isActive ? "btn-outline-warning" : "btn-outline-success") me-1">
+                                            <i class="bi @(isActive ? "bi-slash-circle" : "bi-check2-circle")"></i>
+                                            @(isActive ? "Block" : "Unblock")
                                         </button>
                                     </form>
 
-                                    <form method="post"
-                                          action="/Admin/RemoveUser"
-                                          class="d-inline">
-                                        <input type="hidden"
-                                               name="userId"
-                                               value="@u.UserId" />
-
-                                        <button type="submit"
-                                                class="btn btn-outline-danger btn-sm"
-                                                onclick="return confirm('Remove this user?');">
-                                            Remove
+                                    <form asp-action="RemoveUser" asp-controller="Admin" method="post" class="d-inline">
+                                        <input type="hidden" name="userId" value="@u.UserId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Are you sure you want to remove this user?');">
+                                            <i class="bi bi-trash"></i> Remove
                                         </button>
                                     </form>
                                 </td>
@@ -104,9 +105,7 @@
 
                 </table>
             </div>
-
         </div>
 
     </div>
-
 </div>

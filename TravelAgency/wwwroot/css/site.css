@@ -213,3 +213,79 @@ body {
     #tripGallery .carousel-control-next-icon {
         filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
     }
+
+
+
+/* ===== Admin Trips Page (matches modern TravelAgency style) ===== */
+
+.admin-title {
+    font-weight: 800;
+    color: #0d47a1;
+    margin-bottom: 14px;
+    letter-spacing: .2px;
+}
+
+.admin-add-btn {
+    border-radius: 12px;
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+.admin-reminder-form {
+    margin: 15px 0;
+}
+
+.admin-reminder-btn {
+    border-radius: 12px;
+    font-weight: 700;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+}
+
+.admin-card {
+    border-radius: 18px !important;
+    overflow: hidden;
+}
+
+.admin-table {
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+    .admin-table th {
+        font-weight: 800;
+        color: #0d47a1;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .admin-table td {
+        border-color: #f0f0f0;
+    }
+
+.admin-actions .btn {
+    border-radius: 10px;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+    .admin-actions .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(0,0,0,.08);
+    }
+
+.admin-sep {
+    color: #b8b8b8;
+    margin: 0 6px;
+}
+
+/* make it nicer on small screens */
+@media (max-width: 576px) {
+    .admin-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .admin-sep {
+        display: none;
+    }
+}

@@ -735,3 +735,125 @@ input, textarea, select {
         padding-bottom: 10px;
     }
 }
+
+
+
+/* ===== Admin Trips Page (matches modern TravelAgency style) ===== */
+
+.admin-title {
+    font-weight: 800;
+    color: #0d47a1;
+    margin-bottom: 14px;
+    letter-spacing: .2px;
+}
+
+.admin-add-btn {
+    border-radius: 12px;
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+.admin-reminder-form {
+    margin: 15px 0;
+}
+
+.admin-reminder-btn {
+    border-radius: 12px;
+    font-weight: 700;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+}
+
+.admin-card {
+    border-radius: 18px !important;
+    overflow: hidden;
+}
+
+.admin-table {
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+    .admin-table th {
+        font-weight: 800;
+        color: #0d47a1;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .admin-table td {
+        border-color: #f0f0f0;
+    }
+
+.admin-actions .btn {
+    border-radius: 10px;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+    .admin-actions .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(0,0,0,.08);
+    }
+
+.admin-sep {
+    color: #b8b8b8;
+    margin: 0 6px;
+}
+
+/* make it nicer on small screens */
+@media (max-width: 576px) {
+    .admin-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .admin-sep {
+        display: none;
+    }
+}
+
+
+
+/* ===== Gallery-like simple white navbar ===== */
+.gallery-navbar {
+    background: #fff !important;
+    border-bottom: 1px solid #e9ecef;
+    box-shadow: 0 2px 10px rgba(0,0,0,.04);
+}
+
+.gallery-brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #0d47a1 !important;
+    letter-spacing: .2px;
+}
+
+.gallery-btn {
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-weight: 600;
+}
+
+.gallery-hello {
+    color: #6c757d;
+    font-weight: 600;
+    margin: 0 6px;
+    white-space: nowrap;
+}
+
+.gallery-page-offset {
+    padding-top: 80px; /* so content won't hide under fixed nav */
+}
+
+
+/* ===== Fix login/register card position ===== */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center; /* ממרכז אנכית */
+    justify-content: center; /* ממרכז אופקית */
+    padding-top: 70px; /* מקום ל-navbar */
+    padding-bottom: 30px;
+}
+
+/* אם הכרטיס עדיין נמוך מידי תקטין ל-50px */

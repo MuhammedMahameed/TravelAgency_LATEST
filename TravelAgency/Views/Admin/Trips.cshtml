@@ -1,56 +1,81 @@
 @model List<TravelAgency.Models.Trip>
 
-<h2>Manage Trips</h2>
+<link rel="stylesheet" href="~/css/admin-trips.css" />
 
-<a href="/Admin/AddTrip">➕ Add New Trip</a>
+<div class="login-page container-fluid py-4">
+    <div class="container admin-page">
 
-<form method="post" action="/Admin/SendDepartureReminders" style="margin:15px 0;">
-    <button type="submit" class="btn btn-warning">
-        📧 Send 5-Day Departure Reminders
-    </button>
-</form>
+        <!-- ===== HEADER ===== -->
+        <div class="admin-header d-flex justify-content-between align-items-center flex-wrap mb-4 pt-4">
+            <h2 class="admin-title d-flex align-items-center">
+                <i class="bi bi-globe-americas text-primary me-2"></i>
+                Manage Trips
+            </h2>
+        </div>
 
-@if (TempData["Error"] != null)
-{
-    <div style="color:red; margin:10px 0;">
-        @TempData["Error"]
+        <!-- ===== CONTROLS ===== -->
+        <div class="admin-controls d-flex flex-wrap align-items-center gap-3 mb-4">
+            <a href="/Admin/AddTrip" class="btn btn-outline-success fw-semibold">
+                <i class="bi bi-plus-circle"></i> Add New Trip
+            </a>
+        </div>
+
+        <!-- ===== ALERTS ===== -->
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger shadow-sm mb-3">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+            </div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success shadow-sm mb-3">
+                <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            </div>
+        }
+
+        <!-- ===== TABLE ===== -->
+        <div class="admin-card border-0 p-4 rounded-4 bg-white shadow-sm">
+            <div class="table-responsive">
+                <table class="table align-middle admin-table mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Destination</th>
+                            <th>Country</th>
+                            <th>Price</th>
+                            <th>Rooms</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@t.Destination</td>
+                                <td>@t.Country</td>
+                                <td>₪@t.Price</td>
+                                <td>@t.AvailableRooms</td>
+                                <td class="text-center">
+                                    <a href="/Admin/EditTrip/@t.TripId" class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </a>
+                                    <a href="/Admin/Discount/@t.TripId" class="btn btn-sm btn-outline-info me-1">
+                                        <i class="bi bi-tag"></i> Discount
+                                    </a>
+                                    <form asp-action="DeleteTrip" asp-controller="Admin" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@t.TripId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Are you sure you want to delete this trip?');">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
-}
-@if (TempData["Success"] != null)
-{
-    <div style="color:green; margin:10px 0;">
-        @TempData["Success"]
-    </div>
-}
-
-<table border="1">
-    <tr>
-        <th>Destination</th>
-        <th>Country</th>
-        <th>Price</th>
-        <th>Rooms</th>
-        <th>Actions</th>
-    </tr>
-
-    @foreach (var t in Model)
-    {
-        <tr>
-            <td>@t.Destination</td>
-            <td>@t.Country</td>
-            <td>@t.Price</td>
-            <td>@t.AvailableRooms</td>
-            <td>
-                <a href="/Admin/EditTrip/@t.TripId">Edit</a> |
-                <a href="/Admin/Discount/@t.TripId">Discount</a> |
-
-                <form asp-action="DeleteTrip" asp-controller="Admin" method="post" style="display:inline;">
-                    <input type="hidden" name="id" value="@t.TripId" />
-                    <button type="submit"
-                            onclick="return confirm('Are you sure you want to delete this trip?');">
-                        Delete
-                    </button>
-                </form>
-            </td>
-        </tr>
-    }
-</table>
+</div>
