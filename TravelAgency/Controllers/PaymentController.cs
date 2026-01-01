@@ -7,7 +7,7 @@ namespace TravelAgency.Controllers;
 public class PaymentController : Controller
 {
     private readonly string _connStr;
-    
+
     public PaymentController(IConfiguration config)
     {
         _connStr = config.GetConnectionString("DefaultConnection");
@@ -22,7 +22,7 @@ public class PaymentController : Controller
     }
 
     [HttpPost]
-   public IActionResult Process(int bookingId, string cardholder, string cardNumber, string expMonth, string expYear, string cvv)
+    public IActionResult Process(int bookingId, string cardholder, string cardNumber, string expMonth, string expYear, string cvv)
     {
         if (!AuthHelper.IsLoggedIn(HttpContext))
             return RedirectToAction("Login", "Account");
@@ -55,7 +55,7 @@ public class PaymentController : Controller
             if (!r.Read())
             {
                 TempData["PaymentMessage"] = "Payment failed: Invalid booking.";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("MyBookings", "Booking");
             }
 
             decimal amount = (decimal)r["Price"];
@@ -65,7 +65,7 @@ public class PaymentController : Controller
             if (isPaid)
             {
                 TempData["PaymentMessage"] = "This booking is already paid.";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("MyBookings", "Booking");
             }
 
             // Decide status
@@ -121,51 +121,51 @@ public class PaymentController : Controller
             }
 
             TempData["PaymentMessage"] = success
-                ? "Payment successful!"
-                : "Payment failed. Card details are invalid or declined.";
+                ? "? Payment successful! Your booking is now marked as paid."
+                : "? Payment failed. Card details are invalid or declined.";
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("MyBookings", "Booking");
         }
     }
 
-private static bool PassesLuhn(string digits)
-{
-    int sum = 0;
-    bool alt = false;
-
-    for (int i = digits.Length - 1; i >= 0; i--)
+    private static bool PassesLuhn(string digits)
     {
-        int n = digits[i] - '0';
-        if (alt)
+        int sum = 0;
+        bool alt = false;
+
+        for (int i = digits.Length - 1; i >= 0; i--)
         {
-            n *= 2;
-            if (n > 9) n -= 9;
+            int n = digits[i] - '0';
+            if (alt)
+            {
+                n *= 2;
+                if (n > 9) n -= 9;
+            }
+            sum += n;
+            alt = !alt;
         }
-        sum += n;
-        alt = !alt;
+
+        return sum % 10 == 0;
     }
 
-    return sum % 10 == 0;
-}
+    private static bool IsExpiryValid(string mm, string yy)
+    {
+        if (!int.TryParse(mm, out int m) || m < 1 || m > 12) return false;
+        if (!int.TryParse(yy, out int y)) return false;
 
-private static bool IsExpiryValid(string mm, string yy)
-{
-    if (!int.TryParse(mm, out int m) || m < 1 || m > 12) return false;
-    if (!int.TryParse(yy, out int y)) return false;
+        // interpret YY as 20YY
+        if (y < 100) y += 2000;
 
-    // interpret YY as 20YY
-    if (y < 100) y += 2000;
-
-    var now = DateTime.UtcNow;
-    var exp = new DateTime(y, m, 1).AddMonths(1); // valid until end of month
-    return exp > now;
-}
+        var now = DateTime.UtcNow;
+        var exp = new DateTime(y, m, 1).AddMonths(1); // valid until end of month
+        return exp > now;
+    }
 
     public IActionResult Success()
     {
         return View();
     }
-    
+
     // GET
     public IActionResult Index()
     {

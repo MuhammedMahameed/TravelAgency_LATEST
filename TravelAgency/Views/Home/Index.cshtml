@@ -1,8 +1,51 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using System.Data
+@inject IConfiguration Configuration
+
+@{
+    var reviews = new List<dynamic>();
+    using (var conn = new Microsoft.Data.SqlClient.SqlConnection(Configuration.GetConnectionString("DefaultConnection")))
+    {
+        conn.Open();
+        var cmd = new Microsoft.Data.SqlClient.SqlCommand(@"
+            SELECT TOP 6 r.Rating, r.Comment, u.FullName, r.CreatedAt
+            FROM SiteReviews r
+            JOIN Users u ON r.UserId = u.UserId
+            ORDER BY r.CreatedAt DESC", conn);
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            reviews.Add(new
+            {
+                Rating = (int)reader["Rating"],
+                Comment = reader["Comment"].ToString(),
+                Name = reader["FullName"].ToString(),
+                Date = ((DateTime)reader["CreatedAt"]).ToShortDateString()
+            });
+        }
+        conn.Close();
+    }
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="mt-5 mb-5">
+    <h3 class="text-center fw-bold text-primary mb-4">What users think about our service</h3>
+
+    <div class="row justify-content-center">
+        @foreach (var r in reviews)
+        {
+            <div class="col-md-5 col-lg-4 mb-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <p class="text-warning mb-1">
+                            @for (int i = 0; i < r.Rating; i++)
+                            {
+                                <i class="bi bi-star-fill"></i>
+                            }
+                        </p>
+                        <p>@r.Comment</p>
+                        <small class="text-muted">— @r.Name (@r.Date)</small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

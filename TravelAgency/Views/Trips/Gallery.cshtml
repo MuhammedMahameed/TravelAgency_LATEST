@@ -16,7 +16,6 @@
             <p>Browse our travel packages and book your next adventure</p>
         </div>
 
-       
         <div class="hero-wrap">
             <div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel" data-bs-interval="3500">
 
@@ -30,22 +29,18 @@
                 <div class="carousel-inner">
                     <div class="carousel-item active">
                         <img src="/images/trips/hero-paris.jpg" alt="Paris">
-                       
                     </div>
 
                     <div class="carousel-item">
                         <img src="/images/trips/hero-rome.jpg" alt="Rome">
-                       
                     </div>
 
                     <div class="carousel-item">
                         <img src="/images/trips/hero-tokyo.jpg" alt="Tokyo">
-                       
                     </div>
 
                     <div class="carousel-item">
                         <img src="/images/trips/hero-newyork.jpg" alt="Dubai">
-                       
                     </div>
                 </div>
 
@@ -256,5 +251,120 @@
                 </div>
             }
         </div>
+
+        <!-- ======== WHAT USERS THINK SECTION ======== -->
+        <hr class="my-5" />
+        <section id="site-reviews" class="mb-5">
+            <h3 class="text-center fw-bold text-primary mb-4">What users think about our service</h3>
+
+            @if (Context.Session.GetInt32("UserId") != null)
+            {
+                <div class="mx-auto mb-4" style="max-width:520px;">
+                    <form id="siteReviewForm">
+                        <div class="mb-2">
+                            <label class="form-label fw-semibold">Rating (1–5)</label>
+                            <input class="form-control" name="rating" type="number" min="1" max="5" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Comment</label>
+                            <textarea class="form-control" name="comment" maxlength="500"
+                                  placeholder="Write your feedback about the website..."></textarea>
+                        </div>
+                        <button class="btn btn-primary w-100" type="submit">Submit Feedback</button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <p class="text-center">
+                    <a class="btn btn-outline-primary" href="/Account/Login">Login to leave feedback</a>
+                </p>
+            }
+
+            <div id="siteReviewList" class="row justify-content-center"></div>
+        </section>
+
+        @section Scripts {
+            <script>
+                function loadSiteReviews() {
+                    fetch('/SiteReviews/List')
+                        .then(res => res.json())
+                        .then(data => {
+                            const list = document.getElementById('siteReviewList');
+                            list.innerHTML = '';
+
+                            if (data.length === 0) {
+                                list.innerHTML = '<p class="text-center text-muted">No feedback yet.</p>';
+                                return;
+                            }
+
+                            const isAdmin = '@Context.Session.GetString("Role")' === 'Admin';
+                            const currentUserId = @((Context.Session.GetInt32("UserId") ?? 0));
+
+                            data.forEach(r => {
+                                const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+                                const canDelete = isAdmin || (currentUserId !== 0 && r.userId === currentUserId);
+
+                                const div = document.createElement('div');
+                                div.className = 'col-md-5 col-lg-4 mb-3';
+                                div.innerHTML = `
+                                    <div class="card shadow-sm border-0">
+                                        <div class="card-body position-relative">
+                                            ${canDelete ? `
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                        style="position:absolute; top:12px; right:12px;"
+                                                        onclick="deleteSiteReview(${r.reviewId})">
+                                                    Delete
+                                                </button>` : ''}
+
+                                            <div class="text-warning mb-1" style="font-size:1.1rem;">${stars}</div>
+                                            ${r.comment ? `<p>${r.comment}</p>` : ''}
+                                            <small class="text-muted">— ${r.fullName} (${r.createdAt})</small>
+                                        </div>
+                                    </div>`;
+                                list.appendChild(div);
+                            });
+                        });
+                }
+
+                function deleteSiteReview(id) {
+                    if (!confirm("Are you sure you want to delete this review?")) return;
+
+                    fetch('/SiteReviews/Delete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'id=' + encodeURIComponent(id)
+                    })
+                        .then(res => {
+                            if (!res.ok) throw new Error();
+                            loadSiteReviews();
+                        })
+                        .catch(() => alert('Failed to delete review.'));
+                }
+
+                loadSiteReviews();
+
+                document.getElementById('siteReviewForm')?.addEventListener('submit', e => {
+                    e.preventDefault();
+                    const form = e.target;
+                    const data = new URLSearchParams(new FormData(form));
+
+                    fetch('/SiteReviews/Add', {
+                        method: 'POST',
+                        body: data
+                    })
+                        .then(res => {
+                            if (!res.ok) throw new Error();
+                            return res.json();
+                        })
+                        .then(() => {
+                            form.reset();
+                            loadSiteReviews();
+                        })
+                        .catch(() => alert('Failed to send feedback.'));
+                });
+            </script>
+
+        }
     </div>
 </div>

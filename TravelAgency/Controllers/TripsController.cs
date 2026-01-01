@@ -65,8 +65,6 @@ public class TripsController : Controller
                     break;
             }
 
-
-
             using (SqlCommand command = new SqlCommand(sql, conn))
             {
                 if (!string.IsNullOrEmpty(search))
@@ -176,6 +174,29 @@ public class TripsController : Controller
                     }
                 }
             }
+
+            // ===== ADDED: fetch general site reviews for Gallery page =====
+            var siteReviews = new List<dynamic>();
+            using (var rcmd = new SqlCommand(@"
+                SELECT TOP 6 sr.Rating, sr.Comment, sr.CreatedAt, u.FullName
+                FROM SiteReviews sr
+                JOIN Users u ON sr.UserId = u.UserId
+                ORDER BY sr.CreatedAt DESC", conn))
+            {
+                using var rr = rcmd.ExecuteReader();
+                while (rr.Read())
+                {
+                    siteReviews.Add(new
+                    {
+                        Rating = (int)rr["Rating"],
+                        Comment = rr["Comment"] == DBNull.Value ? "" : rr["Comment"].ToString(),
+                        CreatedAt = (DateTime)rr["CreatedAt"],
+                        FullName = rr["FullName"].ToString()
+                    });
+                }
+            }
+            ViewBag.SiteReviews = siteReviews;
+            // ===== END added section =====
 
             conn.Close();
 
