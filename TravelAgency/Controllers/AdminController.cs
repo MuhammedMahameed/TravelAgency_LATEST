@@ -61,9 +61,6 @@ namespace TravelAgency.Controllers
             return View(t);
         }
 
-
-        // - main image: imageFile (same name you already use)
-        // - additional images: galleryImages (multiple)
         [HttpPost]
         public IActionResult AddTrip(Trip trip, IFormFile? imageFile, List<IFormFile>? galleryImages)
         {
@@ -89,6 +86,14 @@ namespace TravelAgency.Controllers
             if (trip.EndDate <= trip.StartDate)
             {
                 TempData["Error"] = "End date must be after start date";
+                return View(trip);
+            }
+
+            var allowedCategories = new[] { "Family", "Honeymoon", "Adventure", "Cruise", "Luxury" };
+            if (string.IsNullOrWhiteSpace(trip.Category) ||
+                !allowedCategories.Contains(trip.Category, StringComparer.OrdinalIgnoreCase))
+            {
+                TempData["Error"] = "Please select a valid category.";
                 return View(trip);
             }
 
@@ -177,6 +182,9 @@ namespace TravelAgency.Controllers
 
             Trip trip = null;
             var gallery = new List<TripImage>();
+
+            var reviews = new List<dynamic>();
+
             using (var conn = new SqlConnection(_connStr))
             {
                 conn.Open();
@@ -216,11 +224,36 @@ namespace TravelAgency.Controllers
                         ImagePath = r2["ImagePath"].ToString()
                     });
                 }
+                r2.Close();
+
+                var revCmd = new SqlCommand(@"
+                    SELECT r.ReviewId, r.Rating, r.Comment, r.CreatedAt, u.FullName
+                    FROM Reviews r
+                    JOIN Users u ON r.UserId = u.UserId
+                    WHERE r.TripId = @tid
+                    ORDER BY r.CreatedAt DESC", conn);
+                revCmd.Parameters.AddWithValue("@tid", id);
+
+                using var rr = revCmd.ExecuteReader();
+                while (rr.Read())
+                {
+                    reviews.Add(new
+                    {
+                        ReviewId = (int)rr["ReviewId"],
+                        FullName = rr["FullName"]?.ToString() ?? "",
+                        Rating = (int)rr["Rating"],
+                        Comment = rr["Comment"] == DBNull.Value ? "" : rr["Comment"]?.ToString() ?? "",
+                        CreatedAt = (DateTime)rr["CreatedAt"]
+                    });
+                }
 
                 conn.Close();
             }
 
             ViewBag.Gallery = gallery;
+
+            ViewBag.Reviews = reviews;
+
             return View(trip);
         }
 
@@ -235,6 +268,9 @@ namespace TravelAgency.Controllers
             {
                 var gallery = new List<TripImage>();
                 string? existingMainPath = null;
+
+                var reviews = new List<dynamic>();
+
                 using (var conn = new SqlConnection(_connStr))
                 {
                     conn.Open();
@@ -251,17 +287,42 @@ namespace TravelAgency.Controllers
                         });
                     }
                     r2.Close();
+
                     // load main image path
                     var mainCmd = new SqlCommand("SELECT ImagePath FROM Trips WHERE TripId=@id", conn);
                     mainCmd.Parameters.AddWithValue("@id", trip.TripId);
                     var obj = mainCmd.ExecuteScalar();
                     existingMainPath = obj == DBNull.Value || obj == null ? null : obj.ToString();
 
+                    var revCmd = new SqlCommand(@"
+                        SELECT r.ReviewId, r.Rating, r.Comment, r.CreatedAt, u.FullName
+                        FROM Reviews r
+                        JOIN Users u ON r.UserId = u.UserId
+                        WHERE r.TripId = @tid
+                        ORDER BY r.CreatedAt DESC", conn);
+                    revCmd.Parameters.AddWithValue("@tid", trip.TripId);
+
+                    using var rr = revCmd.ExecuteReader();
+                    while (rr.Read())
+                    {
+                        reviews.Add(new
+                        {
+                            ReviewId = (int)rr["ReviewId"],
+                            FullName = rr["FullName"]?.ToString() ?? "",
+                            Rating = (int)rr["Rating"],
+                            Comment = rr["Comment"] == DBNull.Value ? "" : rr["Comment"]?.ToString() ?? "",
+                            CreatedAt = (DateTime)rr["CreatedAt"]
+                        });
+                    }
+
                     conn.Close();
                 }
 
                 ViewBag.Gallery = gallery;
                 ViewBag.ExistingMainPath = existingMainPath;
+
+                ViewBag.Reviews = reviews;
+
                 return View(trip);
             }
 

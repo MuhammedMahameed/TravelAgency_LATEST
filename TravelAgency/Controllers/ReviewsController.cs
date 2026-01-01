@@ -70,6 +70,14 @@ namespace TravelAgency.Controllers
             }
 
             TempData["Success"] = "Review deleted successfully!";
+
+            var referer = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(referer) && referer.Contains("/Admin/EditTrip", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("EditTrip", "Admin", new { id = tripId });
+            }
+
+            // אחרת - נחזור ל-Details הרגיל
             return RedirectToAction("Details", "Trips", new { id = tripId });
         }
     }

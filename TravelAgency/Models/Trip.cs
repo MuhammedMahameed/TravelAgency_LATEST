@@ -36,6 +36,9 @@ namespace TravelAgency.Models
         [Range(0, 500, ErrorMessage = "Available rooms must be between 0 and 500")]
         public int AvailableRooms { get; set; }
 
+        [Required(ErrorMessage = "Category is required")]
+        [RegularExpression("^(Family|Honeymoon|Adventure|Cruise|Luxury)$",
+            ErrorMessage = "Category must be one of: Family, Honeymoon, Adventure, Cruise, or Luxury.")]
         [StringLength(100, ErrorMessage = "Category must be at most 100 characters")]
         public string Category { get; set; } = string.Empty;
 
@@ -47,6 +50,8 @@ namespace TravelAgency.Models
 
         public string? ImagePath { get; set; }
     }
+
+
 }
 
 // Simple custom validation attribute for EndDate > StartDate

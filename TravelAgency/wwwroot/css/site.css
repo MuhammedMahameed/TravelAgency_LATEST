@@ -289,3 +289,14 @@ body {
         display: none;
     }
 }
+
+
+/* --- Fix black input background on focus --- */
+input.form-control:focus,
+textarea.form-control:focus,
+select.form-control:focus {
+    background-color: #ffffff !important; /* רקע לבן */
+    color: #000000 !important; /* טקסט שחור */
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* גבול כחול עדין */
+    border-color: #86b7fe;
+}
