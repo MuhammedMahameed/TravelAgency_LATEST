@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using TravelAgency.Helpers;
 using TravelAgency.Models;
+using TravelAgency.ViewModel;
 
 namespace TravelAgency.Controllers;
 
@@ -41,14 +43,14 @@ public class AccountController : Controller
             using (var transaction = connection.BeginTransaction())
             {
                 var isExsistCMD = new SqlCommand(
-                @"SELECT COUNT(*) FROM Users WHERE Email = @email", connection,transaction);
+                @"SELECT COUNT(*) FROM Users WHERE Email = @email", connection, transaction);
                 isExsistCMD.Parameters.AddWithValue("@email", user.Email);
                 int count = (int)isExsistCMD.ExecuteScalar();
                 if (count > 0)
                 {
                     transaction.Rollback();
-                    TempData["UserAlreadyExists"] =  "Email is already registered.";
-                    return RedirectToAction("LogIn");
+                    TempData["UserAlreadyExists"] = "Email is already registered.";
+                    return RedirectToAction("Login");
                 }
             }
 
@@ -68,7 +70,7 @@ public class AccountController : Controller
     [HttpPost]
     public IActionResult Login(string email, string password)
     {
-        string role = "User";   
+        string role = "User";
         string status = "Active";
 
         using (SqlConnection connection = new SqlConnection(_connStr))
@@ -124,4 +126,212 @@ public class AccountController : Controller
     {
         return View();
     }
+
+    [HttpGet]
+    [HttpGet]
+    public IActionResult ForgotPassword()
+    {
+        TempData["Error"] = null;
+        TempData["Success"] = null;
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult ForgotPassword(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            TempData["Error"] = "Please enter your email address.";
+            return View();
+        }
+
+        using (var conn = new SqlConnection(_connStr))
+        {
+            conn.Open();
+            var cmd = new SqlCommand("SELECT UserId FROM Users WHERE Email=@e", conn);
+            cmd.Parameters.AddWithValue("@e", email);
+            var userObj = cmd.ExecuteScalar();
+
+            if (userObj == null)
+            {
+                TempData["Error"] = "Email not found in our system.";
+                return View();
+            }
+
+            string resetToken = Guid.NewGuid().ToString();
+
+            // נוודא שקיימת טבלת PasswordResets במסד
+            var createTableCmd = new SqlCommand(@"
+                IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PasswordResets' AND xtype='U')
+                CREATE TABLE PasswordResets (
+                    Id INT IDENTITY(1,1) PRIMARY KEY,
+                    Email NVARCHAR(200) NOT NULL,
+                    Token NVARCHAR(200) NOT NULL,
+                    ExpireAt DATETIME NOT NULL
+                )", conn);
+            createTableCmd.ExecuteNonQuery();
+
+            // נוסיף את הטוקן עם תוקף של שעה
+            var tokenCmd = new SqlCommand(@"
+                INSERT INTO PasswordResets (Email, Token, ExpireAt)
+                VALUES (@e, @t, DATEADD(HOUR, 1, GETDATE()))", conn);
+            tokenCmd.Parameters.AddWithValue("@e", email);
+            tokenCmd.Parameters.AddWithValue("@t", resetToken);
+            tokenCmd.ExecuteNonQuery();
+
+            string resetLink = $"https://localhost:7217/Account/ChangePassword?token={resetToken}";
+
+            EmailHelper.Send(
+                email,
+                "Travel Agency - Reset your password",
+                $"Click the link below to reset your password:\n{resetLink}\n\nThis link will expire in 1 hour."
+            );
+
+            TempData["Success"] = "A password reset link has been sent to your email.";
+            return RedirectToAction("Login");
+        }
+    }
+
+    [HttpGet]
+    public IActionResult ChangePassword(string? token)
+    {
+
+        TempData["Success"] = null;
+        TempData["Error"] = null;
+        // אם יש טוקן בקישור - נבדוק אותו
+        if (!string.IsNullOrEmpty(token))
+        {
+            using (var conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+                var cmd = new SqlCommand(
+                    "SELECT Email FROM PasswordResets WHERE Token=@t AND ExpireAt > GETDATE()", conn);
+                cmd.Parameters.AddWithValue("@t", token);
+                var email = cmd.ExecuteScalar()?.ToString();
+
+                if (email == null)
+                {
+                    TempData["Error"] = "Reset link is invalid or expired.";
+                    return RedirectToAction("ForgotPassword");
+                }
+
+                // נשמור את האימייל בסשן כדי לזהות את המשתמש בשלב האיפוס
+                HttpContext.Session.SetString("ResetEmail", email);
+            }
+        }
+        else if (HttpContext.Session.GetString("ResetEmail") == null)
+        {
+            return RedirectToAction("ForgotPassword");
+        }
+
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult ChangePassword(string newPassword, string confirmPassword)
+    {
+        string? email = HttpContext.Session.GetString("ResetEmail");
+        if (email == null)
+            return RedirectToAction("ForgotPassword");
+
+        if (string.IsNullOrWhiteSpace(newPassword) || newPassword != confirmPassword)
+        {
+            TempData["Error"] = "Passwords do not match.";
+            return View();
+        }
+
+        using (var conn = new SqlConnection(_connStr))
+        {
+            conn.Open();
+            string hashed = PasswordHelper.Hash(newPassword);
+            var cmd = new SqlCommand("UPDATE Users SET PasswordHash=@p WHERE Email=@e", conn);
+            cmd.Parameters.AddWithValue("@p", hashed);
+            cmd.Parameters.AddWithValue("@e", email);
+            cmd.ExecuteNonQuery();
+
+            // מוחקים את הטוקן כדי למנוע שימוש חוזר
+            var del = new SqlCommand("DELETE FROM PasswordResets WHERE Email=@e", conn);
+            del.Parameters.AddWithValue("@e", email);
+            del.ExecuteNonQuery();
+        }
+
+        HttpContext.Session.Remove("ResetEmail");
+        TempData["Success"] = "Your password has been updated successfully.";
+        return RedirectToAction("Login");
+    }
+
+
+    [HttpGet]
+    public IActionResult Profile()
+    {
+        int? userId = HttpContext.Session.GetInt32("UserId");
+        if (userId == null)
+            return RedirectToAction("Login");
+
+        var vm = new ProfileViewModel();
+
+        using (var conn = new SqlConnection(_connStr))
+        {
+            conn.Open();
+            var cmd = new SqlCommand(@"
+            SELECT UserId, FullName, Email, Role, Status
+            FROM Users
+            WHERE UserId = @id", conn);
+
+            cmd.Parameters.AddWithValue("@id", userId.Value);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                vm.UserId = (int)reader["UserId"];
+                vm.FullName = reader["FullName"]?.ToString() ?? "";
+                vm.Email = reader["Email"]?.ToString() ?? "";
+                vm.Role = reader["Role"]?.ToString() ?? "User";
+                vm.Status = reader["Status"]?.ToString() ?? "Active";
+            }
+            else
+            {
+                // אם משום מה אין משתמש במסד
+                HttpContext.Session.Clear();
+                return RedirectToAction("Login");
+            }
+        }
+
+        return View(vm);
+    }
+
+    [HttpPost]
+    public IActionResult Profile(ProfileViewModel vm)
+    {
+        int? userId = HttpContext.Session.GetInt32("UserId");
+        if (userId == null)
+            return RedirectToAction("Login");
+
+        if (string.IsNullOrWhiteSpace(vm.FullName))
+        {
+            TempData["Error"] = "Full name is required.";
+            return View(vm);
+        }
+
+        using (var conn = new SqlConnection(_connStr))
+        {
+            conn.Open();
+            var cmd = new SqlCommand(@"
+            UPDATE Users
+            SET FullName = @name
+            WHERE UserId = @id", conn);
+
+            cmd.Parameters.AddWithValue("@name", vm.FullName.Trim());
+            cmd.Parameters.AddWithValue("@id", userId.Value);
+
+            cmd.ExecuteNonQuery();
+        }
+
+        // עדכון גם ב-Session כדי שיראה מיד בכותרת (Hello, ...)
+        HttpContext.Session.SetString("FullName", vm.FullName.Trim());
+
+        TempData["Success"] = "Profile updated successfully!";
+        return RedirectToAction("Profile");
+    }
+
 }

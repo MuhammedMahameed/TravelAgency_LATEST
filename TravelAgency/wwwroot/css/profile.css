@@ -1,0 +1,181 @@
+﻿/* wwwroot/css/profile.css */
+
+.profile-page {
+    min-height: 100vh;
+    padding: 48px 0;
+    background: linear-gradient(180deg, #f9fafc 0%, #f1f3f6 100%);
+}
+
+/* הכרטיס של הפרופיל */
+.profile-card {
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+    .profile-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 26px rgba(0,0,0,0.12);
+    }
+
+/* כותרות */
+.profile-title {
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.profile-subtitle {
+    color: #6c757d;
+}
+
+/* פוקוס בשדות */
+.profile-card .form-control:focus {
+    border-color: #6ba7e6;
+    box-shadow: 0 0 0 0.2rem rgba(107,167,230,0.25);
+}
+
+/* כפתורי עליון */
+.profile-actions .btn {
+    border-radius: 10px;
+}
+
+/* ---------- שיפורים נוספים (בלי לפגוע במה שיש) ---------- */
+
+/* ריווח נעים יותר בין אלמנטים */
+.profile-page .container {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+/* שדות קצת יותר "רכים" */
+.profile-card .form-control {
+    border-radius: 12px;
+}
+
+/* כפתור Save שיראה יותר מודרני */
+.profile-card .btn.btn-primary {
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(13,110,253,0.18);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .profile-card .btn.btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px rgba(13,110,253,0.24);
+    }
+
+/* עיצוב ההודעות (Success/Error) שייראו תואמות לדף */
+.profile-page .alert {
+    border-radius: 14px;
+    border: 0;
+    padding: 14px 16px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+}
+
+.profile-page .alert-success {
+    background: rgba(25,135,84,0.12);
+    color: #146c43;
+}
+
+.profile-page .alert-danger {
+    background: rgba(220,53,69,0.10);
+    color: #b02a37;
+}
+
+/* קישור My Bookings שיהיה קצת יותר ברור */
+.profile-page a.text-decoration-none.fw-semibold {
+    display: inline-block;
+    padding: 6px 2px;
+}
+
+/* ============================================================
+   ✅ תוספות ל-Change Password שנפתח בתוך ה-Profile
+   (בלי להסיר שום דבר, רק מוסיף)
+   ============================================================ */
+
+/* כפתור Change Password שיהיה תואם ל-Save */
+.profile-card .btn.btn-outline-secondary {
+    border-radius: 12px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .profile-card .btn.btn-outline-secondary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    }
+
+/* כפתור Update Password */
+.profile-card .btn.btn-success {
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(25,135,84,0.18);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .profile-card .btn.btn-success:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px rgba(25,135,84,0.24);
+    }
+
+/* פס הפרדה יפה לפני הטופס */
+.profile-card hr {
+    opacity: 0.15;
+    margin: 18px 0;
+}
+
+/* אנימציה עדינה לטופס שנפתח */
+#passwordSection {
+    border-radius: 14px;
+    padding: 14px;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(0,0,0,0.06);
+    animation: profileFadeIn 0.18s ease-in-out;
+}
+
+@keyframes profileFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ✅ צבעים מתאימים לכותרות ול-Labels באזור Change Password */
+#passwordSection h5 {
+    color: #0b2a4a;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+}
+
+#passwordSection .form-label {
+    color: #0b2a4a;
+    font-weight: 700;
+}
+
+/* אם אתה משתמש ב-placeholder ורוצה שיהיה קריא */
+#passwordSection .form-control::placeholder {
+    color: rgba(11, 42, 74, 0.45);
+}
+
+
+.profile-card .form-label {
+    color: #0b2a4a; /* כחול כהה קריא */
+    font-weight: 700;
+    letter-spacing: 0.15px;
+}
+
+/* התאמה למסכים קטנים */
+@media (max-width: 576px) {
+    .profile-card .btn.btn-lg {
+        width: 100%;
+    }
+
+    .profile-card .d-flex.justify-content-end.gap-2 {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

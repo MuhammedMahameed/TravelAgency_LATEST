@@ -1,27 +1,68 @@
 ﻿@model List<TravelAgency.ViewModel.BookingViewModel>
 
-<h2>Past Trips</h2>
-
-@if (!Model.Any())
-{
-    <p>You have no past trips.</p>
+@{
+    ViewData["Title"] = "Past Trips";
 }
-else
-{
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>Destination</th>
-            <th>Country</th>
-            <th>Start Date</th>
-        </tr>
 
-        @foreach (var trip in Model)
+<link rel="stylesheet" href="~/css/past-trips.css" asp-append-version="true" />
+
+<div class="past-trips-page">
+    <div class="container past-trips-container">
+
+        <!-- ===== HEADER ===== -->
+        <div class="past-trips-header d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <div>
+                <h2 class="past-trips-title d-flex align-items-center mb-1">
+                    <i class="bi bi-airplane-fill me-2"></i> My Past Trips
+                </h2>
+                <div class="past-trips-subtitle">Trips you already completed</div>
+            </div>
+
+            <a href="/Trips/Gallery" class="btn btn-outline-secondary fw-semibold">
+                <i class="bi bi-arrow-left"></i> Back to Gallery
+            </a>
+        </div>
+
+        <!-- ===== EMPTY STATE ===== -->
+        @if (Model == null || !Model.Any())
         {
-            <tr>
-                <td>@trip.Destination</td>
-                <td>@trip.Country</td>
-                <td>@trip.StartDate.ToShortDateString()</td>
-            </tr>
+            <div class="alert alert-info shadow-sm rounded-4 py-3 px-4 text-center">
+                <i class="bi bi-info-circle me-2"></i>You have no past trips yet.
+            </div>
         }
-    </table>
-}
+        else
+        {
+            <div class="row g-4">
+                @foreach (var trip in Model)
+                {
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card past-trip-card border-0 overflow-hidden h-100">
+                            <div class="ratio ratio-16x9 bg-light">
+                                <img src="@(string.IsNullOrEmpty(trip.ImagePath) ? "/images/trips/default.jpg" : trip.ImagePath)"
+                                     class="past-trip-img"
+                                     alt="@trip.Destination"
+                                     onerror="this.onerror=null; this.src='/images/trips/default.jpg';" />
+                            </div>
+
+                            <div class="card-body p-3">
+                                <h5 class="past-trip-destination mb-1 text-capitalize">@trip.Destination</h5>
+                                <div class="past-trip-country text-muted mb-2">@trip.Country</div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="past-trip-date">
+                                        <i class="bi bi-calendar-event me-1"></i>@trip.StartDate.ToShortDateString()
+                                    </small>
+
+                                    <span class="badge past-trip-badge px-3 py-2 rounded-pill">
+                                        Completed
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+    </div>
+</div>

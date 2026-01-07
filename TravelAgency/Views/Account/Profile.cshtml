@@ -1,0 +1,107 @@
+﻿@model TravelAgency.ViewModel.ProfileViewModel
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="profile-page">
+    <div class="container py-5" style="max-width:900px;">
+
+        <div>
+            <h2 class="profile-title fw-bold mb-1">My Profile</h2>
+            <div class="profile-subtitle text-muted mb-4">Manage your account details</div>
+        </div>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+
+        <div class="card profile-card shadow rounded-4 border-0 bg-light">
+            <div class="card-body p-4">
+                <form method="post">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Full Name</label>
+                            <input class="form-control form-control-lg" name="FullName" value="@Model.FullName" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email</label>
+                            <input class="form-control form-control-lg" value="@Model.Email" readonly />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Role</label>
+                            <input class="form-control" value="@Model.Role" readonly />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Status</label>
+                            <input class="form-control" value="@Model.Status" readonly />
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-end gap-2">
+                        <button class="btn btn-primary btn-lg px-4" type="submit">
+                            Save Changes
+                        </button>
+                        <button class="btn btn-outline-secondary btn-lg px-4" type="button" id="toggleChangePassword">
+                            Change Password
+                        </button>
+                    </div>
+                </form>
+
+                <!-- טופס החלפת סיסמה (מוסתר בהתחלה) -->
+                <div id="passwordSection" class="mt-4" style="display:none;">
+                    <hr />
+                    <h5 class="fw-semibold mb-3">Change Password</h5>
+
+                    <form method="post" action="/Account/ChangePassword" id="passwordForm">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Old Password</label>
+                                <input type="password" class="form-control" name="oldPassword" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">New Password</label>
+                                <input type="password" class="form-control" name="newPassword" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Confirm Password</label>
+                                <input type="password" class="form-control" name="confirmPassword" required />
+                            </div>
+                        </div>
+
+                        <div class="mt-4 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success btn-lg px-4">
+                                Update Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a class="text-decoration-none fw-semibold" href="/Booking/MyBookings">My Bookings</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const toggleBtn = document.getElementById('toggleChangePassword');
+        const passwordSection = document.getElementById('passwordSection');
+        toggleBtn.addEventListener('click', () => {
+            const visible = passwordSection.style.display === 'block';
+            passwordSection.style.display = visible ? 'none' : 'block';
+            toggleBtn.innerText = visible ? 'Change Password' : 'Hide';
+        });
+    </script>
+}

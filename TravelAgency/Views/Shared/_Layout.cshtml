@@ -54,6 +54,10 @@
                                 <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Booking/MyBookings">
                                     My Bookings
                                 </a>
+                                <a href="/Account/Profile" class="btn btn-outline-secondary">
+                                    <i class="bi bi-person-circle me-1"></i> Profile
+                                </a>
+
                             }
 
                             if (role == "Admin")
@@ -67,9 +71,6 @@
                             }
 
                             <!-- Hello + Logout -->
-                            <span class="gallery-hello">
-                                Hello, @Context.Session.GetString("FullName")
-                            </span>
 
                             <a class="btn btn-danger btn-sm gallery-btn" href="/Account/Logout">
                                 Logout

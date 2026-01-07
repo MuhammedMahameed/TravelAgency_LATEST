@@ -301,6 +301,51 @@ public class TripsController : Controller
         return View(trip);
     }
 
+
+   
+    public IActionResult PastTrips()
+    {
+        int? userId = HttpContext.Session.GetInt32("UserId");
+        if (userId == null)
+            return RedirectToAction("Login", "Account");
+
+        var list = new List<TravelAgency.ViewModel.BookingViewModel>();
+
+        using (var conn = new SqlConnection(_connStr))
+        {
+            conn.Open();
+
+            var cmd = new SqlCommand(@"
+            SELECT t.Destination, t.Country, t.StartDate, t.ImagePath, b.Status
+            FROM Bookings b
+            JOIN Trips t ON b.TripId = t.TripId
+            WHERE b.UserId = @uid AND t.EndDate < GETDATE()
+            ORDER BY t.StartDate DESC", conn);
+
+            cmd.Parameters.AddWithValue("@uid", userId);
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    list.Add(new TravelAgency.ViewModel.BookingViewModel
+                    {
+                        Destination = reader["Destination"].ToString(),
+                        Country = reader["Country"].ToString(),
+                        StartDate = (DateTime)reader["StartDate"],
+                        Status = reader["Status"].ToString(),
+                        ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"].ToString()
+                    });
+                }
+            }
+
+            conn.Close();
+        }
+
+        return View(list);
+    }
+
+
     // GET
     public IActionResult Index()
     {

@@ -20,4 +20,7 @@ public class BookingViewModel
 
     public string Status { get; set; } = string.Empty;
     public bool IsPaid { get; set; }
+
+    public string? ImagePath { get; set; }
+
 }

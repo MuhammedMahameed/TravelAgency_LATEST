@@ -40,7 +40,9 @@ namespace TravelAgency.Controllers
                         Destination = reader["Destination"].ToString(),
                         Country = reader["Country"].ToString(),
                         Price = (decimal)reader["Price"],
-                        AvailableRooms = (int)reader["AvailableRooms"]
+                        AvailableRooms = (int)reader["AvailableRooms"],
+                        ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"].ToString()
+
                     });
                 }
                 conn.Close();
@@ -840,7 +842,7 @@ namespace TravelAgency.Controllers
             {
                 conn.Open();
                 var cmd = new SqlCommand(@"
-            SELECT t.Destination, t.Country, t.StartDate, b.Status
+            SELECT t.Destination, t.Country, t.StartDate, t.ImagePath, b.Status
             FROM Bookings b
             JOIN Trips t ON b.TripId = t.TripId
             WHERE b.UserId=@uid
@@ -856,7 +858,8 @@ namespace TravelAgency.Controllers
                         Destination = reader["Destination"].ToString(),
                         Country = reader["Country"].ToString(),
                         StartDate = (DateTime)reader["StartDate"],
-                        Status = reader["Status"].ToString()
+                        Status = reader["Status"].ToString(),
+                        ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"].ToString()
                     });
                 }
                 conn.Close();
@@ -865,9 +868,13 @@ namespace TravelAgency.Controllers
             return View(list);
         }
 
+
         public IActionResult Index()
         {
             return View();
         }
+
+
+
     }
 }
