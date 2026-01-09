@@ -16,6 +16,20 @@
             <p>Browse our travel packages and book your next adventure</p>
         </div>
 
+        <!-- ===== TEMP MESSAGES ===== -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success text-center shadow-sm">
+                <i class="bi bi-check-circle me-1"></i>@TempData["Success"]
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger text-center shadow-sm">
+                <i class="bi bi-exclamation-triangle me-1"></i>@TempData["Error"]
+            </div>
+        }
+
         <div class="hero-wrap">
             <div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel" data-bs-interval="3500">
 
@@ -30,15 +44,12 @@
                     <div class="carousel-item active">
                         <img src="/images/trips/hero-paris.jpg" alt="Paris">
                     </div>
-
                     <div class="carousel-item">
                         <img src="/images/trips/hero-rome.jpg" alt="Rome">
                     </div>
-
                     <div class="carousel-item">
                         <img src="/images/trips/hero-tokyo.jpg" alt="Tokyo">
                     </div>
-
                     <div class="carousel-item">
                         <img src="/images/trips/hero-newyork.jpg" alt="Dubai">
                     </div>
@@ -53,7 +64,6 @@
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Next</span>
                 </button>
-
             </div>
         </div>
 
@@ -67,18 +77,14 @@
             </div>
 
             <div class="col-md-2 col-sm-3">
-                <input name="minPrice"
-                       type="number"
-                       step="0.01"
+                <input name="minPrice" type="number" step="0.01"
                        class="form-control form-control-sm"
                        placeholder="Min ₪"
                        value="@Context.Request.Query["minPrice"]" />
             </div>
 
             <div class="col-md-2 col-sm-3">
-                <input name="maxPrice"
-                       type="number"
-                       step="0.01"
+                <input name="maxPrice" type="number" step="0.01"
                        class="form-control form-control-sm"
                        placeholder="Max ₪"
                        value="@Context.Request.Query["maxPrice"]" />
@@ -106,17 +112,13 @@
             </div>
 
             <div class="col-md-1 col-sm-4">
-                <button class="btn btn-primary btn-sm w-100">
-                    Apply
-                </button>
+                <button class="btn btn-primary btn-sm w-100">Apply</button>
             </div>
         </form>
 
         @if (!Model.Any())
         {
-            <div class="alert alert-warning text-center">
-                No trips found.
-            </div>
+            <div class="alert alert-warning text-center">No trips found.</div>
         }
 
         <!-- CARDS -->
@@ -126,7 +128,7 @@
                 var t = item.Trip;
 
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="trip-card h-100">
+                    <div class="trip-card h-100 shadow-sm rounded-3">
                         <a href="/Trips/Details/@t.TripId" class="text-decoration-none">
                             @if (!string.IsNullOrEmpty(t.ImagePath))
                             {
@@ -147,22 +149,15 @@
                             </div>
 
                             @{
-                                bool onSale =
-                                t.OldPrice != null &&
-                                t.DiscountEndDate != null &&
-                                t.DiscountEndDate > DateTime.Now;
+                                bool onSale = t.OldPrice != null && t.DiscountEndDate != null && t.DiscountEndDate > DateTime.Now;
                             }
 
                             <div class="small mb-1">
                                 <strong>Price:</strong>
                                 @if (onSale)
                                 {
-                                    <span class="text-muted text-decoration-line-through">
-                                        ₪@t.OldPrice
-                                    </span>
-                                    <span class="text-danger fw-bold ms-1">
-                                        ₪@t.Price
-                                    </span>
+                                    <span class="text-muted text-decoration-line-through">₪@t.OldPrice</span>
+                                    <span class="text-danger fw-bold ms-1">₪@t.Price</span>
                                 }
                                 else
                                 {
@@ -176,14 +171,12 @@
 
                             @if (item.WaitingCount > 0)
                             {
-                                <span class="badge bg-warning text-dark mt-1">
-                                    @item.WaitingCount waiting
-                                </span>
+                                <span class="badge bg-warning text-dark mt-1">@item.WaitingCount waiting</span>
                             }
                         </div>
 
                         <!-- ACTIONS -->
-                        <div class="card-footer text-center py-3">
+                        <div class="card-footer text-center py-3 bg-light">
                             @if (t.AvailableRooms > 0)
                             {
                                 if (item.IsBookedByMe)
@@ -191,59 +184,44 @@
                                     <button class="btn btn-success btn-sm w-75" disabled>Booked</button>
                                     <a href="/Booking/MyBookings" class="btn btn-outline-primary btn-sm mt-2 w-75">My Bookings</a>
                                 }
-                                else if (item.WaitingCount == 0 || item.IsMyTurn)
-                                {
-                                    <a href="/Booking/Start/@t.TripId"
-                                       class="btn btn-primary btn-sm w-75">
-                                        Book Now
-                                    </a>
-                                }
                                 else
                                 {
-                                    <span class="text-warning small">
-                                        Waiting list active
-                                    </span>
+                                    <a href="/Booking/Start/@t.TripId" class="btn btn-primary btn-sm w-75">Book Now</a>
                                 }
                             }
                             else
                             {
-                                <span class="text-danger small">
-                                    Fully booked
-                                </span>
-                            }
+                                <span class="text-danger small d-block mb-1">Fully booked</span>
 
-                            @if (Context.Session.GetInt32("UserId") != null)
-                            {
-                                if (item.IAmInWaitingList)
+                                @if (Context.Session.GetInt32("UserId") != null)
                                 {
-                                    <div class="mt-2 text-muted small">
-                                        Position:
-                                        <strong>@item.MyPosition</strong>
-
-                                        <form method="post"
-                                              action="/WaitingList/Leave"
-                                              class="d-inline ms-1">
-                                            <input type="hidden"
-                                                   name="tripId"
-                                                   value="@t.TripId" />
-                                            <button class="btn btn-outline-danger btn-sm py-0 px-2">
-                                                Leave
+                                    if (item.IAmInWaitingList)
+                                    {
+                                        <div class="alert alert-info small py-1 mb-2">
+                                            You are on the waiting list (Position #@item.MyPosition)
+                                        </div>
+                                        <form method="post" asp-controller="WaitingList" asp-action="Leave">
+                                            <input type="hidden" name="tripId" value="@t.TripId" />
+                                            <button type="submit" class="btn btn-outline-danger btn-sm w-75">
+                                                Leave Waiting List
                                             </button>
                                         </form>
-                                    </div>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-controller="WaitingList" asp-action="Join">
+                                            <input type="hidden" name="tripId" value="@t.TripId" />
+                                            <button type="submit" class="btn btn-outline-warning btn-sm w-75 mt-1 fw-semibold">
+                                                <i class="bi bi-hourglass-split"></i> Join Waiting List
+                                            </button>
+                                        </form>
+                                    }
                                 }
-                                else if (!item.IsBookedByMe && (t.AvailableRooms <= 0 || item.WaitingCount > 0))
+                                else
                                 {
-                                    <form method="post"
-                                          action="/WaitingList/Join"
-                                          class="mt-2">
-                                        <input type="hidden"
-                                               name="tripId"
-                                               value="@t.TripId" />
-                                        <button class="btn btn-outline-secondary btn-sm w-75">
-                                            Join Waiting List
-                                        </button>
-                                    </form>
+                                    <a href="/Account/Login" class="btn btn-outline-secondary btn-sm w-75 mt-1">
+                                        Login to Join Waiting List
+                                    </a>
                                 }
                             }
                         </div>
@@ -267,8 +245,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Comment</label>
-                            <textarea class="form-control" name="comment" maxlength="500"
-                                  placeholder="Write your feedback about the website..."></textarea>
+                            <textarea class="form-control" name="comment" maxlength="500" placeholder="Write your feedback about the website..."></textarea>
                         </div>
                         <button class="btn btn-primary w-100" type="submit">Submit Feedback</button>
                     </form>
@@ -364,7 +341,6 @@
                         .catch(() => alert('Failed to send feedback.'));
                 });
             </script>
-
         }
     </div>
 </div>

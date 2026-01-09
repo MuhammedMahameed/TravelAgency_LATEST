@@ -110,3 +110,13 @@ body {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
+
+
+.table-hover tbody tr:hover {
+    background-color: #f7f9fc;
+}
+
+.badge.bg-primary {
+    font-size: 0.9rem;
+    padding: 0.5em 0.75em;
+}

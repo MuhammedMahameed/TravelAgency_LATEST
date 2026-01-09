@@ -869,6 +869,155 @@ namespace TravelAgency.Controllers
         }
 
 
+        [HttpGet]
+        public IActionResult WaitingList(int id)
+        {
+            var list = new List<dynamic>();
+
+            using (var conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+
+                var cmd = new SqlCommand(@"
+            SELECT w.WaitingId, u.FullName, u.Email, w.JoinDate,
+                   ROW_NUMBER() OVER (ORDER BY w.JoinDate) AS Position
+            FROM WaitingList w
+            JOIN Users u ON w.UserId = u.UserId
+            WHERE w.TripId = @tid
+            ORDER BY w.JoinDate ASC", conn);
+
+                cmd.Parameters.AddWithValue("@tid", id);
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    list.Add(new
+                    {
+                        WaitingId = Convert.ToInt32(reader["WaitingId"]),
+                        FullName = reader["FullName"].ToString(),
+                        Email = reader["Email"].ToString(),
+                        JoinDate = ((DateTime)reader["JoinDate"]).ToString("yyyy-MM-dd HH:mm"),
+                        Position = Convert.ToInt32(reader["Position"])
+                    });
+                }
+
+                conn.Close();
+            }
+
+            ViewBag.TripId = id;
+            return View(list);
+        }
+
+
+        [HttpPost]
+        public IActionResult ProcessWaitingList()
+        {
+            if (!AuthHelper.IsAdmin(HttpContext))
+                return RedirectToAction("Login", "Account");
+
+            using var conn = new SqlConnection(_connStr);
+            conn.Open();
+
+            // 1?? – נבדוק מי קיבל הזדמנות של 24 שעות אבל לא הזמין
+            var expiredCmd = new SqlCommand(@"
+        SELECT WaitingId, TripId, UserId
+        FROM WaitingList
+        WHERE ExpirationAt IS NOT NULL
+          AND GETDATE() > ExpirationAt", conn);
+
+            var toRemove = new List<(int waitingId, int tripId, int userId)>();
+            using (var r = expiredCmd.ExecuteReader())
+            {
+                while (r.Read())
+                {
+                    toRemove.Add((
+                        Convert.ToInt32(r["WaitingId"]),
+                        Convert.ToInt32(r["TripId"]),
+                        Convert.ToInt32(r["UserId"])
+                    ));
+                }
+            }
+
+            // 2?? – נסיר אותם ונשלח הודעה למי שאחריהם
+            foreach (var x in toRemove)
+            {
+                // מחיקה
+                var del = new SqlCommand("DELETE FROM WaitingList WHERE WaitingId=@id", conn);
+                del.Parameters.AddWithValue("@id", x.waitingId);
+                del.ExecuteNonQuery();
+
+                // מציאת הבא בתור
+                var nextCmd = new SqlCommand(@"
+            SELECT TOP 1 w.WaitingId, u.Email
+            FROM WaitingList w
+            JOIN Users u ON w.UserId = u.UserId
+            WHERE w.TripId=@tid AND (w.NotifiedAt IS NULL)
+            ORDER BY w.JoinDate", conn);
+                nextCmd.Parameters.AddWithValue("@tid", x.tripId);
+
+                using var r2 = nextCmd.ExecuteReader();
+                if (r2.Read())
+                {
+                    int nextId = Convert.ToInt32(r2["WaitingId"]);
+                    string email = r2["Email"].ToString();
+
+                    // עדכון תאריך ההתרעה + תפוגה
+                    r2.Close();
+                    var update = new SqlCommand(@"
+                UPDATE WaitingList
+                SET NotifiedAt=GETDATE(), ExpirationAt=DATEADD(hour,24,GETDATE())
+                WHERE WaitingId=@id", conn);
+                    update.Parameters.AddWithValue("@id", nextId);
+                    update.ExecuteNonQuery();
+
+                    // שליחת מייל
+                    EmailHelper.Send(
+                        email,
+                        "Room now available!",
+                        "A room is now available for your desired trip. You have 24 hours to book it before it’s offered to the next user."
+                    );
+                }
+            }
+
+            // 3?? – אם אין פעילים, נאתר את הראשונים שעדיין לא קיבלו הודעה (חדשים ברשימה)
+            var freshCmd = new SqlCommand(@"
+        SELECT TOP 1 w.WaitingId, u.Email
+        FROM WaitingList w
+        JOIN Users u ON w.UserId = u.UserId
+        WHERE w.NotifiedAt IS NULL
+        ORDER BY w.JoinDate", conn);
+
+            using (var fr = freshCmd.ExecuteReader())
+            {
+                if (fr.Read())
+                {
+                    int wid = Convert.ToInt32(fr["WaitingId"]);
+                    string email = fr["Email"].ToString();
+                    fr.Close();
+
+                    var update = new SqlCommand(@"
+                UPDATE WaitingList
+                SET NotifiedAt=GETDATE(), ExpirationAt=DATEADD(hour,24,GETDATE())
+                WHERE WaitingId=@id", conn);
+                    update.Parameters.AddWithValue("@id", wid);
+                    update.ExecuteNonQuery();
+
+                    EmailHelper.Send(
+                        email,
+                        "Room available!",
+                        "You are next in line! You have 24 hours to book your trip."
+                    );
+                }
+            }
+
+            conn.Close();
+            TempData["Success"] = "Waiting list processed successfully.";
+            return RedirectToAction("Trips");
+        }
+
+
+
+
         public IActionResult Index()
         {
             return View();
