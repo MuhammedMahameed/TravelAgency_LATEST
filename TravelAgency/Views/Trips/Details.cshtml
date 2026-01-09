@@ -102,6 +102,10 @@
         <div class="col-md-6">
             <p><strong>Price:</strong> ₪@Model.Price</p>
             <p><strong>Available Rooms:</strong> @Model.AvailableRooms</p>
+            @if (Model.MinAge.HasValue)
+            {
+                <p><strong>Minimum age:</strong> @Model.MinAge.Value years</p>
+            }
         </div>
     </div>
 
@@ -119,9 +123,18 @@
             }
             else
             {
-                <a href="/Booking/BookNow/@Model.TripId" class="btn btn-primary">
-                    Book Now
-                </a>
+                <form method="get" action="/Booking/BookNow" class="d-inline">
+                    <input type="hidden" name="id" value="@Model.TripId" />
+                    <input type="hidden" name="pay" value="true" />
+                    <div class="d-flex gap-2 align-items-center">
+                        <input type="number" name="qty" min="1" max="@Model.AvailableRooms" value="1" class="form-control" style="width:100px;" />
+
+                        <input type="number" name="groupMinAge" min="@(Model.MinAge ?? 0)" max="120" class="form-control" style="width:160px;" placeholder="Group min age"
+                               @(Model.MinAge.HasValue ? "required" : "") />
+
+                        <button type="submit" class="btn btn-primary">Book & Pay</button>
+                    </div>
+                </form>
             }
         }
         else

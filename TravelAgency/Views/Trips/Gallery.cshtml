@@ -153,7 +153,7 @@
                             }
 
                             <div class="small mb-1">
-                                <strong>Price:</strong>
+                                <strong>Price per room:</strong>
                                 @if (onSale)
                                 {
                                     <span class="text-muted text-decoration-line-through">₪@t.OldPrice</span>
@@ -173,64 +173,169 @@
                             {
                                 <span class="badge bg-warning text-dark mt-1">@item.WaitingCount waiting</span>
                             }
-                        </div>
-
-                        <!-- ACTIONS -->
-                        <div class="card-footer text-center py-3 bg-light">
-                            @if (t.AvailableRooms > 0)
+                            @if (t.MinAge.HasValue && t.MinAge.Value > 0)
                             {
-                                if (item.IsBookedByMe)
-                                {
-                                    <button class="btn btn-success btn-sm w-75" disabled>Booked</button>
-                                    <a href="/Booking/MyBookings" class="btn btn-outline-primary btn-sm mt-2 w-75">My Bookings</a>
-                                }
-                                else
-                                {
-                                    <a href="/Booking/Start/@t.TripId" class="btn btn-primary btn-sm w-75">Book Now</a>
-                                }
+                                <span class="badge bg-warning text-dark ms-2">
+                                    Min age: @t.MinAge
+                                </span>
                             }
                             else
                             {
-                                <span class="text-danger small d-block mb-1">Fully booked</span>
-
-                                @if (Context.Session.GetInt32("UserId") != null)
-                                {
-                                    if (item.IAmInWaitingList)
-                                    {
-                                        <div class="alert alert-info small py-1 mb-2">
-                                            You are on the waiting list (Position #@item.MyPosition)
-                                        </div>
-                                        <form method="post" asp-controller="WaitingList" asp-action="Leave">
-                                            <input type="hidden" name="tripId" value="@t.TripId" />
-                                            <button type="submit" class="btn btn-outline-danger btn-sm w-75">
-                                                Leave Waiting List
-                                            </button>
-                                        </form>
-                                    }
-                                    else
-                                    {
-                                        <form method="post" asp-controller="WaitingList" asp-action="Join">
-                                            <input type="hidden" name="tripId" value="@t.TripId" />
-                                            <button type="submit" class="btn btn-outline-warning btn-sm w-75 mt-1 fw-semibold">
-                                                <i class="bi bi-hourglass-split"></i> Join Waiting List
-                                            </button>
-                                        </form>
-                                    }
-                                }
-                                else
-                                {
-                                    <a href="/Account/Login" class="btn btn-outline-secondary btn-sm w-75 mt-1">
-                                        Login to Join Waiting List
-                                    </a>
-                                }
+                                <span class="badge bg-success ms-2">
+                                    All ages
+                                </span>
                             }
                         </div>
-                    </div>
-                </div>
-            }
-        </div>
 
-        <!-- ======== WHAT USERS THINK SECTION ======== -->
+                        <!-- ACTIONS -->
+                        <div class="card-footer text-center py-3">
+                             @if (t.AvailableRooms > 0)
+                             {
+                                 if (item.IsBookedByMe)
+                                 {
+                                     <button class="btn btn-success btn-sm w-75" disabled>Booked</button>
+                                     <a href="/Booking/MyBookings" class="btn btn-outline-primary btn-sm mt-2 w-75">My Bookings</a>
+                                 }
+                                 else if (item.WaitingCount == 0 || item.IsMyTurn)
+                                 {
+                                    <button type="button" class="btn btn-primary btn-sm w-75 book-btn"
+                                            data-tripid="@t.TripId" data-available="@t.AvailableRooms" data-minage="@(t.MinAge ?? 0)">
+                                        Book Now
+                                    </button>
+                                 }
+                                 else
+                                 {
+                                     <span class="text-warning small">
+                                         Waiting list active
+                                     </span>
+                                 }
+                             }
+                             else
+                             {
+                                 <span class="text-danger small">
+                                     Fully booked
+                                 </span>
+                             }
+
+                             @if (Context.Session.GetInt32("UserId") != null)
+                             {
+                                 if (item.IAmInWaitingList)
+                                 {
+                                     <div class="mt-2 text-muted small">
+                                         Position:
+                                         <strong>@item.MyPosition</strong>
+
+                                         <form method="post"
+                                               action="/WaitingList/Leave"
+                                               class="d-inline ms-1">
+                                             <input type="hidden"
+                                                    name="tripId"
+                                                    value="@t.TripId" />
+                                             <button class="btn btn-outline-danger btn-sm py-0 px-2">
+                                                 Leave
+                                             </button>
+                                         </form>
+                                     </div>
+                                 }
+                                 else if (!item.IsBookedByMe && (t.AvailableRooms <= 0 || item.WaitingCount > 0))
+                                 {
+                                     <form method="post"
+                                           action="/WaitingList/Join"
+                                           class="mt-2">
+                                         <input type="hidden"
+                                                name="tripId"
+                                                value="@t.TripId" />
+                                         <button class="btn btn-outline-secondary btn-sm w-75">
+                                             Join Waiting List
+                                         </button>
+                                     </form>
+                                 }
+                             }
+                         </div>
+                     </div>
+                 </div>
+             }
+         </div>
+     </div>
+ </div>
+
+<!-- BOOK MODAL -->
+<div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="bookModalLabel">Book Rooms</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="get" action="/Booking/BookNow" id="bookForm">
+        <div class="modal-body">
+          <input type="hidden" name="id" id="modalTripId" />
+
+          <div class="mb-2">
+            <label class="form-label">How many rooms would you like?</label>
+            <input type="number" name="qty" id="modalQty" class="form-control" value="1" min="1" />
+            <div class="form-text" id="modalAvailableText"></div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Minimum age of participants</label>
+            <input type="number" name="groupminAge" id="modalMinAge" class="form-control" value="0" min="0" />
+            <div class="form-text" id="modalMinAgeHint"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Confirm</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function(){
+            var bookModalEl = document.getElementById('bookModal');
+            if(!bookModalEl) return;
+            var modal = new bootstrap.Modal(bookModalEl);
+
+            document.querySelectorAll('.book-btn').forEach(function(btn){
+                btn.addEventListener('click', function(){
+                    var tripId = btn.getAttribute('data-tripid');
+                    var available = parseInt(btn.getAttribute('data-available') || '0', 10);
+                    var tripMinAge = parseInt(btn.getAttribute('data-minage') || '0', 10);
+                    document.getElementById('modalTripId').value = tripId;
+                    var qty = document.getElementById('modalQty');
+                    qty.value = 1;
+                    qty.min = 1;
+                    qty.max = available;
+                    document.getElementById('modalAvailableText').textContent = available + ' rooms available.';
+                    var minAgeInput = document.getElementById('modalMinAge');
+                    minAgeInput.value = tripMinAge > 0 ? tripMinAge : 0;
+                    minAgeInput.min = tripMinAge > 0 ? tripMinAge : 0;
+                    document.getElementById('modalMinAgeHint').textContent = tripMinAge > 0 ? 'This trip requires minimum age of ' + tripMinAge + ' years.' : 'No minimum age restriction for this trip.';
+                    modal.show();
+                });
+            });
+
+            // simple client-side validation before submit
+            document.getElementById('bookForm').addEventListener('submit', function(e){
+                var qty = parseInt(document.getElementById('modalQty').value || '1', 10);
+                var max = parseInt(document.getElementById('modalQty').max || '1', 10);
+                var providedMinAge = parseInt(document.getElementById('modalMinAge').value || '0', 10);
+                var tripMinAge = parseInt(document.getElementById('modalMinAge').min || '0', 10); // not authoritative
+                if(qty < 1) { e.preventDefault(); alert('Quantity must be at least 1'); return; }
+                if(qty > max) { e.preventDefault(); alert('Requested quantity exceeds availability'); return; }
+                // server will enforce trip minAge, but do a quick client-side hint
+                var hint = document.getElementById('modalMinAgeHint').textContent || '';
+                if (hint.indexOf('requires minimum age') !== -1) {
+                    var required = parseInt(hint.replace(/[^0-9]/g,'')) || 0;
+                    if (providedMinAge < required) { e.preventDefault(); alert('Minimum age for this trip is ' + required + '. Please enter a valid minimum age.'); return; }
+                }
+            });
+        })();
+    </script>
+
+          <!-- ======== WHAT USERS THINK SECTION ======== -->
         <hr class="my-5" />
         <section id="site-reviews" class="mb-5">
             <h3 class="text-center fw-bold text-primary mb-4">What users think about our service</h3>
@@ -260,8 +365,6 @@
 
             <div id="siteReviewList" class="row justify-content-center"></div>
         </section>
-
-        @section Scripts {
             <script>
                 function loadSiteReviews() {
                     fetch('/SiteReviews/List')
@@ -342,5 +445,4 @@
                 });
             </script>
         }
-    </div>
-</div>
+

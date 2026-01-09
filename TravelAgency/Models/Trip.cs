@@ -49,6 +49,11 @@ namespace TravelAgency.Models
         public string Description { get; set; } = string.Empty;
 
         public string? ImagePath { get; set; }
+
+        // New: number of days before StartDate after which cancellation is NOT allowed.
+        // 0 = no limit (users may cancel up to the start date)
+        [Range(0, 365, ErrorMessage = "Cancellation days must be between 0 and 365")]
+        public int CancellationDays { get; set; } = 0;
     }
 
 

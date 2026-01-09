@@ -123,10 +123,10 @@ namespace TravelAgency.Controllers
 
                 var cmd = new SqlCommand(@"
                     INSERT INTO Trips
-                    (Destination, Country, StartDate, EndDate, Price, AvailableRooms, Category, MinAge, Description, ImagePath)
+                    (Destination, Country, StartDate, EndDate, Price, AvailableRooms, Category, MinAge, Description, ImagePath, CancellationDays)
                     OUTPUT INSERTED.TripId
                     VALUES
-                    (@Destination, @Country, @StartDate, @EndDate, @Price, @Rooms, @Category, @MinAge, @Description, @ImagePath)", conn);
+                    (@Destination, @Country, @StartDate, @EndDate, @Price, @Rooms, @Category, @MinAge, @Description, @ImagePath, @CancellationDays)", conn);
 
                 cmd.Parameters.AddWithValue("@Destination", trip.Destination);
                 cmd.Parameters.AddWithValue("@Country", trip.Country);
@@ -140,6 +140,7 @@ namespace TravelAgency.Controllers
                 cmd.Parameters.AddWithValue("@Description", (object?)trip.Description ?? DBNull.Value);
 
                 cmd.Parameters.AddWithValue("@ImagePath", (object?)trip.ImagePath ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@CancellationDays", trip.CancellationDays);
 
                 newTripId = (int)cmd.ExecuteScalar();
 
@@ -208,7 +209,8 @@ namespace TravelAgency.Controllers
                         Category = reader["Category"].ToString(),
                         MinAge = reader["MinAge"] as int?,
                         Description = reader["Description"].ToString(),
-                        ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"].ToString()
+                        ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"].ToString(),
+                        CancellationDays = reader["CancellationDays"] == DBNull.Value ? 0 : Convert.ToInt32(reader["CancellationDays"])
                     };
                 }
                 reader.Close();
@@ -410,7 +412,8 @@ namespace TravelAgency.Controllers
                         AvailableRooms=@Rooms,
                         Category=@Category,
                         MinAge=@MinAge,
-                        Description=@Description
+                        Description=@Description,
+                        CancellationDays=@CancellationDays
                     WHERE TripId=@Id", conn);
 
                 cmd.Parameters.AddWithValue("@Id", trip.TripId);
@@ -423,6 +426,7 @@ namespace TravelAgency.Controllers
                 cmd.Parameters.AddWithValue("@Category", trip.Category);
                 cmd.Parameters.AddWithValue("@MinAge", (object?)trip.MinAge ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@Description", trip.Description ?? string.Empty);
+                cmd.Parameters.AddWithValue("@CancellationDays", trip.CancellationDays);
 
                 cmd.ExecuteNonQuery();
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using System;
-using TravelAgency.Helpers;
+using System.Collections.Generic;
 
 namespace TravelAgency.Helpers
 {
@@ -13,47 +13,81 @@ namespace TravelAgency.Helpers
 
             try
             {
-                // נבדוק אם יש מישהו בתור עם ExpirationAt בתוקף
-                var checkActive = new SqlCommand(@"
-                    SELECT COUNT(*) FROM WaitingList
-                    WHERE TripId=@tid AND ExpirationAt IS NOT NULL AND GETDATE() < ExpirationAt", conn);
-                checkActive.Parameters.AddWithValue("@tid", tripId);
-                int activeCount = (int)checkActive.ExecuteScalar();
-
-                // אם כבר יש מישהו עם תוקף פעיל – לא שולחים שוב
-                if (activeCount > 0)
+                // read current available rooms
+                var roomsCmd = new SqlCommand("SELECT AvailableRooms FROM Trips WHERE TripId=@tid", conn);
+                roomsCmd.Parameters.AddWithValue("@tid", tripId);
+                var roomsObj = roomsCmd.ExecuteScalar();
+                if (roomsObj == null || roomsObj == DBNull.Value)
                     return;
 
-                // נמצא את הבא בתור שעדיין לא קיבל הודעה
+                int availableRooms = (int)roomsObj;
+                if (availableRooms <= 0)
+                    return;
+
+                // count currently-notified (active) waiting entries
+                var activeNotifiedCmd = new SqlCommand(@"
+                    SELECT COUNT(*) FROM WaitingList
+                    WHERE TripId=@tid AND ExpirationAt IS NOT NULL AND GETDATE() < ExpirationAt", conn);
+                activeNotifiedCmd.Parameters.AddWithValue("@tid", tripId);
+                int activeNotified = (int)activeNotifiedCmd.ExecuteScalar();
+
+                // how many new notifications we can send without blocking non-waiting users
+                int freeSlots = availableRooms - activeNotified;
+                if (freeSlots <= 0)
+                    return;
+
+                // select next freeSlots users from waiting list who were not notified yet
                 var nextCmd = new SqlCommand(@"
-                    SELECT TOP 1 w.WaitingId, u.Email
+                    SELECT TOP (@n) w.WaitingId, u.Email
                     FROM WaitingList w
                     JOIN Users u ON w.UserId = u.UserId
-                    WHERE w.TripId=@tid AND w.NotifiedAt IS NULL
+                    WHERE w.TripId = @tid AND w.NotifiedAt IS NULL
                     ORDER BY w.JoinDate", conn);
                 nextCmd.Parameters.AddWithValue("@tid", tripId);
+                nextCmd.Parameters.AddWithValue("@n", freeSlots);
 
-                using var r = nextCmd.ExecuteReader();
-                if (r.Read())
+                var toNotify = new List<(int waitingId, string email)>();
+                using (var r = nextCmd.ExecuteReader())
                 {
-                    int waitingId = Convert.ToInt32(r["WaitingId"]);
-                    string email = r["Email"].ToString();
-                    r.Close();
+                    while (r.Read())
+                    {
+                        toNotify.Add((Convert.ToInt32(r["WaitingId"]), r["Email"]?.ToString() ?? string.Empty));
+                    }
+                }
 
-                    // נעדכן תוקף 24 שעות + זמן הודעה
+                // mark notified and send emails
+                foreach (var entry in toNotify)
+                {
                     var update = new SqlCommand(@"
                         UPDATE WaitingList
-                        SET NotifiedAt=GETDATE(), ExpirationAt=DATEADD(hour,24,GETDATE())
-                        WHERE WaitingId=@id", conn);
-                    update.Parameters.AddWithValue("@id", waitingId);
+                        SET NotifiedAt = GETDATE(), ExpirationAt = DATEADD(hour,24,GETDATE())
+                        WHERE WaitingId = @id", conn);
+                    update.Parameters.AddWithValue("@id", entry.waitingId);
                     update.ExecuteNonQuery();
 
-                    // שליחת מייל
-                    EmailHelper.Send(
-                        email,
-                        "Room available for your trip!",
-                        "A room has just become available for the trip you wanted. You have 24 hours to complete your booking before the opportunity moves to the next person."
-                    );
+                    try
+                    {
+                        EmailHelper.Send(
+                            entry.email,
+                            "Room available for your trip!",
+                            "A room has just become available for the trip you wanted. You have 24 hours to complete your booking before the opportunity moves to the next person."
+                        );
+                    }
+                    catch { }
+                }
+
+                // If there are fewer waiting users than available rooms, clear remaining waiting entries
+                // so that non-waiting users can also book immediately.
+                var remainingCmd = new SqlCommand(@"SELECT COUNT(*) FROM WaitingList WHERE TripId=@tid AND NotifiedAt IS NULL", conn);
+                remainingCmd.Parameters.AddWithValue("@tid", tripId);
+                int remaining = (int)remainingCmd.ExecuteScalar();
+
+                if (remaining == 0)
+                {
+                    // delete any entries (including notified ones) to remove the waiting list altogether
+                    var delAll = new SqlCommand("DELETE FROM WaitingList WHERE TripId=@tid", conn);
+                    delAll.Parameters.AddWithValue("@tid", tripId);
+                    delAll.ExecuteNonQuery();
                 }
             }
             catch (Exception ex)

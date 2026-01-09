@@ -105,9 +105,12 @@ public class TripsController : Controller
                             Category = reader["Category"].ToString(),
                             StartDate = (DateTime)reader["StartDate"],
                             EndDate = (DateTime)reader["EndDate"],
+
+                            MinAge = reader["MinAge"] == DBNull.Value ? null : (int?)reader["MinAge"],
+
                             ImagePath = reader["ImagePath"] == DBNull.Value
-                                ? null
-                                : reader["ImagePath"].ToString()
+                                        ? null
+                                        : reader["ImagePath"].ToString()
                         });
                     }
                 }
@@ -262,6 +265,7 @@ public class TripsController : Controller
                 waitCountCmd.Parameters.AddWithValue("@tid", id);
                 var wcnt = (int)waitCountCmd.ExecuteScalar();
                 ViewBag.HasWaiting = wcnt > 0;
+                ViewBag.WaitingCount = wcnt; // expose count so view can decide if waiting blocks booking
 
                 // detect if current user is in waiting list for this trip and their position
                 var userInWaitCmd = new SqlCommand("SELECT COUNT(*) FROM WaitingList WHERE TripId=@tid AND UserId=@uid", conn);
