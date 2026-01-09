@@ -544,28 +544,7 @@ namespace TravelAgency.Controllers
 
                 if (trip.AvailableRooms > oldRooms)
                 {
-                    try
-                    {
-                        var mailCmd = new SqlCommand(@"
-                            SELECT TOP 1 u.Email
-                            FROM WaitingList w
-                            JOIN Users u ON w.UserId = u.UserId
-                            WHERE w.TripId = @tid
-                            ORDER BY w.JoinDate", conn);
-
-                        mailCmd.Parameters.AddWithValue("@tid", trip.TripId);
-                        var email = mailCmd.ExecuteScalar()?.ToString();
-
-                        if (!string.IsNullOrEmpty(email))
-                        {
-                            EmailHelper.Send(
-                                email,
-                                "Seat Available!",
-                                "A seat is now available for a trip you are waiting for. Please log in and complete your booking."
-                            );
-                        }
-                    }
-                    catch { }
+                    WaitingListHelper.ProcessTripWaitingList(_connStr, trip.TripId);
                 }
 
                 return RedirectToAction("Trips");
