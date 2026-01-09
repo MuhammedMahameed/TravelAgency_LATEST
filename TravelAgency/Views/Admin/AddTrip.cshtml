@@ -61,6 +61,12 @@
         </div>
 
         <div class="mb-3">
+            <label class="form-label fw-bold">Cancellation Limit (days)</label>
+            <input asp-for="CancellationDays" type="number" min="0" max="365" class="form-control" value="0" />
+            <small class="text-muted">Number of days prior to start date within which cancellations are NOT allowed. Enter 0 for no limit.</small>
+        </div>
+
+        <div class="mb-3">
             <label class="form-label fw-bold">Description</label>
             <textarea asp-for="Description" class="form-control" rows="3"></textarea>
         </div>

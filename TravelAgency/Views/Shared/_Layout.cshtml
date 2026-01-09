@@ -105,6 +105,14 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
+
+  
+    @if(TempData["CancellationMessage"] != null)
+    {
+        <script>
+            alert("@TempData["CancellationMessage"]");
+        </script>
+    }
     @if (TempData["UserAlreadyExists"] != null)
     {
         <script>

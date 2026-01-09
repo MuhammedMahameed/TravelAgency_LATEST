@@ -85,3 +85,52 @@ CREATE TABLE TripImages (
     ImagePath NVARCHAR(500) NOT NULL,
     FOREIGN KEY (TripId) REFERENCES Trips(TripId)
 );
+
+CREATE TABLE PasswordResets (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Email NVARCHAR(200) NOT NULL,
+    Token NVARCHAR(200) NOT NULL,
+    ExpireAt DATETIME NOT NULL
+);
+ALTER TABLE WaitingList
+ADD NotifiedAt DATETIME NULL,
+    ExpirationAt DATETIME NULL;
+CREATE TABLE SiteReviews (
+    ReviewId INT IDENTITY PRIMARY KEY,
+    UserId INT NOT NULL,
+    Rating INT CHECK (Rating BETWEEN 1 AND 5),
+    Comment NVARCHAR(500),
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (UserId) REFERENCES Users(UserId)
+);
+
+ALTER TABLE Trips
+ADD CancellationDays INT NOT NULL CONSTRAINT DF_Trips_CancellationDays DEFAULT 0;
+ALTER TABLE Trips
+ADD Quantitiy INT NOT NULL DEFAULT 1;
+-- Add column if it doesn't exist
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.columns
+    WHERE Name = N'GroupMinAge'
+      AND Object_ID = Object_ID(N'dbo.Bookings')
+)
+BEGIN
+    ALTER TABLE dbo.Bookings
+    ADD GroupMinAge INT NULL;
+END
+GO
+
+-- Add a CHECK constraint to enforce 0..120 when value is present
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.check_constraints
+    WHERE name = N'CK_Bookings_GroupMinAge_Range'
+)
+BEGIN
+    ALTER TABLE dbo.Bookings WITH CHECK
+    ADD CONSTRAINT CK_Bookings_GroupMinAge_Range
+    CHECK (GroupMinAge IS NULL OR (GroupMinAge BETWEEN 0 AND 120));
+    ALTER TABLE dbo.Bookings CHECK CONSTRAINT CK_Bookings_GroupMinAge_Range;
+END
+GO
