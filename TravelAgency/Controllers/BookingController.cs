@@ -35,21 +35,37 @@ public class BookingController : Controller
             {
                 try
                 {
-                    // ===== Limit to 3 active future bookings =====
-                    var countCmd = new SqlCommand(@"
+                    // ===== Limit to 3 distinct upcoming trip packages =====
+                    // Rule: user may have at most 3 DISTINCT upcoming TripId bookings (Status='Active' and Trip.StartDate > GETDATE()).
+                    // Booking extra rooms for an already-booked trip does NOT count as a new trip.
+
+                    var alreadyBookedCmd = new SqlCommand(@"
                         SELECT COUNT(*)
+                        FROM Bookings
+                        WHERE UserId=@uid AND TripId=@tid AND Status='Active'", connection, transaction);
+                    alreadyBookedCmd.Parameters.AddWithValue("@uid", userId);
+                    alreadyBookedCmd.Parameters.AddWithValue("@tid", id);
+                    bool alreadyBooked = (int)alreadyBookedCmd.ExecuteScalar() > 0;
+
+                    // Count how many OTHER upcoming trips the user has.
+                    var countCmd = new SqlCommand(@"
+                        SELECT COUNT(DISTINCT b.TripId)
                         FROM Bookings b
                         JOIN Trips t ON b.TripId = t.TripId
                         WHERE b.UserId = @uid
-                        AND b.Status = @status",
-                        connection, transaction);
+                          AND b.Status = 'Active'
+                          AND t.StartDate > GETDATE()
+                          AND b.TripId <> @tid", connection, transaction);
 
                     countCmd.Parameters.AddWithValue("@uid", userId);
-                    countCmd.Parameters.AddWithValue("@status", "Active");
+                    countCmd.Parameters.AddWithValue("@tid", id);
 
-                    int activeBookings = (int)countCmd.ExecuteScalar();
+                    int otherUpcomingTrips = (int)countCmd.ExecuteScalar();
 
-                    if (activeBookings >= 3)
+                    // If not already booked, this booking would add one new distinct trip.
+                    int distinctAfter = otherUpcomingTrips + (alreadyBooked ? 0 : 1);
+
+                    if (!alreadyBooked && distinctAfter >= 4)
                     {
                         transaction.Rollback();
                         TempData["activeBookingsMessage"] = "You cannot book more than 3 upcoming trips.";
@@ -221,11 +237,46 @@ public class BookingController : Controller
         {
             if (!string.IsNullOrEmpty(userEmail))
             {
-                EmailHelper.Send(
-                    userEmail,
-                    "Booking Confirmation",
-                    $"Your booking was successful! Trip ID: {id} (Quantity: {qty})"
-                );
+                // Fetch friendly trip info for the email
+                string title = "";
+                string destination = "";
+                string country = "";
+                DateTime? startDate = null;
+                DateTime? endDate = null;
+
+                using (var conn = new SqlConnection(_connStr))
+                {
+                    conn.Open();
+                    var infoCmd = new SqlCommand(@"
+                        SELECT PackageName, Destination, Country, StartDate, EndDate
+                        FROM Trips
+                        WHERE TripId = @tid", conn);
+                    infoCmd.Parameters.AddWithValue("@tid", id);
+                    using var r = infoCmd.ExecuteReader();
+                    if (r.Read())
+                    {
+                        title = (r["PackageName"] == DBNull.Value ? "" : r["PackageName"]?.ToString() ?? "").Trim();
+                        destination = r["Destination"]?.ToString() ?? "";
+                        country = r["Country"]?.ToString() ?? "";
+                        startDate = r["StartDate"] == DBNull.Value ? null : (DateTime?)r["StartDate"];
+                        endDate = r["EndDate"] == DBNull.Value ? null : (DateTime?)r["EndDate"];
+                    }
+                }
+
+                var displayTitle = !string.IsNullOrWhiteSpace(title) ? title : $"{destination}, {country}";
+                var dateRange = (startDate.HasValue && endDate.HasValue)
+                    ? $"{startDate.Value:dd/MM/yyyy} - {endDate.Value:dd/MM/yyyy}"
+                    : "(dates unavailable)";
+
+                var body =
+                    $"Thank you for your booking!\n\n" +
+                    $"Trip: {displayTitle}\n" +
+                    $"Dates: {dateRange}\n" +
+                    $"Rooms: {qty}\n\n" +
+                    $"You can manage your booking and download your itinerary anytime from: /Booking/MyBookings\n\n" +
+                    $"Travel Agency";
+
+                EmailHelper.Send(userEmail, "Booking Confirmation", body);
             }
         }
         catch
@@ -257,29 +308,39 @@ public class BookingController : Controller
             {
                 try
                 {
-                    // limit to 3 active future bookings
-                    var countCmd = new SqlCommand(@"
+                    // limit to 3 distinct upcoming trip packages
+                    // If user is booking more rooms for an already-booked trip, it should NOT count as a new trip.
+                    var alreadyBookedCmd = new SqlCommand(@"
                         SELECT COUNT(*)
+                        FROM Bookings
+                        WHERE UserId=@uid AND TripId=@tid AND Status='Active'", connection, transaction);
+                    alreadyBookedCmd.Parameters.AddWithValue("@uid", userId);
+                    alreadyBookedCmd.Parameters.AddWithValue("@tid", id);
+                    bool alreadyBooked = (int)alreadyBookedCmd.ExecuteScalar() > 0;
+
+                    var countCmd = new SqlCommand(@"
+                        SELECT COUNT(DISTINCT b.TripId)
                         FROM Bookings b
                         JOIN Trips t ON b.TripId = t.TripId
                         WHERE b.UserId = @uid
-                        AND b.Status = @status
-                        AND t.StartDate > GETDATE()",
-                        connection, transaction);
+                          AND b.Status = 'Active'
+                          AND t.StartDate > GETDATE()
+                          AND b.TripId <> @tid", connection, transaction);
 
                     countCmd.Parameters.AddWithValue("@uid", userId);
-                    countCmd.Parameters.AddWithValue("@status", "Active");
+                    countCmd.Parameters.AddWithValue("@tid", id);
 
-                    int activeBookings = (int)countCmd.ExecuteScalar();
+                    int otherUpcomingTrips = (int)countCmd.ExecuteScalar();
+                    int distinctAfter = otherUpcomingTrips + (alreadyBooked ? 0 : 1);
 
-                    if (activeBookings >= 3)
+                    if (!alreadyBooked && distinctAfter >= 4)
                     {
                         transaction.Rollback();
                         TempData["activeBookingsMessage"] = "You cannot book more than 3 upcoming trips.";
                         return RedirectToAction("MyBookings");
                     }
 
-                    // lock trip row and check rooms
+                    // ===== Lock trip row and check rooms =====
                     var roomCmd = new SqlCommand(@"
                         SELECT AvailableRooms, MinAge FROM Trips WITH (UPDLOCK)
                         WHERE TripId = @tid",
@@ -392,7 +453,7 @@ public class BookingController : Controller
                         newBookingId = (int)bookCmd.ExecuteScalar();
                     }
 
-                    // update rooms
+                    // ===== Update rooms =====
                     var updateCmd = new SqlCommand(@"
                         UPDATE Trips
                         SET AvailableRooms = AvailableRooms - @qty
@@ -403,7 +464,7 @@ public class BookingController : Controller
                     updateCmd.Parameters.AddWithValue("@qty", qty);
                     updateCmd.ExecuteNonQuery();
 
-                    // remove from waiting list
+                    // ===== Remove from waiting list =====
                     var delCmd = new SqlCommand(@"
                         DELETE FROM WaitingList
                         WHERE TripId = @tid AND UserId = @uid",
@@ -413,7 +474,7 @@ public class BookingController : Controller
                     delCmd.Parameters.AddWithValue("@uid", userId);
                     delCmd.ExecuteNonQuery();
 
-                    // get user email
+                    // ===== Get user email BEFORE closing =====
                     var emailCmd = new SqlCommand(
                         "SELECT Email FROM Users WHERE UserId = @uid",
                         connection, transaction);
@@ -435,7 +496,47 @@ public class BookingController : Controller
         {
             if (!string.IsNullOrEmpty(userEmail))
             {
-                EmailHelper.Send(userEmail, "Booking Confirmation", $"Your booking was successful! Trip ID: {id} (Quantity: {qty})");
+                // Fetch friendly trip info for the email
+                string title = "";
+                string destination = "";
+                string country = "";
+                DateTime? startDate = null;
+                DateTime? endDate = null;
+
+                using (var conn = new SqlConnection(_connStr))
+                {
+                    conn.Open();
+                    var infoCmd = new SqlCommand(@"
+                        SELECT PackageName, Destination, Country, StartDate, EndDate
+                        FROM Trips
+                        WHERE TripId = @tid", conn);
+                    infoCmd.Parameters.AddWithValue("@tid", id);
+                    using var r = infoCmd.ExecuteReader();
+                    if (r.Read())
+                    {
+                        title = (r["PackageName"] == DBNull.Value ? "" : r["PackageName"]?.ToString() ?? "").Trim();
+                        destination = r["Destination"]?.ToString() ?? "";
+                        country = r["Country"]?.ToString() ?? "";
+                        startDate = r["StartDate"] == DBNull.Value ? null : (DateTime?)r["StartDate"];
+                        endDate = r["EndDate"] == DBNull.Value ? null : (DateTime?)r["EndDate"];
+                    }
+                }
+
+                var displayTitle = !string.IsNullOrWhiteSpace(title) ? title : $"{destination}, {country}";
+                var dateRange = (startDate.HasValue && endDate.HasValue)
+                    ? $"{startDate.Value:dd/MM/yyyy} - {endDate.Value:dd/MM/yyyy}"
+                    : "(dates unavailable)";
+
+                var body =
+                    $"Thank you for your booking!\n\n" +
+                    $"Trip: {displayTitle}\n" +
+                    $"Dates: {dateRange}\n" +
+                    $"Rooms: {qty}\n\n" +
+                    $"If you chose to pay now, please complete your payment.\n" +
+                    $"You can manage your booking and download your itinerary anytime from: /Booking/MyBookings\n\n" +
+                    $"Travel Agency";
+
+                EmailHelper.Send(userEmail, "Booking Confirmation", body);
             }
         }
         catch { }
@@ -520,6 +621,7 @@ public class BookingController : Controller
                 t.Category,
                 t.MinAge,
                 ISNULL(t.CancellationDays, 0) AS CancellationDays,
+                t.AvailableRooms,
                 t.ImagePath,
                 t.Description
             FROM Bookings b
@@ -553,6 +655,7 @@ public class BookingController : Controller
                     Category = reader["Category"] == DBNull.Value ? null : reader["Category"].ToString(),
                     TripMinAge = reader["MinAge"] == DBNull.Value ? null : (int?)reader["MinAge"],
                     CancellationDays = Convert.ToInt32(reader["CancellationDays"]),
+                    AvailableRooms = Convert.ToInt32(reader["AvailableRooms"]),
                     ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"].ToString(),
                     Description = reader["Description"] == DBNull.Value ? null : reader["Description"].ToString(),
                 });
@@ -707,24 +810,46 @@ public class BookingController : Controller
         {
             connection.Open();
 
+            // Past trip = the trip ended in the past.
+            // Some legacy rows may have EndDate missing/incorrect; in that case, treat StartDate in the past as a fallback.
+            // Only include bookings that are effectively completed (exclude Cancelled).
             var cmd = new SqlCommand(@"
-                SELECT b.BookingId, t.Destination, t.Country, t.StartDate
+                SELECT
+                    b.BookingId,
+                    b.TripId,
+                    b.Status,
+                    t.PackageName,
+                    t.Destination,
+                    t.Country,
+                    t.StartDate,
+                    t.EndDate,
+                    t.ImagePath
                 FROM Bookings b
                 JOIN Trips t ON b.TripId = t.TripId
                 WHERE b.UserId = @uid
-                AND t.StartDate < GETDATE()", connection);
+                  AND (b.Status IS NULL OR b.Status <> 'Cancelled')
+                  AND (
+                        (t.EndDate IS NOT NULL AND t.EndDate < GETDATE())
+                        OR (t.EndDate IS NULL AND t.StartDate < GETDATE())
+                      )
+                ORDER BY t.StartDate DESC;", connection);
 
             cmd.Parameters.AddWithValue("@uid", userId);
 
-            var reader = cmd.ExecuteReader();
+            using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 list.Add(new BookingViewModel
                 {
                     BookingId = (int)reader["BookingId"],
-                    Destination = reader["Destination"].ToString(),
-                    Country = reader["Country"].ToString(),
-                    StartDate = (DateTime)reader["StartDate"]
+                    TripId = (int)reader["TripId"],
+                    Status = reader["Status"]?.ToString() ?? "",
+                    PackageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"]?.ToString() ?? "",
+                    Destination = reader["Destination"]?.ToString() ?? "",
+                    Country = reader["Country"]?.ToString() ?? "",
+                    StartDate = (DateTime)reader["StartDate"],
+                    EndDate = reader["EndDate"] == DBNull.Value ? DateTime.MinValue : (DateTime)reader["EndDate"],
+                    ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"]?.ToString(),
                 });
             }
         }
@@ -826,5 +951,185 @@ public class BookingController : Controller
         var pdfBytes = ItineraryPdfGenerator.Generate(booking);
         var fileName = $"Itinerary_Booking_{booking.BookingId}_Trip_{booking.TripId}.pdf";
         return File(pdfBytes, "application/pdf", fileName);
+    }
+
+    [HttpPost]
+    public IActionResult UpdateQuantity(int bookingId, int newQty)
+    {
+        if (!AuthHelper.IsLoggedIn(HttpContext))
+            return RedirectToAction("Login", "Account");
+
+        if (newQty < 1) newQty = 1;
+
+        int userId = HttpContext.Session.GetInt32("UserId")!.Value;
+
+        using var conn = new SqlConnection(_connStr);
+        conn.Open();
+
+        using var tx = conn.BeginTransaction();
+        try
+        {
+            // Lock booking + trip row (and read everything needed for policy)
+            var cmd = new SqlCommand(@"
+                SELECT
+                    b.BookingId,
+                    b.UserId,
+                    b.TripId,
+                    b.Status,
+                    b.IsPaid,
+                    ISNULL(b.Quantity, 1) AS Quantity,
+                    t.AvailableRooms,
+                    t.StartDate
+                FROM Bookings b
+                JOIN Trips t WITH (UPDLOCK) ON b.TripId = t.TripId
+                WHERE b.BookingId = @bid
+                  AND b.UserId = @uid
+                  AND b.Status = 'Active';", conn, tx);
+
+            cmd.Parameters.AddWithValue("@bid", bookingId);
+            cmd.Parameters.AddWithValue("@uid", userId);
+
+            int tripId;
+            int currentQty;
+            int availableRooms;
+            DateTime startDate;
+            bool isPaid;
+
+            using (var r = cmd.ExecuteReader())
+            {
+                if (!r.Read())
+                {
+                    tx.Rollback();
+                    TempData["Error"] = "Booking not found.";
+                    return RedirectToAction("MyBookings");
+                }
+
+                tripId = (int)r["TripId"];
+                currentQty = Convert.ToInt32(r["Quantity"]);
+                availableRooms = Convert.ToInt32(r["AvailableRooms"]);
+                startDate = (DateTime)r["StartDate"];
+                isPaid = (bool)r["IsPaid"];
+            }
+
+            // NEW: Disallow editing once booking is paid
+            if (isPaid)
+            {
+                tx.Rollback();
+                TempData["Error"] = "You cannot change room quantity after payment.";
+                return RedirectToAction("MyBookings");
+            }
+
+            // No changes
+            if (newQty == currentQty)
+            {
+                tx.Rollback();
+                return RedirectToAction("MyBookings");
+            }
+
+            // Disallow editing once the trip starts
+            if (startDate.Date <= DateTime.Now.Date)
+            {
+                tx.Rollback();
+                TempData["Error"] = "You can only change room quantity before the trip starts.";
+                return RedirectToAction("MyBookings");
+            }
+
+            // Waiting list priority: if there are active notified slots and they occupy all rooms,
+            // only notified users may consume rooms.
+            // This mirrors your booking rules.
+            var activeNotifiedCmd = new SqlCommand(@"
+                SELECT COUNT(*) FROM WaitingList
+                WHERE TripId=@tid AND ExpirationAt IS NOT NULL AND GETDATE() < ExpirationAt", conn, tx);
+            activeNotifiedCmd.Parameters.AddWithValue("@tid", tripId);
+            int activeNotified = (int)activeNotifiedCmd.ExecuteScalar();
+
+            if (activeNotified > 0 && availableRooms <= activeNotified)
+            {
+                var myNotifCmd = new SqlCommand(@"
+                    SELECT COUNT(*) FROM WaitingList
+                    WHERE TripId=@tid AND UserId=@uid AND ExpirationAt IS NOT NULL AND GETDATE() < ExpirationAt", conn, tx);
+                myNotifCmd.Parameters.AddWithValue("@tid", tripId);
+                myNotifCmd.Parameters.AddWithValue("@uid", userId);
+                int isNotified = (int)myNotifCmd.ExecuteScalar();
+
+                if (isNotified == 0)
+                {
+                    tx.Rollback();
+                    TempData["Error"] = "Waiting list priority is active. You cannot increase rooms right now.";
+                    return RedirectToAction("MyBookings");
+                }
+            }
+
+            int delta = newQty - currentQty;
+
+            if (delta > 0)
+            {
+                // Need more rooms
+                if (availableRooms < delta)
+                {
+                    tx.Rollback();
+                    TempData["Error"] = "Not enough available rooms to increase your booking.";
+                    return RedirectToAction("MyBookings");
+                }
+
+                var updBooking = new SqlCommand(@"UPDATE Bookings SET Quantity=@q WHERE BookingId=@bid AND UserId=@uid AND Status='Active'", conn, tx);
+                updBooking.Parameters.AddWithValue("@q", newQty);
+                updBooking.Parameters.AddWithValue("@bid", bookingId);
+                updBooking.Parameters.AddWithValue("@uid", userId);
+                updBooking.ExecuteNonQuery();
+
+                var updTrip = new SqlCommand(@"UPDATE Trips SET AvailableRooms = AvailableRooms - @d WHERE TripId=@tid", conn, tx);
+                updTrip.Parameters.AddWithValue("@d", delta);
+                updTrip.Parameters.AddWithValue("@tid", tripId);
+                updTrip.ExecuteNonQuery();
+            }
+            else
+            {
+                // Release rooms
+                int release = -delta;
+
+                var updBooking = new SqlCommand(@"UPDATE Bookings SET Quantity=@q WHERE BookingId=@bid AND UserId=@uid AND Status='Active'", conn, tx);
+                updBooking.Parameters.AddWithValue("@q", newQty);
+                updBooking.Parameters.AddWithValue("@bid", bookingId);
+                updBooking.Parameters.AddWithValue("@uid", userId);
+                updBooking.ExecuteNonQuery();
+
+                var updTrip = new SqlCommand(@"UPDATE Trips SET AvailableRooms = AvailableRooms + @d WHERE TripId=@tid", conn, tx);
+                updTrip.Parameters.AddWithValue("@d", release);
+                updTrip.Parameters.AddWithValue("@tid", tripId);
+                updTrip.ExecuteNonQuery();
+
+                // Rooms freed -> let waiting list logic run after commit
+            }
+
+            tx.Commit();
+        }
+        catch
+        {
+            try { tx.Rollback(); } catch { }
+            TempData["Error"] = "Could not update booking quantity. Please try again.";
+            return RedirectToAction("MyBookings");
+        }
+
+        // If rooms were freed, process waiting list best-effort.
+        // (Not in transaction to avoid prolonging locks.)
+        try
+        {
+            // We need tripId to process; re-read quickly.
+            using var conn2 = new SqlConnection(_connStr);
+            conn2.Open();
+            var tcmd = new SqlCommand("SELECT TripId FROM Bookings WHERE BookingId=@bid AND UserId=@uid", conn2);
+            tcmd.Parameters.AddWithValue("@bid", bookingId);
+            tcmd.Parameters.AddWithValue("@uid", userId);
+            var tidObj = tcmd.ExecuteScalar();
+            if (tidObj != null && tidObj != DBNull.Value)
+            {
+                WaitingListHelper.ProcessTripWaitingList(_connStr, Convert.ToInt32(tidObj));
+            }
+        }
+        catch { }
+
+        TempData["PaymentMessage"] = "Booking updated.";
+        return RedirectToAction("MyBookings");
     }
 }

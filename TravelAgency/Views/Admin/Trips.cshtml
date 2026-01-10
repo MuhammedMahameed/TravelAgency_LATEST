@@ -53,6 +53,7 @@
                             <th>Country</th>
                             <th>Price</th>
                             <th>Rooms</th>
+                            <th>Status</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -61,7 +62,7 @@
                         {
                             var title = !string.IsNullOrWhiteSpace(t.PackageName) ? t.PackageName : t.Destination;
 
-                            <tr>
+                            <tr class="@(t.IsHidden ? "table-secondary" : "")">
                                 <!-- ====== IMAGE COLUMN ====== -->
                                 <td>
                                     @if (!string.IsNullOrEmpty(t.ImagePath))
@@ -83,6 +84,17 @@
                                 <td>₪@t.Price</td>
                                 <td>@t.AvailableRooms</td>
 
+                                <td>
+                                    @if (t.IsHidden)
+                                    {
+                                        <span class="badge bg-secondary">Hidden</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Visible</span>
+                                    }
+                                </td>
+
                                 <!-- ====== ACTION BUTTONS ====== -->
                                 <td class="text-center">
                                     <a href="/Admin/EditTrip/@t.TripId" class="btn btn-sm btn-outline-primary me-1">
@@ -94,6 +106,16 @@
                                     <a href="/Admin/WaitingList/@t.TripId" class="btn btn-sm btn-outline-warning me-1">
                                         <i class="bi bi-hourglass-split"></i> Waiting List
                                     </a>
+
+                                    <form asp-action="ToggleTripVisibility" asp-controller="Admin" method="post" class="d-inline me-1">
+                                        <input type="hidden" name="id" value="@t.TripId" />
+                                        <button type="submit" class="btn btn-sm @(t.IsHidden ? "btn-outline-success" : "btn-outline-secondary")"
+                                                onclick="return confirm('@(t.IsHidden ? "Show this trip in the gallery?" : "Hide this trip from the gallery?")');">
+                                            <i class="bi @(t.IsHidden ? "bi-eye" : "bi-eye-slash")"></i>
+                                            @(t.IsHidden ? "Show" : "Hide")
+                                        </button>
+                                    </form>
+
                                     <form asp-action="DeleteTrip" asp-controller="Admin" method="post" class="d-inline">
                                         <input type="hidden" name="id" value="@t.TripId" />
                                         <button type="submit" class="btn btn-sm btn-outline-danger"

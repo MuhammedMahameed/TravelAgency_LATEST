@@ -58,6 +58,9 @@ namespace TravelAgency.Models
         // 0 = no limit (users may cancel up to the start date)
         [Range(0, 365, ErrorMessage = "Cancellation days must be between 0 and 365")]
         public int CancellationDays { get; set; } = 0;
+
+        // NEW: allow admin to hide trips from public Gallery (soft hide)
+        public bool IsHidden { get; set; } = false;
     }
 
 

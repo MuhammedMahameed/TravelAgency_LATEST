@@ -157,3 +157,11 @@ SET PackageName =
     ))
 WHERE (PackageName IS NULL OR LTRIM(RTRIM(PackageName)) = '');
 GO
+
+IF COL_LENGTH('dbo.Trips', 'IsHidden') IS NULL
+BEGIN
+    ALTER TABLE dbo.Trips
+    ADD IsHidden BIT NOT NULL
+        CONSTRAINT DF_Trips_IsHidden DEFAULT 0;
+END
+GO

@@ -42,13 +42,46 @@ namespace TravelAgency.Controllers
                         Country = reader["Country"].ToString(),
                         Price = (decimal)reader["Price"],
                         AvailableRooms = (int)reader["AvailableRooms"],
-                        ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"].ToString()
+                        ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"].ToString(),
+                        IsHidden = reader["IsHidden"] != DBNull.Value && Convert.ToBoolean(reader["IsHidden"])
 
                     });
                 }
                 conn.Close();
             }
             return View(trips);
+        }
+
+        [HttpPost]
+        public IActionResult ToggleTripVisibility(int id)
+        {
+            if (!AuthHelper.IsAdmin(HttpContext))
+                return RedirectToAction("Login", "Account");
+
+            using var conn = new SqlConnection(_connStr);
+            conn.Open();
+
+            // Ensure the column exists (dev safety). If it doesn't, fail with a friendly message.
+            try
+            {
+                var cmd = new SqlCommand(@"
+                    UPDATE Trips
+                    SET IsHidden = CASE WHEN ISNULL(IsHidden, 0) = 1 THEN 0 ELSE 1 END
+                    WHERE TripId = @id", conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                var rows = cmd.ExecuteNonQuery();
+
+                if (rows == 0)
+                    TempData["Error"] = "Trip not found.";
+                else
+                    TempData["Success"] = "Trip visibility updated.";
+            }
+            catch (SqlException)
+            {
+                TempData["Error"] = "IsHidden column is missing in the Trips table. Add it to enable hide/show.";
+            }
+
+            return RedirectToAction("Trips");
         }
 
         [HttpGet]
@@ -1002,7 +1035,6 @@ namespace TravelAgency.Controllers
             TempData["Success"] = "Waiting list processed successfully.";
             return RedirectToAction("Trips");
         }
-
 
 
 

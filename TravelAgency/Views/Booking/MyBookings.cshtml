@@ -51,6 +51,9 @@
                     ? b.PackageName
                     : $"{b.Destination}, {b.Country}";
 
+                // client-side max for increase; server re-checks against DB
+                var maxRoomsClient = b.Quantity + Math.Max(0, b.AvailableRooms);
+
                 <div class="col-12">
                     <div class="card booking-card">
                         <div class="row g-0">
@@ -171,6 +174,33 @@
                                             </a>
                                         }
 
+                                        @if (isUpcoming && !b.IsPaid)
+                                        {
+                                            <form method="post" action="/Booking/UpdateQuantity" class="d-inline">
+                                                <input type="hidden" name="bookingId" value="@b.BookingId" />
+
+                                                <div class="d-inline-flex flex-column gap-1">
+                                                    <div class="input-group input-group-sm shadow-sm" style="width: 260px;">
+                                                        <span class="input-group-text bg-light">Rooms</span>
+                                                        <button class="btn btn-outline-secondary" type="button" onclick="decQty(this)">-</button>
+                                                        <input type="number"
+                                                               class="form-control text-center"
+                                                               name="newQty"
+                                                               min="1"
+                                                               max="@maxRoomsClient"
+                                                               value="@b.Quantity"
+                                                               style="max-width:80px;" />
+                                                        <button class="btn btn-outline-secondary" type="button" onclick="incQty(this)">+</button>
+                                                        <button class="btn btn-primary" type="submit">Update</button>
+                                                    </div>
+
+                                                    <div class="text-muted" style="font-size:0.78rem; line-height:1.1;">
+                                                        Available now: <strong>@b.AvailableRooms</strong> &nbsp;|&nbsp; Current: <strong>@b.Quantity</strong>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        }
+
                                         @if (!b.IsPaid)
                                         {
                                             <a href="/Payment/Pay?bookingId=@b.BookingId" class="btn btn-success btn-sm">Pay now</a>
@@ -192,3 +222,37 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        function findQtyInput(btn){
+            const group = btn.closest('.input-group');
+            if(!group) return null;
+            return group.querySelector('input[name="newQty"]');
+        }
+
+        function decQty(btn){
+            const input = findQtyInput(btn);
+            if(!input) return;
+            const min = parseInt(input.getAttribute('min') || '1', 10);
+            let v = parseInt(input.value || '1', 10);
+            if (isNaN(v)) v = min;
+            v = Math.max(min, v - 1);
+            input.value = v;
+        }
+
+        function incQty(btn){
+            const input = findQtyInput(btn);
+            if(!input) return;
+            const maxAttr = input.getAttribute('max');
+            const max = maxAttr ? parseInt(maxAttr, 10) : null;
+            let v = parseInt(input.value || '1', 10);
+            if (isNaN(v)) v = 1;
+            if (max !== null && !isNaN(max))
+                v = Math.min(max, v + 1);
+            else
+                v = v + 1;
+            input.value = v;
+        }
+    </script>
+}
