@@ -31,7 +31,12 @@ namespace TravelAgency.Helpers
             conn.Open();
 
             var cmd = new SqlCommand(@"
-                SELECT u.Email, t.Destination, t.StartDate
+                SELECT u.Email,
+                       t.PackageName,
+                       t.Destination,
+                       t.Country,
+                       t.StartDate,
+                       t.EndDate
                 FROM Bookings b
                 JOIN Trips t ON b.TripId = t.TripId
                 JOIN Users u ON b.UserId = u.UserId
@@ -43,10 +48,27 @@ namespace TravelAgency.Helpers
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
+                var packageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"]?.ToString() ?? "";
+                var destination = reader["Destination"]?.ToString() ?? "";
+                var country = reader["Country"]?.ToString() ?? "";
+                var startDate = (DateTime)reader["StartDate"];
+                var endDate = (DateTime)reader["EndDate"];
+
+                var title = !string.IsNullOrWhiteSpace(packageName)
+                    ? packageName
+                    : $"{destination}, {country}";
+
+                var body =
+                    $"Friendly reminder: your upcoming trip is starting soon.\n\n" +
+                    $"Trip: {title}\n" +
+                    $"Dates: {startDate:dd/MM/yyyy} - {endDate:dd/MM/yyyy}\n\n" +
+                    $"You can review details and your itinerary here: /Booking/MyBookings\n\n" +
+                    $"Travel Agency";
+
                 EmailHelper.Send(
-                    reader["Email"].ToString(),
-                    "Trip Reminder",
-                    $"Reminder: Your trip to {reader["Destination"]} starts on {((DateTime)reader["StartDate"]).ToShortDateString()}."
+                    reader["Email"]?.ToString() ?? "",
+                    "Trip reminder – starts in 5 days",
+                    body
                 );
             }
         }

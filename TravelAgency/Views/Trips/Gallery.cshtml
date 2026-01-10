@@ -4,6 +4,12 @@
 @{
     ViewData["Title"] = "Trip Gallery";
     ViewData["BodyClass"] = "login-light";
+
+    var discountedOnly = string.Equals(Context.Request.Query["discountedOnly"], "true", StringComparison.OrdinalIgnoreCase)
+                      || string.Equals(Context.Request.Query["discountedOnly"], "on", StringComparison.OrdinalIgnoreCase);
+
+    var selectedCategory = Context.Request.Query["category"].ToString();
+    var selectedSort = Context.Request.Query["sort"].ToString();
 }
 
 <link rel="stylesheet" href="~/css/gallery.css" />
@@ -92,23 +98,30 @@
 
             <div class="col-md-2 col-sm-4">
                 <select name="category" class="form-select form-select-sm">
-                    <option value="">All categories</option>
-                    <option>Family</option>
-                    <option>Honeymoon</option>
-                    <option>Adventure</option>
-                    <option>Cruise</option>
-                    <option>Luxury</option>
+                    <option value="" selected="@(string.IsNullOrEmpty(selectedCategory))">All categories</option>
+                    <option value="Family" selected="@(selectedCategory == "Family")">Family</option>
+                    <option value="Honeymoon" selected="@(selectedCategory == "Honeymoon")">Honeymoon</option>
+                    <option value="Adventure" selected="@(selectedCategory == "Adventure")">Adventure</option>
+                    <option value="Cruise" selected="@(selectedCategory == "Cruise")">Cruise</option>
+                    <option value="Luxury" selected="@(selectedCategory == "Luxury")">Luxury</option>
                 </select>
             </div>
 
             <div class="col-md-2 col-sm-4">
                 <select name="sort" class="form-select form-select-sm">
-                    <option value="">Sort</option>
-                    <option value="price_asc">Price ↑</option>
-                    <option value="price_desc">Price ↓</option>
-                    <option value="date">Date</option>
-                    <option value="popular">Most Popular</option>
+                    <option value="" selected="@(string.IsNullOrEmpty(selectedSort))">Sort</option>
+                    <option value="price_asc" selected="@(selectedSort == "price_asc")">Price ↑</option>
+                    <option value="price_desc" selected="@(selectedSort == "price_desc")">Price ↓</option>
+                    <option value="date" selected="@(selectedSort == "date")">Date</option>
+                    <option value="popular" selected="@(selectedSort == "popular")">Most Popular</option>
                 </select>
+            </div>
+
+            <div class="col-md-2 col-sm-6 d-flex align-items-center">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="discountedOnly" name="discountedOnly" value="true" @(discountedOnly ? "checked" : "") />
+                    <label class="form-check-label" for="discountedOnly">Discounted only</label>
+                </div>
             </div>
 
             <div class="col-md-1 col-sm-4">
@@ -126,13 +139,14 @@
             @foreach (var item in Model)
             {
                 var t = item.Trip;
+                var title = !string.IsNullOrWhiteSpace(t.PackageName) ? t.PackageName : $"{t.Destination}, {t.Country}";
 
                 <div class="col-xl-3 col-lg-4 col-md-6">
                     <div class="trip-card h-100 shadow-sm rounded-3">
                         <a href="/Trips/Details/@t.TripId" class="text-decoration-none">
                             @if (!string.IsNullOrEmpty(t.ImagePath))
                             {
-                                <img src="@t.ImagePath" alt="@t.Destination" />
+                                <img src="@t.ImagePath" alt="@title" />
                             }
                             else
                             {
@@ -141,8 +155,13 @@
                         </a>
 
                         <div class="trip-info p-3">
+                            <h5 class="package-name">@title</h5>
+
                             <span class="badge mb-2">@t.Category</span>
-                            <h6>@t.Destination, @t.Country</h6>
+
+                            <div class="small text-muted mb-1">
+                                📍 @t.Destination, @t.Country
+                            </div>
 
                             <div class="small text-muted mb-1">
                                 📅 @t.StartDate.ToString("dd/MM/yyyy") – @t.EndDate.ToString("dd/MM/yyyy")
@@ -171,8 +190,11 @@
 
                             @if (item.WaitingCount > 0)
                             {
-                                <span class="badge bg-warning text-dark mt-1">@item.WaitingCount waiting</span>
+                                <div class="mt-1">
+                                    <span class="badge bg-warning text-dark">@item.WaitingCount waiting</span>
+                                </div>
                             }
+
                             @if (t.MinAge.HasValue && t.MinAge.Value > 0)
                             {
                                 <span class="badge bg-warning text-dark ms-2">

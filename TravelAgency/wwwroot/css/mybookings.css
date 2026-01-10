@@ -1,0 +1,104 @@
+/* My Bookings page styles */
+
+/* page background */
+body {
+  background: #e7eaee;
+}
+
+.mybookings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.booking-card {
+  border: 1px solid rgba(16, 24, 40, .12);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #dfe3e8; /* darker gray card surface */
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .10);
+}
+
+/* content area: slightly different surface for contrast */
+.booking-card .card-body {
+  background: #eef1f4;
+  color: #111827;
+}
+
+.booking-card .text-muted,
+.booking-card .price-sub,
+.booking-card .desc,
+.booking-card .kv dt {
+  color: #4b5563 !important; /* improve contrast for secondary text */
+}
+
+.booking-card hr {
+  border-top-color: rgba(17, 24, 39, .15);
+}
+
+.booking-card .img-wrap {
+  min-height: 190px;
+  height: 100%;
+  background: #cfd6dd;
+}
+
+.booking-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.booking-meta {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: .35rem;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: .25rem .75rem;
+  margin: 0;
+}
+
+.kv dt {
+  font-weight: 700;
+}
+
+.kv dd {
+  margin: 0;
+  color: #111827;
+}
+
+.price-box {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .25rem;
+}
+
+.price-total {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: #0f172a;
+}
+
+.price-sub {
+  font-size: .85rem;
+}
+
+.desc {
+  margin-top: .75rem;
+  margin-bottom: .25rem;
+}
+
+@media (max-width: 576px) {
+  .kv { grid-template-columns: 1fr; }
+  .price-box { align-items: flex-start; }
+}

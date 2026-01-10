@@ -14,16 +14,17 @@ public class TripsController : Controller
         _connStr = configuration.GetConnectionString("DefaultConnection");
     }
 
-    public IActionResult Gallery(string search, string category, string sort, decimal? minPrice, decimal? maxPrice)
+    public IActionResult Gallery(string search, string category, string sort, decimal? minPrice, decimal? maxPrice, bool discountedOnly = false)
     {
         var trips = new List<Trip>();
         using (SqlConnection conn = new SqlConnection(_connStr))
         {
             conn.Open();
-            var sql = @"SELECT * FROM Trips WHERE 1=1 ";
+            var sql = @"SELECT * FROM Trips WHERE 1=1 AND ISNULL(IsHidden, 0) = 0 ";
+
             if (!string.IsNullOrEmpty(search))
             {
-                sql += " AND (Destination LIKE @search OR Country LIKE @search)";
+                sql += " AND ((Destination LIKE @search OR Country LIKE @search) OR (PackageName LIKE @search))";
             }
 
             if (!string.IsNullOrEmpty(category))
@@ -39,6 +40,13 @@ public class TripsController : Controller
             if (maxPrice != null)
             {
                 sql += " AND Price <= @maxPrice";
+            }
+
+            // NEW: Discounted-only filter (must match what the UI considers "On Sale")
+            // On sale when OldPrice and DiscountEndDate are set and DiscountEndDate is in the future.
+            if (discountedOnly)
+            {
+                sql += " AND OldPrice IS NOT NULL AND DiscountEndDate IS NOT NULL AND DiscountEndDate > GETDATE()";
             }
 
             switch (sort)
@@ -94,6 +102,7 @@ public class TripsController : Controller
                         trips.Add(new Trip
                         {
                             TripId = (int)reader["TripId"],
+                            PackageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"].ToString(),
                             Destination = reader["Destination"].ToString(),
                             Country = reader["Country"].ToString(),
                             Price = (decimal)reader["Price"],
@@ -201,6 +210,9 @@ public class TripsController : Controller
             ViewBag.SiteReviews = siteReviews;
             // ===== END added section =====
 
+            // keep state for view
+            ViewBag.DiscountedOnly = discountedOnly;
+
             conn.Close();
 
             return View(vm);
@@ -224,6 +236,7 @@ public class TripsController : Controller
                 trip = new Trip
                 {
                     TripId = (int)reader["TripId"],
+                    PackageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"].ToString(),
                     Destination = reader["Destination"].ToString(),
                     Country = reader["Country"].ToString(),
                     Category = reader["Category"].ToString(),

@@ -7,6 +7,10 @@ namespace TravelAgency.Models
     {
         public int TripId { get; set; }
 
+        [Required(ErrorMessage = "Package name is required")]
+        [StringLength(200, ErrorMessage = "Package name must be at most 200 characters")]
+        public string PackageName { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Destination is required")]
         [StringLength(150, ErrorMessage = "Destination must be at most 150 characters")]
         public string Destination { get; set; } = string.Empty;
@@ -54,6 +58,9 @@ namespace TravelAgency.Models
         // 0 = no limit (users may cancel up to the start date)
         [Range(0, 365, ErrorMessage = "Cancellation days must be between 0 and 365")]
         public int CancellationDays { get; set; } = 0;
+
+        // NEW: allow admin to hide trips from public Gallery (soft hide)
+        public bool IsHidden { get; set; } = false;
     }
 
 

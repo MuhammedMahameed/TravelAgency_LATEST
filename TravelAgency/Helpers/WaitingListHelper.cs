@@ -55,6 +55,35 @@ namespace TravelAgency.Helpers
                     }
                 }
 
+                // Fetch friendly trip info once
+                string title = "";
+                string destination = "";
+                string country = "";
+                DateTime? startDate = null;
+                DateTime? endDate = null;
+
+                var tripInfoCmd = new SqlCommand(@"
+                    SELECT PackageName, Destination, Country, StartDate, EndDate
+                    FROM Trips
+                    WHERE TripId = @tid", conn);
+                tripInfoCmd.Parameters.AddWithValue("@tid", tripId);
+                using (var tr = tripInfoCmd.ExecuteReader())
+                {
+                    if (tr.Read())
+                    {
+                        title = (tr["PackageName"] == DBNull.Value ? "" : tr["PackageName"]?.ToString() ?? "").Trim();
+                        destination = tr["Destination"]?.ToString() ?? "";
+                        country = tr["Country"]?.ToString() ?? "";
+                        startDate = tr["StartDate"] == DBNull.Value ? null : (DateTime?)tr["StartDate"];
+                        endDate = tr["EndDate"] == DBNull.Value ? null : (DateTime?)tr["EndDate"];
+                    }
+                }
+
+                var displayTitle = !string.IsNullOrWhiteSpace(title) ? title : $"{destination}, {country}";
+                var dateRange = (startDate.HasValue && endDate.HasValue)
+                    ? $"{startDate.Value:dd/MM/yyyy} - {endDate.Value:dd/MM/yyyy}"
+                    : "(dates unavailable)";
+
                 // mark notified and send emails
                 foreach (var entry in toNotify)
                 {
@@ -67,11 +96,15 @@ namespace TravelAgency.Helpers
 
                     try
                     {
-                        EmailHelper.Send(
-                            entry.email,
-                            "Room available for your trip!",
-                            "A room has just become available for the trip you wanted. You have 24 hours to complete your booking before the opportunity moves to the next person."
-                        );
+                        var body =
+                            $"Good news! A room is now available for your trip.\n\n" +
+                            $"Trip: {displayTitle}\n" +
+                            $"Dates: {dateRange}\n\n" +
+                            $"You have 24 hours to complete your booking before the offer moves to the next person in the waiting list.\n\n" +
+                            $"Visit the site to book now: /Trips/Gallery\n\n" +
+                            $"Travel Agency";
+
+                        EmailHelper.Send(entry.email, "Room available – complete your booking", body);
                     }
                     catch { }
                 }

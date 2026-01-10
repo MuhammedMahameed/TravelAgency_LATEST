@@ -37,17 +37,51 @@ namespace TravelAgency.Controllers
                     trips.Add(new Trip
                     {
                         TripId = (int)reader["TripId"],
+                        PackageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"].ToString(),
                         Destination = reader["Destination"].ToString(),
                         Country = reader["Country"].ToString(),
                         Price = (decimal)reader["Price"],
                         AvailableRooms = (int)reader["AvailableRooms"],
-                        ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"].ToString()
+                        ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"].ToString(),
+                        IsHidden = reader["IsHidden"] != DBNull.Value && Convert.ToBoolean(reader["IsHidden"])
 
                     });
                 }
                 conn.Close();
             }
             return View(trips);
+        }
+
+        [HttpPost]
+        public IActionResult ToggleTripVisibility(int id)
+        {
+            if (!AuthHelper.IsAdmin(HttpContext))
+                return RedirectToAction("Login", "Account");
+
+            using var conn = new SqlConnection(_connStr);
+            conn.Open();
+
+            // Ensure the column exists (dev safety). If it doesn't, fail with a friendly message.
+            try
+            {
+                var cmd = new SqlCommand(@"
+                    UPDATE Trips
+                    SET IsHidden = CASE WHEN ISNULL(IsHidden, 0) = 1 THEN 0 ELSE 1 END
+                    WHERE TripId = @id", conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                var rows = cmd.ExecuteNonQuery();
+
+                if (rows == 0)
+                    TempData["Error"] = "Trip not found.";
+                else
+                    TempData["Success"] = "Trip visibility updated.";
+            }
+            catch (SqlException)
+            {
+                TempData["Error"] = "IsHidden column is missing in the Trips table. Add it to enable hide/show.";
+            }
+
+            return RedirectToAction("Trips");
         }
 
         [HttpGet]
@@ -123,11 +157,12 @@ namespace TravelAgency.Controllers
 
                 var cmd = new SqlCommand(@"
                     INSERT INTO Trips
-                    (Destination, Country, StartDate, EndDate, Price, AvailableRooms, Category, MinAge, Description, ImagePath, CancellationDays)
+                    (PackageName, Destination, Country, StartDate, EndDate, Price, AvailableRooms, Category, MinAge, Description, ImagePath, CancellationDays)
                     OUTPUT INSERTED.TripId
                     VALUES
-                    (@Destination, @Country, @StartDate, @EndDate, @Price, @Rooms, @Category, @MinAge, @Description, @ImagePath, @CancellationDays)", conn);
+                    (@PackageName, @Destination, @Country, @StartDate, @EndDate, @Price, @Rooms, @Category, @MinAge, @Description, @ImagePath, @CancellationDays)", conn);
 
+                cmd.Parameters.AddWithValue("@PackageName", trip.PackageName);
                 cmd.Parameters.AddWithValue("@Destination", trip.Destination);
                 cmd.Parameters.AddWithValue("@Country", trip.Country);
                 cmd.Parameters.AddWithValue("@StartDate", trip.StartDate);
@@ -200,6 +235,7 @@ namespace TravelAgency.Controllers
                     trip = new Trip
                     {
                         TripId = (int)reader["TripId"],
+                        PackageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"].ToString(),
                         Destination = reader["Destination"].ToString(),
                         Country = reader["Country"].ToString(),
                         StartDate = (DateTime)reader["StartDate"],
@@ -404,6 +440,7 @@ namespace TravelAgency.Controllers
 
                 var cmd = new SqlCommand(@"
                     UPDATE Trips SET
+                        PackageName=@PackageName,
                         Destination=@Destination,
                         Country=@Country,
                         StartDate=@StartDate,
@@ -417,6 +454,7 @@ namespace TravelAgency.Controllers
                     WHERE TripId=@Id", conn);
 
                 cmd.Parameters.AddWithValue("@Id", trip.TripId);
+                cmd.Parameters.AddWithValue("@PackageName", trip.PackageName);
                 cmd.Parameters.AddWithValue("@Destination", trip.Destination);
                 cmd.Parameters.AddWithValue("@Country", trip.Country);
                 cmd.Parameters.AddWithValue("@StartDate", trip.StartDate);
@@ -997,7 +1035,6 @@ namespace TravelAgency.Controllers
             TempData["Success"] = "Waiting list processed successfully.";
             return RedirectToAction("Trips");
         }
-
 
 
 

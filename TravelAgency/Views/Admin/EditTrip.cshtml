@@ -10,6 +10,12 @@
     <div class="row">
         <div class="col-md-8">
             <div class="mb-3">
+                <label class="form-label fw-bold">Package Name</label>
+                <input name="PackageName" value="@Model.PackageName" class="form-control" />
+                @Html.ValidationMessageFor(m => m.PackageName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label fw-bold">Destination</label>
                 <input name="Destination" value="@Model.Destination" class="form-control" />
                 @Html.ValidationMessageFor(m => m.Destination, "", new { @class = "text-danger" })

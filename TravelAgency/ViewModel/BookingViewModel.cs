@@ -5,6 +5,8 @@ public class BookingViewModel
     public int BookingId { get; set; }
     public int TripId { get; set; }
 
+    public string PackageName { get; set; } = string.Empty;
+
     public string Destination { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
 
@@ -24,6 +26,8 @@ public class BookingViewModel
 
     public string Status { get; set; } = string.Empty;
     public int Quantity { get; set; } = 1;
+
+    public int AvailableRooms { get; set; }       // CURRENT: available rooms for this.tripId (Trips.AvailableRooms)
 
     public string? ImagePath { get; set; }
     public string? Description { get; set; }
