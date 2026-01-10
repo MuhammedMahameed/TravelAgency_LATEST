@@ -6,7 +6,7 @@
 
 <div class="container mt-4">
 
-    <h2>@Model.Destination, @Model.Country</h2>
+    <h2>@(!string.IsNullOrWhiteSpace(Model.PackageName) ? Model.PackageName : $"{Model.Destination}, {Model.Country}")</h2>
 
     @{
         var gallery = new List<string>();
@@ -125,14 +125,14 @@
             {
                 <form method="get" action="/Booking/BookNow" class="d-inline">
                     <input type="hidden" name="id" value="@Model.TripId" />
-                    <input type="hidden" name="pay" value="true" />
-                    <div class="d-flex gap-2 align-items-center">
+                    <div class="d-flex gap-2 align-items-center flex-wrap">
                         <input type="number" name="qty" min="1" max="@Model.AvailableRooms" value="1" class="form-control" style="width:100px;" />
 
                         <input type="number" name="groupMinAge" min="@(Model.MinAge ?? 0)" max="120" class="form-control" style="width:160px;" placeholder="Group min age"
                                @(Model.MinAge.HasValue ? "required" : "") />
 
-                        <button type="submit" class="btn btn-primary">Book & Pay</button>
+                        <button type="submit" name="pay" value="true" class="btn btn-primary">Book & Pay</button>
+                        <button type="submit" name="pay" value="false" class="btn btn-outline-primary">Book</button>
                     </div>
                 </form>
             }

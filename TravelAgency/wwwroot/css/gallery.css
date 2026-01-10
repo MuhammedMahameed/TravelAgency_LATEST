@@ -136,3 +136,18 @@ body {
     height: 10px;
     border-radius: 50%;
 }
+
+/* Gallery: package name as primary title */
+.trip-info .package-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 0 0 .5rem 0;
+  color: #111827;
+}
+
+@media (max-width: 576px) {
+  .trip-info .package-name {
+    font-size: 1.05rem;
+  }
+}

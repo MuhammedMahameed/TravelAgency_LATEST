@@ -37,6 +37,7 @@ namespace TravelAgency.Controllers
                     trips.Add(new Trip
                     {
                         TripId = (int)reader["TripId"],
+                        PackageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"].ToString(),
                         Destination = reader["Destination"].ToString(),
                         Country = reader["Country"].ToString(),
                         Price = (decimal)reader["Price"],
@@ -123,11 +124,12 @@ namespace TravelAgency.Controllers
 
                 var cmd = new SqlCommand(@"
                     INSERT INTO Trips
-                    (Destination, Country, StartDate, EndDate, Price, AvailableRooms, Category, MinAge, Description, ImagePath, CancellationDays)
+                    (PackageName, Destination, Country, StartDate, EndDate, Price, AvailableRooms, Category, MinAge, Description, ImagePath, CancellationDays)
                     OUTPUT INSERTED.TripId
                     VALUES
-                    (@Destination, @Country, @StartDate, @EndDate, @Price, @Rooms, @Category, @MinAge, @Description, @ImagePath, @CancellationDays)", conn);
+                    (@PackageName, @Destination, @Country, @StartDate, @EndDate, @Price, @Rooms, @Category, @MinAge, @Description, @ImagePath, @CancellationDays)", conn);
 
+                cmd.Parameters.AddWithValue("@PackageName", trip.PackageName);
                 cmd.Parameters.AddWithValue("@Destination", trip.Destination);
                 cmd.Parameters.AddWithValue("@Country", trip.Country);
                 cmd.Parameters.AddWithValue("@StartDate", trip.StartDate);
@@ -200,6 +202,7 @@ namespace TravelAgency.Controllers
                     trip = new Trip
                     {
                         TripId = (int)reader["TripId"],
+                        PackageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"].ToString(),
                         Destination = reader["Destination"].ToString(),
                         Country = reader["Country"].ToString(),
                         StartDate = (DateTime)reader["StartDate"],
@@ -404,6 +407,7 @@ namespace TravelAgency.Controllers
 
                 var cmd = new SqlCommand(@"
                     UPDATE Trips SET
+                        PackageName=@PackageName,
                         Destination=@Destination,
                         Country=@Country,
                         StartDate=@StartDate,
@@ -417,6 +421,7 @@ namespace TravelAgency.Controllers
                     WHERE TripId=@Id", conn);
 
                 cmd.Parameters.AddWithValue("@Id", trip.TripId);
+                cmd.Parameters.AddWithValue("@PackageName", trip.PackageName);
                 cmd.Parameters.AddWithValue("@Destination", trip.Destination);
                 cmd.Parameters.AddWithValue("@Country", trip.Country);
                 cmd.Parameters.AddWithValue("@StartDate", trip.StartDate);

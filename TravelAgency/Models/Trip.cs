@@ -7,6 +7,10 @@ namespace TravelAgency.Models
     {
         public int TripId { get; set; }
 
+        [Required(ErrorMessage = "Package name is required")]
+        [StringLength(200, ErrorMessage = "Package name must be at most 200 characters")]
+        public string PackageName { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Destination is required")]
         [StringLength(150, ErrorMessage = "Destination must be at most 150 characters")]
         public string Destination { get; set; } = string.Empty;

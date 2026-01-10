@@ -100,7 +100,8 @@ public class BookingController : Controller
                     if (rooms <= 0 || rooms < qty)
                     {
                         transaction.Rollback();
-                        return RedirectToAction("Join", "WaitingList", new { tripId = id });
+                        // Join is POST-only. Send user to Status page (which can show info + allow joining).
+                        return RedirectToAction("Status", "WaitingList", new { tripId = id });
                     }
 
                     // Now evaluate waiting list notified slots vs available rooms
@@ -319,7 +320,8 @@ public class BookingController : Controller
                     if (rooms <= 0 || rooms < qty)
                     {
                         transaction.Rollback();
-                        return RedirectToAction("Join", "WaitingList", new { tripId = id });
+                        // Join is POST-only. Send user to Status page (which can show info + allow joining).
+                        return RedirectToAction("Status", "WaitingList", new { tripId = id });
                     }
 
                     // waiting list priority: only restrict booking when notified users occupy all available rooms
@@ -509,6 +511,7 @@ public class BookingController : Controller
                 ISNULL(b.Quantity, 1) AS Quantity,
                 b.GroupMinAge,
 
+                t.PackageName,
                 t.Destination,
                 t.Country,
                 t.StartDate,
@@ -541,6 +544,7 @@ public class BookingController : Controller
                     Quantity = Convert.ToInt32(reader["Quantity"]),
                     GroupMinAge = reader["GroupMinAge"] == DBNull.Value ? null : (int?)reader["GroupMinAge"],
 
+                    PackageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"].ToString() ?? "",
                     Destination = reader["Destination"].ToString() ?? "",
                     Country = reader["Country"].ToString() ?? "",
                     StartDate = (DateTime)reader["StartDate"],
@@ -610,8 +614,8 @@ public class BookingController : Controller
                 // Enforce cancellation day limit
                 if (cancellationDays > 0)
                 {
-                    var daysUntilStart = (startDate - DateTime.Now).TotalDays;
-                    if (daysUntilStart < cancellationDays)
+                    var daysUntilStart = (startDate - DateTime.Now).TotalMinutes;
+                    if (daysUntilStart < cancellationDays * 24 * 60)
                     {
                         transaction.Rollback();
                         TempData["CancellationMessage"] = $"Cancellation not allowed within {cancellationDays} days of the trip start";
@@ -731,5 +735,96 @@ public class BookingController : Controller
     public IActionResult Index()
     {
         return View();
+    }
+
+    // GET: /Booking/ItineraryPdf?bookingId=123
+    public IActionResult ItineraryPdf(int bookingId)
+    {
+        if (!AuthHelper.IsLoggedIn(HttpContext))
+            return RedirectToAction("Login", "Account");
+
+        int userId = HttpContext.Session.GetInt32("UserId").Value;
+
+        BookingViewModel? booking = null;
+
+        using (SqlConnection connection = new SqlConnection(_connStr))
+        {
+            connection.Open();
+
+            // Only allow downloading for the current user's booking.
+            // We'll validate upcoming vs past in C# so we can show a friendly message.
+            var cmd = new SqlCommand(@"
+                SELECT
+                    b.BookingId,
+                    b.TripId,
+                    b.BookingDate,
+                    b.Status,
+                    b.IsPaid,
+                    b.PaidAt,
+                    ISNULL(b.Quantity, 1) AS Quantity,
+                    b.GroupMinAge,
+
+                    t.PackageName,
+                    t.Destination,
+                    t.Country,
+                    t.StartDate,
+                    t.EndDate,
+                    t.Price,
+                    t.Category,
+                    t.MinAge,
+                    ISNULL(t.CancellationDays, 0) AS CancellationDays,
+                    t.ImagePath,
+                    t.Description
+                FROM Bookings b
+                JOIN Trips t ON b.TripId = t.TripId
+                WHERE b.BookingId = @bid
+                  AND b.UserId = @uid
+                  AND b.Status = 'Active';", connection);
+
+            cmd.Parameters.AddWithValue("@bid", bookingId);
+            cmd.Parameters.AddWithValue("@uid", userId);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                booking = new BookingViewModel
+                {
+                    BookingId = (int)reader["BookingId"],
+                    TripId = (int)reader["TripId"],
+                    BookingDate = (DateTime)reader["BookingDate"],
+                    Status = reader["Status"]?.ToString() ?? "",
+                    IsPaid = (bool)reader["IsPaid"],
+                    PaidAt = reader["PaidAt"] == DBNull.Value ? null : (DateTime?)reader["PaidAt"],
+                    Quantity = Convert.ToInt32(reader["Quantity"]),
+                    GroupMinAge = reader["GroupMinAge"] == DBNull.Value ? null : (int?)reader["GroupMinAge"],
+
+                    PackageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"].ToString() ?? "",
+                    Destination = reader["Destination"]?.ToString() ?? "",
+                    Country = reader["Country"]?.ToString() ?? "",
+                    StartDate = (DateTime)reader["StartDate"],
+                    EndDate = (DateTime)reader["EndDate"],
+                    Price = (decimal)reader["Price"],
+                    Category = reader["Category"] == DBNull.Value ? null : reader["Category"].ToString(),
+                    TripMinAge = reader["MinAge"] == DBNull.Value ? null : (int?)reader["MinAge"],
+                    CancellationDays = Convert.ToInt32(reader["CancellationDays"]),
+                    ImagePath = reader["ImagePath"] == DBNull.Value ? null : reader["ImagePath"].ToString(),
+                    Description = reader["Description"] == DBNull.Value ? null : reader["Description"].ToString(),
+                };
+            }
+        }
+
+        if (booking == null)
+            return NotFound();
+
+        // Validation: block PDF for trips that already started.
+        if (booking.StartDate.Date < DateTime.Now.Date)
+        {
+            TempData["Error"] = "You can only download an itinerary for upcoming trips.";
+            return RedirectToAction("MyBookings");
+        }
+
+        var pdfBytes = ItineraryPdfGenerator.Generate(booking);
+        var fileName = $"Itinerary_Booking_{booking.BookingId}_Trip_{booking.TripId}.pdf";
+        return File(pdfBytes, "application/pdf", fileName);
     }
 }

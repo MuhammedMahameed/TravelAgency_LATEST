@@ -23,7 +23,7 @@ public class TripsController : Controller
             var sql = @"SELECT * FROM Trips WHERE 1=1 ";
             if (!string.IsNullOrEmpty(search))
             {
-                sql += " AND (Destination LIKE @search OR Country LIKE @search)";
+                sql += " AND ((Destination LIKE @search OR Country LIKE @search) OR (PackageName LIKE @search))";
             }
 
             if (!string.IsNullOrEmpty(category))
@@ -94,6 +94,7 @@ public class TripsController : Controller
                         trips.Add(new Trip
                         {
                             TripId = (int)reader["TripId"],
+                            PackageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"].ToString(),
                             Destination = reader["Destination"].ToString(),
                             Country = reader["Country"].ToString(),
                             Price = (decimal)reader["Price"],
@@ -224,6 +225,7 @@ public class TripsController : Controller
                 trip = new Trip
                 {
                     TripId = (int)reader["TripId"],
+                    PackageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"].ToString(),
                     Destination = reader["Destination"].ToString(),
                     Country = reader["Country"].ToString(),
                     Category = reader["Category"].ToString(),

@@ -48,6 +48,7 @@
                     <thead class="table-light">
                         <tr>
                             <th>Image</th>
+                            <th>Package</th>
                             <th>Destination</th>
                             <th>Country</th>
                             <th>Price</th>
@@ -58,6 +59,8 @@
                     <tbody>
                         @foreach (var t in Model)
                         {
+                            var title = !string.IsNullOrWhiteSpace(t.PackageName) ? t.PackageName : t.Destination;
+
                             <tr>
                                 <!-- ====== IMAGE COLUMN ====== -->
                                 <td>
@@ -71,6 +74,8 @@
                                         <span class="text-muted">No image</span>
                                     }
                                 </td>
+
+                                <td class="fw-semibold">@title</td>
 
                                 <!-- ====== EXISTING COLUMNS ====== -->
                                 <td class="fw-semibold">@t.Destination</td>

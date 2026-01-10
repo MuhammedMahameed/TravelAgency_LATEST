@@ -1,9 +1,54 @@
 <h2>Waiting List</h2>
 
-<p>Your position in the waiting list is:</p>
-<h3>@ViewBag.Position</h3>
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-<p>
+@{
+    int tripId = ViewBag.TripId ?? 0;
+    bool isInWaiting = ViewBag.IsInWaiting == true;
+    int? position = ViewBag.Position as int?;
+    DateTime? eta = ViewBag.EstimatedAvailableAt as DateTime?;
+}
+
+<p class="text-muted">Total people waiting for this trip: <strong>@ViewBag.WaitingCount</strong></p>
+
+@if (eta.HasValue)
+{
+    <p class="text-muted">
+        Estimated next availability: <strong>@eta.Value.ToString("dd/MM/yyyy HH:mm")</strong>
+        <span class="text-muted">(when the current priority window expires)</span>
+    </p>
+}
+
+@if (isInWaiting)
+{
+    <p>Your position in the waiting list is:</p>
+    <h3>@position</h3>
+
+    <form method="post" action="/WaitingList/Leave" class="d-inline">
+        <input type="hidden" name="tripId" value="@tripId" />
+        <button class="btn btn-outline-danger">Leave Waiting List</button>
+    </form>
+}
+else
+{
+    <p class="mb-2">This trip is currently full. You can join the waiting list to be notified when a room becomes available.</p>
+
+    <form method="post" action="/WaitingList/Join" class="d-inline">
+        <input type="hidden" name="tripId" value="@tripId" />
+        <button class="btn btn-primary">Join Waiting List</button>
+    </form>
+
+    <a class="btn btn-outline-secondary ms-2" href="/Trips/Details/@tripId">Back to Trip</a>
+}
+
+<p class="mt-3">
     When a room becomes available and it is your turn,
     you will be able to book the trip.
 </p>

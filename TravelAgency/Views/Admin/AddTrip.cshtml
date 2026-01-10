@@ -15,6 +15,12 @@
     <form asp-action="AddTrip" asp-controller="Admin" method="post" enctype="multipart/form-data" class="mt-4">
 
         <div class="mb-3">
+            <label class="form-label fw-bold">Package Name</label>
+            <input asp-for="PackageName" class="form-control" required placeholder="e.g., Paris Honeymoon Package" />
+            <span asp-validation-for="PackageName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
             <label class="form-label fw-bold">Destination</label>
             <input asp-for="Destination" class="form-control" required />
         </div>

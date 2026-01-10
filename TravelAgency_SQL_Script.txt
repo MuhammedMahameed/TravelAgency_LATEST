@@ -106,6 +106,8 @@ CREATE TABLE SiteReviews (
 
 ALTER TABLE Trips
 ADD CancellationDays INT NOT NULL CONSTRAINT DF_Trips_CancellationDays DEFAULT 0;
+ALTER TABLE Bookings
+ADD Quantitiy INT NOT NULL Default 1;
 ALTER TABLE Trips
 ADD Quantitiy INT NOT NULL DEFAULT 1;
 -- Add column if it doesn't exist
@@ -133,4 +135,25 @@ BEGIN
     CHECK (GroupMinAge IS NULL OR (GroupMinAge BETWEEN 0 AND 120));
     ALTER TABLE dbo.Bookings CHECK CONSTRAINT CK_Bookings_GroupMinAge_Range;
 END
+GO
+
+IF COL_LENGTH('dbo.Trips', 'PackageName') IS NULL
+BEGIN
+    ALTER TABLE dbo.Trips
+    ADD PackageName NVARCHAR(200) NOT NULL
+        CONSTRAINT DF_Trips_PackageName DEFAULT '';
+END
+GO
+
+-- Optional: backfill empty PackageName to a friendly default
+UPDATE dbo.Trips
+SET PackageName =
+    LTRIM(RTRIM(
+        CONCAT(
+            ISNULL(Destination, ''),
+            CASE WHEN ISNULL(Category,'') <> '' THEN CONCAT(' ', Category) ELSE '' END,
+            ' Package'
+        )
+    ))
+WHERE (PackageName IS NULL OR LTRIM(RTRIM(PackageName)) = '');
 GO

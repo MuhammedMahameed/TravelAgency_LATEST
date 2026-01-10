@@ -5,6 +5,8 @@ public class BookingViewModel
     public int BookingId { get; set; }
     public int TripId { get; set; }
 
+    public string PackageName { get; set; } = string.Empty;
+
     public string Destination { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
 
