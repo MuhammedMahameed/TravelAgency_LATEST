@@ -261,6 +261,96 @@ body.has-fixed-top-nav {
   border: 1px solid hsla(0, 0%, 0%, 0.10);
 }
 
+/* ===== Gallery Filters (Search/Sort) ===== */
+.ta-filter-card {
+  background: hsla(0, 0%, 100%, 0.92);
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-1);
+  border-radius: var(--radius-25);
+  padding: 14px;
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.ta-filter-grid {
+  display: grid;
+  gap: 12px;
+  align-items: end;
+}
+
+@media (min-width: 576px) {
+  .ta-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 992px) {
+  .ta-filter-grid {
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+  }
+}
+
+.ta-filter-label {
+  margin-bottom: 6px;
+  font-family: var(--ff-montserrat);
+  text-transform: uppercase;
+  font-size: var(--fs-7);
+  letter-spacing: 0.04em;
+  font-weight: var(--fw-700);
+  color: var(--gunmetal);
+}
+
+.ta-filter-input .input-group-text {
+  border-radius: 999px 0 0 999px;
+  border-color: hsla(0, 0%, 0%, 0.10);
+  background: hsla(0, 0%, 100%, 0.85);
+  color: var(--black-coral);
+}
+
+.ta-filter-input .form-control {
+  border-radius: 0 999px 999px 0;
+  border-color: hsla(0, 0%, 0%, 0.10);
+}
+
+.ta-filter-select {
+  border-radius: 999px;
+  border-color: hsla(0, 0%, 0%, 0.10);
+}
+
+.ta-filter-check {
+  display: grid;
+  align-content: end;
+}
+
+.ta-filter-check .form-check {
+  background: hsla(0, 0%, 100%, 0.85);
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+
+.ta-filter-actions {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+  justify-content: flex-end;
+}
+
+.ta-filter-actions .btn {
+  border-radius: 999px;
+  padding-inline: 16px;
+}
+
+@media (max-width: 991.98px) {
+  .ta-filter-actions {
+    justify-content: stretch;
+  }
+  .ta-filter-actions .btn {
+    flex: 1 1 auto;
+  }
+}
+
 .ta-gallery .trip-card {
   border-radius: var(--radius-25);
   overflow: hidden;
@@ -1028,4 +1118,49 @@ body {
 
 .ta-payment-element {
   padding: 12px;
+}
+
+/* Admin Edit Trip - form controls */
+.ta-admin-edittrip .form-label {
+  font-family: var(--ff-montserrat);
+  text-transform: uppercase;
+  font-size: var(--fs-7);
+  letter-spacing: 0.04em;
+  font-weight: var(--fw-700);
+}
+
+.ta-admin-edittrip .form-control,
+.ta-admin-edittrip .form-select {
+  border-radius: 16px;
+}
+
+/* ===== Admin Edit Trip (background like Discount) ===== */
+.ta-admin-edittrip {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.ta-admin-edittrip::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background-image: url(/images/hero-banner.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  background-color: hsla(0, 0%, 0%, 0.45);
+  background-blend-mode: overlay;
+
+  /* blur like Discount */
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+
+.ta-admin-edittrip > .container {
+  position: relative;
+  z-index: 1;
 }

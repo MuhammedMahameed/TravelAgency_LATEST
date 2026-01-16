@@ -73,58 +73,77 @@
         </div>
 
         <!-- FILTERS -->
-        <form method="get" class="ta-filter-bar row g-2 mb-4 justify-content-center">
-            <div class="col-md-3 col-sm-6">
-                <input name="search"
-                       class="form-control form-control-sm"
-                       placeholder="Search destination..."
-                       value="@Context.Request.Query["search"]" />
-            </div>
+        <form method="get" class="ta-filter-bar ta-filter-card mb-4">
+            <div class="ta-filter-grid">
 
-            <div class="col-md-2 col-sm-3">
-                <input name="minPrice" type="number" step="0.01"
-                       class="form-control form-control-sm"
-                       placeholder="Min ₪"
-                       value="@Context.Request.Query["minPrice"]" />
-            </div>
-
-            <div class="col-md-2 col-sm-3">
-                <input name="maxPrice" type="number" step="0.01"
-                       class="form-control form-control-sm"
-                       placeholder="Max ₪"
-                       value="@Context.Request.Query["maxPrice"]" />
-            </div>
-
-            <div class="col-md-2 col-sm-4">
-                <select name="category" class="form-select form-select-sm">
-                    <option value="" selected="@(string.IsNullOrEmpty(selectedCategory))">All categories</option>
-                    <option value="Family" selected="@(selectedCategory == "Family")">Family</option>
-                    <option value="Honeymoon" selected="@(selectedCategory == "Honeymoon")">Honeymoon</option>
-                    <option value="Adventure" selected="@(selectedCategory == "Adventure")">Adventure</option>
-                    <option value="Cruise" selected="@(selectedCategory == "Cruise")">Cruise</option>
-                    <option value="Luxury" selected="@(selectedCategory == "Luxury")">Luxury</option>
-                </select>
-            </div>
-
-            <div class="col-md-2 col-sm-4">
-                <select name="sort" class="form-select form-select-sm">
-                    <option value="" selected="@(string.IsNullOrEmpty(selectedSort))">Sort</option>
-                    <option value="price_asc" selected="@(selectedSort == "price_asc")">Price ↑</option>
-                    <option value="price_desc" selected="@(selectedSort == "price_desc")">Price ↓</option>
-                    <option value="date" selected="@(selectedSort == "date")">Date</option>
-                    <option value="popular" selected="@(selectedSort == "popular")">Most Popular</option>
-                </select>
-            </div>
-
-            <div class="col-md-2 col-sm-6 d-flex align-items-center">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="discountedOnly" name="discountedOnly" value="true" @(discountedOnly ? "checked" : "") />
-                    <label class="form-check-label" for="discountedOnly">Discounted only</label>
+                <div class="ta-filter-field">
+                    <label class="form-label ta-filter-label" for="taSearch">Search</label>
+                    <div class="input-group input-group-sm ta-filter-input">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input id="taSearch" name="search" type="search"
+                               class="form-control"
+                               placeholder="Destination or country..."
+                               value="@Context.Request.Query["search"]" />
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-md-1 col-sm-4">
-                <button class="btn btn-primary btn-sm w-100">Apply</button>
+                <div class="ta-filter-field">
+                    <label class="form-label ta-filter-label" for="taMin">Min Price</label>
+                    <div class="input-group input-group-sm ta-filter-input">
+                        <span class="input-group-text">₪</span>
+                        <input id="taMin" name="minPrice" type="number" step="0.01"
+                               class="form-control"
+                               placeholder="Min"
+                               value="@Context.Request.Query["minPrice"]" />
+                    </div>
+                </div>
+
+                <div class="ta-filter-field">
+                    <label class="form-label ta-filter-label" for="taMax">Max Price</label>
+                    <div class="input-group input-group-sm ta-filter-input">
+                        <span class="input-group-text">₪</span>
+                        <input id="taMax" name="maxPrice" type="number" step="0.01"
+                               class="form-control"
+                               placeholder="Max"
+                               value="@Context.Request.Query["maxPrice"]" />
+                    </div>
+                </div>
+
+                <div class="ta-filter-field">
+                    <label class="form-label ta-filter-label" for="taCategory">Category</label>
+                    <select id="taCategory" name="category" class="form-select form-select-sm ta-filter-select">
+                        <option value="" selected="@(string.IsNullOrEmpty(selectedCategory))">All categories</option>
+                        <option value="Family" selected="@(selectedCategory == "Family")">Family</option>
+                        <option value="Honeymoon" selected="@(selectedCategory == "Honeymoon")">Honeymoon</option>
+                        <option value="Adventure" selected="@(selectedCategory == "Adventure")">Adventure</option>
+                        <option value="Cruise" selected="@(selectedCategory == "Cruise")">Cruise</option>
+                        <option value="Luxury" selected="@(selectedCategory == "Luxury")">Luxury</option>
+                    </select>
+                </div>
+
+                <div class="ta-filter-field">
+                    <label class="form-label ta-filter-label" for="taSort">Sort</label>
+                    <select id="taSort" name="sort" class="form-select form-select-sm ta-filter-select">
+                        <option value="" selected="@(string.IsNullOrEmpty(selectedSort))">Recommended</option>
+                        <option value="price_asc" selected="@(selectedSort == "price_asc")">Price ↑</option>
+                        <option value="price_desc" selected="@(selectedSort == "price_desc")">Price ↓</option>
+                        <option value="date" selected="@(selectedSort == "date")">Date</option>
+                        <option value="popular" selected="@(selectedSort == "popular")">Most Popular</option>
+                    </select>
+                </div>
+
+                <div class="ta-filter-field ta-filter-check">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="discountedOnly" name="discountedOnly" value="true" @(discountedOnly ? "checked" : "") />
+                        <label class="form-check-label" for="discountedOnly">Discounted only</label>
+                    </div>
+                </div>
+
+                <div class="ta-filter-actions">
+                    <button class="btn btn-primary btn-sm" type="submit">Apply</button>
+                    <a class="btn btn-outline-primary btn-sm" href="/Trips/Gallery">Clear</a>
+                </div>
+
             </div>
         </form>
 
