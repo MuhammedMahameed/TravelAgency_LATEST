@@ -2,75 +2,66 @@
 
 @{
     ViewData["Title"] = "Register";
-    ViewData["BodyClass"] = "login-light";
+    ViewData["BodyClass"] = "";
+    ViewData["FullWidth"] = true;
 }
 
-<div class="login-page container-fluid d-flex justify-content-center align-items-center"
-     style="min-height:100vh; margin-top:-90px;">
+<div class="ta-auth ta-auth--register">
+    <div class="ta-auth-card">
+        <div class="ta-auth-header">
+            <h2 class="ta-auth-title">Create account</h2>
+            <p class="ta-auth-subtitle">Join Travel Agency and start booking trips</p>
+        </div>
 
+        <div class="ta-auth-body">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger text-center">
+                    Please fix the errors and try again
+                </div>
+            }
 
+            <form method="post" asp-controller="Account" asp-action="Register">
+                @Html.AntiForgeryToken()
 
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-    <div class="login-card shadow-lg rounded-4 p-4" style="max-width:420px; width:100%;">
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input asp-for="FullName"
+                           class="form-control"
+                           placeholder="Your full name" />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
 
-        <h2 class="fw-bold text-center mb-1 login-title">Create account</h2>
-        <p class="text-muted text-center mb-4">
-            Join Travel Agency and start booking trips
-        </p>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input asp-for="Email"
+                           type="email"
+                           class="form-control"
+                           placeholder="name@example.com" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
 
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div class="alert alert-danger text-center">
-                Please fix the errors and try again
-            </div>
-        }
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input asp-for="Password"
+                           type="password"
+                           class="form-control"
+                           placeholder="Choose a password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
 
-        <form method="post" asp-controller="Account" asp-action="Register">
-            @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-primary w-100 mt-2">Register</button>
+            </form>
+        </div>
 
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-            <div class="mb-3">
-                <label class="form-label fw-semibold login-label">Full Name</label>
-                <input asp-for="FullName"
-                       class="form-control form-control-lg"
-                       placeholder="Your full name" />
-                <span asp-validation-for="FullName" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-semibold login-label">Email</label>
-                <input asp-for="Email"
-                       type="email"
-                       class="form-control form-control-lg"
-                       placeholder="name@example.com" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-semibold login-label">Password</label>
-                <input asp-for="Password"
-                       type="password"
-                       class="form-control form-control-lg"
-                       placeholder="Choose a password" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-
-            <button type="submit"
-                    class="btn btn-primary btn-lg w-100 mt-2">
-                Register
-            </button>
-        </form>
-
-        <div class="text-center mt-4 login-footer">
+        <div class="ta-auth-footer">
             <span class="text-muted">Already have an account?</span>
-            <a href="/Account/Login" class="fw-bold text-decoration-none ms-1">
-                Login
-            </a>
+            <a href="/Account/Login" class="ms-1">Login</a>
         </div>
 
     </div>
-
 </div>
 
 @section Scripts {

@@ -1,111 +1,161 @@
 ﻿@model List<TravelAgency.Models.User>
 
-<link rel="stylesheet" href="~/css/admin-trips.css" />
+@{
+    ViewData["Title"] = "User Management";
+    ViewData["BodyClass"] = "";
+}
 
-<div class="login-page container-fluid py-4">
-    <div class="container admin-page">
+<section class="ta-section ta-admin-users">
+    <div class="container">
 
-        <!-- ===== HEADER ===== -->
-        <div class="admin-header d-flex justify-content-between align-items-center flex-wrap mb-4 pt-4">
-            <h2 class="admin-title d-flex align-items-center">
-                <i class="bi bi-people-fill text-primary me-2"></i>
-                User Management
-            </h2>
+        <div class="ta-header-card mb-4">
+            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                <div>
+                    <p class="section-subtitle mb-2">Admin</p>
+                    <h2 class="h2 section-title mb-2">User Management</h2>
+                    <p class="section-text mb-0">View users, manage accounts, and check bookings.</p>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="/Admin/AddUser" class="btn btn-primary">Add New User</a>
+                    <a href="/Admin" class="btn btn-outline-primary">Back to Dashboard</a>
+                </div>
+            </div>
+
+            <div class="ta-admin-users-toolbar mt-3 d-flex flex-wrap gap-2 align-items-center">
+                <div class="input-group ta-search" style="max-width: 420px;">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input id="userSearch" type="search" class="form-control" placeholder="Search by name, email, status..." autocomplete="off" />
+                    <button id="userSearchClear" class="btn btn-outline-secondary" type="button">Clear</button>
+                </div>
+                <div id="userSearchCount" class="text-muted small"></div>
+            </div>
         </div>
 
-        <!-- ===== CONTROLS ===== -->
-        <div class="admin-controls d-flex flex-wrap align-items-center gap-3 mb-4">
-            <a href="/Admin/AddUser" class="btn btn-outline-success fw-semibold">
-                <i class="bi bi-person-plus-fill"></i> Add New User
-            </a>
-        </div>
-
-        <!-- ===== ALERTS ===== -->
         @if (TempData["Error"] != null)
         {
-            <div class="alert alert-danger shadow-sm mb-3">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
-            </div>
+            <div class="alert alert-danger shadow-sm mb-3">@TempData["Error"]</div>
         }
         @if (TempData["Success"] != null)
         {
-            <div class="alert alert-success shadow-sm mb-3">
-                <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
-            </div>
+            <div class="alert alert-success shadow-sm mb-3">@TempData["Success"]</div>
         }
 
-        <!-- ===== TABLE ===== -->
-        <div class="admin-card border-0 p-4 rounded-4 bg-white shadow-sm">
-            <div class="table-responsive">
-                <!-- חשוב: אין table-hover כדי שלא יהיה HOVER -->
-                <table class="table align-middle admin-table mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>Full Name</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @foreach (var u in Model)
-                        {
-                            var isActive = (u.Status ?? "").Equals("Active", StringComparison.OrdinalIgnoreCase);
-
+        <div class="card ta-admin-table-card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 ta-admin-table" id="usersTable">
+                        <thead>
                             <tr>
-                                <td class="text-muted">@u.UserId</td>
-
-                                <td class="fw-semibold">@u.FullName</td>
-
-                                <td>
-                                    <span class="text-muted">@u.Email</span>
-                                </td>
-
-                                <td>
-                                    @if (isActive)
-                                    {
-                                        <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle status-badge">
-                                            Active
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle status-badge">
-                                            Blocked
-                                        </span>
-                                    }
-                                </td>
-
-                                <td class="text-center">
-                                    <a href="/Admin/UserBookings/@u.UserId" class="btn btn-sm btn-outline-info me-1">
-                                        <i class="bi bi-clock-history"></i> Bookings
-                                    </a>
-
-                                    <form asp-action="ToggleUserStatus" asp-controller="Admin" method="post" class="d-inline">
-                                        <input type="hidden" name="userId" value="@u.UserId" />
-                                        <button type="submit" class="btn btn-sm @(isActive ? "btn-outline-warning" : "btn-outline-success") me-1">
-                                            <i class="bi @(isActive ? "bi-slash-circle" : "bi-check2-circle")"></i>
-                                            @(isActive ? "Block" : "Unblock")
-                                        </button>
-                                    </form>
-
-                                    <form asp-action="RemoveUser" asp-controller="Admin" method="post" class="d-inline">
-                                        <input type="hidden" name="userId" value="@u.UserId" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Are you sure you want to remove this user?');">
-                                            <i class="bi bi-trash"></i> Remove
-                                        </button>
-                                    </form>
-                                </td>
+                                <th>#</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th class="text-center">Actions</th>
                             </tr>
-                        }
-                    </tbody>
+                        </thead>
 
-                </table>
+                        <tbody>
+                            @foreach (var u in Model)
+                            {
+                                var isActive = (u.Status ?? "").Equals("Active", StringComparison.OrdinalIgnoreCase);
+                                var statusText = isActive ? "Active" : "Blocked";
+
+                                <tr data-search="@u.UserId @u.FullName @u.Email @statusText">
+                                    <td class="text-muted">@u.UserId</td>
+
+                                    <td class="fw-semibold">@u.FullName</td>
+
+                                    <td>
+                                        <span class="text-muted">@u.Email</span>
+                                    </td>
+
+                                    <td>
+                                        @if (isActive)
+                                        {
+                                            <span class="badge text-bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge text-bg-danger">Blocked</span>
+                                        }
+                                    </td>
+
+                                    <td class="text-center">
+                                        <a href="/Admin/UserBookings/@u.UserId" class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="bi bi-clock-history"></i> Bookings
+                                        </a>
+
+                                        <form asp-action="ToggleUserStatus" asp-controller="Admin" method="post" class="d-inline">
+                                            <input type="hidden" name="userId" value="@u.UserId" />
+                                            <button type="submit" class="btn btn-sm @(isActive ? "btn-outline-warning" : "btn-outline-success") me-1">
+                                                <i class="bi @(isActive ? "bi-slash-circle" : "bi-check2-circle")"></i>
+                                                @(isActive ? "Block" : "Unblock")
+                                            </button>
+                                        </form>
+
+                                        <form asp-action="RemoveUser" asp-controller="Admin" method="post" class="d-inline">
+                                            <input type="hidden" name="userId" value="@u.UserId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Are you sure you want to remove this user?');">
+                                                <i class="bi bi-trash"></i> Remove
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
             </div>
         </div>
 
     </div>
-</div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            const input = document.getElementById('userSearch');
+            const clearBtn = document.getElementById('userSearchClear');
+            const countEl = document.getElementById('userSearchCount');
+            const table = document.getElementById('usersTable');
+            if (!input || !clearBtn || !countEl || !table) return;
+
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const total = rows.length;
+
+            function updateCount(visible) {
+                if (total === 0) {
+                    countEl.textContent = '';
+                    return;
+                }
+                countEl.textContent = visible === total ? (total + ' user(s)') : (visible + ' / ' + total + ' shown');
+            }
+
+            function applyFilter() {
+                const q = (input.value || '').trim().toLowerCase();
+                let visible = 0;
+
+                rows.forEach(r => {
+                    const hay = (r.getAttribute('data-search') || '').toLowerCase();
+                    const show = q.length === 0 || hay.includes(q);
+                    r.style.display = show ? '' : 'none';
+                    if (show) visible++;
+                });
+
+                updateCount(visible);
+            }
+
+            input.addEventListener('input', applyFilter);
+            clearBtn.addEventListener('click', function () {
+                input.value = '';
+                input.focus();
+                applyFilter();
+            });
+
+            applyFilter();
+        })();
+    </script>
+}

@@ -1,47 +1,55 @@
 ﻿@{
     ViewData["Title"] = "Apply Discount";
+    ViewData["BodyClass"] = "";
     var tripId = (int)ViewBag.TripId;
 }
 
-<link rel="stylesheet" href="~/css/admin-trips.css" />
+<section class="ta-section ta-admin-discount">
+    <div class="container">
 
-<div class="admin-page container py-5">
+        <div class="ta-header-card mb-4">
+            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                <div>
+                    <p class="section-subtitle mb-2">Admin</p>
+                    <h2 class="h2 section-title mb-2">Apply Discount</h2>
+                    <p class="section-text mb-0">Set a temporary discounted price and an end date.</p>
+                </div>
 
-    <div class="admin-header d-flex justify-content-between align-items-center flex-wrap mb-4">
-        <h2 class="admin-title">
-            <i class="bi bi-tag-fill text-primary me-2"></i>
-            Apply Discount
-        </h2>
-
-        <a href="/Admin/Trips" class="btn btn-outline-secondary fw-semibold">
-            <i class="bi bi-arrow-left"></i> Back
-        </a>
-    </div>
-
-    <div class="admin-card shadow-sm border-0 p-4 rounded-4 bg-white">
-
-        <form asp-action="Discount" method="post">
-            <input type="hidden" name="tripId" value="@tripId" />
-
-            <div class="mb-3">
-                <label class="form-label fw-bold">
-                    <i class="bi bi-cash-coin me-1"></i> New Price:
-                </label>
-                <input type="number" step="0.01" name="newPrice" required class="form-control" />
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="/Admin/Trips" class="btn btn-outline-primary">Back to Trips</a>
+                    <a href="/Admin" class="btn btn-outline-primary">Dashboard</a>
+                </div>
             </div>
+        </div>
 
-            <div class="mb-4">
-                <label class="form-label fw-bold">
-                    <i class="bi bi-calendar-event me-1"></i> Discount End Date:
-                </label>
-                <input type="datetime-local" name="endDate" required class="form-control" />
+        <div class="card ta-admin-form-card">
+            <div class="card-body p-4 p-md-5">
+
+                <form asp-action="Discount" method="post" class="row g-3">
+                    <input type="hidden" name="tripId" value="@tripId" />
+
+                    <div class="col-md-6">
+                        <label class="form-label">New Price</label>
+                        <input type="number" step="0.01" name="newPrice" required class="form-control"
+                            placeholder="e.g., 799.00" />
+                        <div class="form-text">A discounted price will replace the original price in the gallery until
+                            it expires.</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Discount End Date</label>
+                        <input type="datetime-local" name="endDate" required class="form-control" />
+                        <div class="form-text">After this time, the trip returns to its normal price.</div>
+                    </div>
+
+                    <div class="col-12 d-flex gap-2 flex-wrap mt-2">
+                        <button type="submit" class="btn btn-primary">Save Discount</button>
+                        <a href="/Admin/Trips" class="btn btn-outline-primary">Cancel</a>
+                    </div>
+                </form>
+
             </div>
-
-            <button type="submit" class="btn btn-primary fw-semibold">
-                <i class="bi bi-save2 me-1"></i> Save Discount
-            </button>
-        </form>
+        </div>
 
     </div>
-
-</div>
+</section>

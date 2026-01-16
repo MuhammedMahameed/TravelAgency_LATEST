@@ -12,6 +12,8 @@
     var galleryImages = ViewBag.GalleryImages as List<string> ?? new List<string>();
     var siteReviews = ViewBag.SiteReviews as IEnumerable<dynamic> ?? new List<dynamic>();
 
+    var role = Context.Session.GetString("Role");
+
     string Img(string? path)
     {
         if (string.IsNullOrWhiteSpace(path)) return Url.Content("~/tourly/assets/images/placeholder.jpg");
@@ -51,13 +53,11 @@
             </a>
 
             <a href="/Home/Index" class="logo">
-                <img src="~/tourly/assets/images/logo.svg" alt="TRAVEL AGENCY logo" />
+                @* Logo removed *@
             </a>
 
             <div class="header-btn-group">
-                <button class="search-btn" aria-label="Search">
-                    <ion-icon name="search"></ion-icon>
-                </button>
+                @* Removed non-functional search button to reduce clutter *@
 
                 <button class="nav-open-btn" aria-label="Open Menu" data-nav-open-btn>
                     <ion-icon name="menu-outline"></ion-icon>
@@ -71,16 +71,14 @@
         <div class="container">
 
             <ul class="social-list">
-                <li><a href="#" class="social-link"><ion-icon name="logo-facebook"></ion-icon></a></li>
-                <li><a href="#" class="social-link"><ion-icon name="logo-twitter"></ion-icon></a></li>
-                <li><a href="#" class="social-link"><ion-icon name="logo-youtube"></ion-icon></a></li>
+                @* Social links removed *@
             </ul>
 
             <nav class="navbar" data-navbar>
 
                 <div class="navbar-top">
                     <a href="/Home/Index" class="logo">
-                        <img src="~/tourly/assets/images/logo-blue.svg" alt="TRAVEL AGENCY logo" />
+                        @* Logo removed *@
                     </a>
 
                     <button class="nav-close-btn" aria-label="Close Menu" data-nav-close-btn>
@@ -100,7 +98,6 @@
                         <li><a href="/Booking/MyBookings" class="navbar-link" data-nav-link>my bookings</a></li>
                         <li><a href="/Account/Profile" class="navbar-link" data-nav-link>profile</a></li>
 
-                        var role = Context.Session.GetString("Role");
                         if (role == "Admin")
                         {
                             <li><a href="/Admin/Trips" class="navbar-link" data-nav-link>admin</a></li>
@@ -117,7 +114,14 @@
 
             </nav>
 
-            <a class="btn btn-primary" href="/Trips/Gallery">Book Now</a>
+            @if (role == "Admin")
+            {
+                <a class="btn btn-primary" href="/Admin">Admin Dashboard</a>
+            }
+            else
+            {
+                <a class="btn btn-primary" href="/Trips/Gallery">Book Now</a>
+            }
 
         </div>
     </div>
@@ -140,8 +144,16 @@
                 </p>
 
                 <div class="btn-group">
-                    <a class="btn btn-primary" href="#destination">Learn more</a>
-                    <a class="btn btn-secondary" href="/Trips/Gallery">Book now</a>
+                    <a class="btn btn-primary" href="/Trips/Gallery">Explore Trips</a>
+
+                    @if (role == "Admin")
+                    {
+                        <a class="btn btn-secondary" href="/Admin">Admin Dashboard</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-secondary" href="#destination">Learn more</a>
+                    }
                 </div>
 
             </div>
@@ -158,11 +170,7 @@
                         <input type="text" name="search" id="search" placeholder="Enter Destination" class="input-field" />
                     </div>
 
-                 
-
-              
-
-                    <button type="submit" class="btn btn-secondary">Inquire now</button>
+                    <button type="submit" class="btn btn-secondary">Search</button>
 
                 </form>
 
@@ -299,7 +307,7 @@
                     </p>
                 </div>
 
-                <a class="btn btn-secondary" href="/Trips/Gallery">Contact Us !</a>
+                <a class="btn btn-secondary" href="/Trips/Gallery">Explore Trips</a>
             </div>
         </section>
 
@@ -311,9 +319,7 @@
         <div class="container">
 
             <div class="footer-brand">
-                <a href="/Home/Index" class="logo">
-                    <img src="~/tourly/assets/images/logo.svg" alt="TRAVEL AGENCY logo" />
-                </a>
+                
 
                 <p class="footer-text">
                     TRAVEL AGENCY — book trips, pay securely, join waiting lists, receive email notifications,

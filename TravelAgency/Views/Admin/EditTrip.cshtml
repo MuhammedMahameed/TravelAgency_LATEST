@@ -1,5 +1,9 @@
 @model TravelAgency.Models.Trip
 
+@{
+    var selectedCategory = (Model?.Category ?? string.Empty).Trim();
+}
+
 <h2>Edit Trip</h2>
 
 <form method="post" enctype="multipart/form-data" asp-action="EditTrip" asp-controller="Admin">
@@ -43,7 +47,61 @@
 
             <div class="mb-3">
                 <label class="form-label fw-bold">Category</label>
-                <input name="Category" value="@Model.Category" class="form-control" />
+                <select name="Category" class="form-select">
+                    @if (string.IsNullOrWhiteSpace(selectedCategory))
+                    {
+                        <option value="" selected disabled>Choose category...</option>
+                    }
+                    else
+                    {
+                        <option value="" disabled>Choose category...</option>
+                    }
+
+                    @if (selectedCategory == "Family")
+                    {
+                        <option value="Family" selected>Family</option>
+                    }
+                    else
+                    {
+                        <option value="Family">Family</option>
+                    }
+
+                    @if (selectedCategory == "Honeymoon")
+                    {
+                        <option value="Honeymoon" selected>Honeymoon</option>
+                    }
+                    else
+                    {
+                        <option value="Honeymoon">Honeymoon</option>
+                    }
+
+                    @if (selectedCategory == "Adventure")
+                    {
+                        <option value="Adventure" selected>Adventure</option>
+                    }
+                    else
+                    {
+                        <option value="Adventure">Adventure</option>
+                    }
+
+                    @if (selectedCategory == "Cruise")
+                    {
+                        <option value="Cruise" selected>Cruise</option>
+                    }
+                    else
+                    {
+                        <option value="Cruise">Cruise</option>
+                    }
+
+                    @if (selectedCategory == "Luxury")
+                    {
+                        <option value="Luxury" selected>Luxury</option>
+                    }
+                    else
+                    {
+                        <option value="Luxury">Luxury</option>
+                    }
+                </select>
                 @Html.ValidationMessageFor(m => m.Category, "", new { @class = "text-danger" })
             </div>
 

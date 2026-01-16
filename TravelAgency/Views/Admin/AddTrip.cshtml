@@ -1,92 +1,125 @@
 @model TravelAgency.Models.Trip
 
-<div class="container mt-4">
-    <h2>Add New Trip</h2>
+@{
+    ViewData["Title"] = "Add New Trip";
+    ViewData["BodyClass"] = "";
+}
 
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
+<section class="ta-section ta-admin-addtrip">
+    <div class="container">
 
-    <form asp-action="AddTrip" asp-controller="Admin" method="post" enctype="multipart/form-data" class="mt-4">
+        <div class="ta-header-card mb-4">
+            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                <div>
+                    <p class="section-subtitle mb-2">Admin</p>
+                    <h2 class="h2 section-title mb-2">Add New Trip</h2>
+                    <p class="section-text mb-0">Create a new travel package and publish it to the gallery.</p>
+                </div>
 
-        <div class="mb-3">
-            <label class="form-label fw-bold">Package Name</label>
-            <input asp-for="PackageName" class="form-control" required placeholder="e.g., Paris Honeymoon Package" />
-            <span asp-validation-for="PackageName" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-bold">Destination</label>
-            <input asp-for="Destination" class="form-control" required />
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-bold">Country</label>
-            <input asp-for="Country" class="form-control" required />
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">Start Date</label>
-                <input asp-for="StartDate" type="date" class="form-control" required
-                       value="@(Model.StartDate.Year <= 1900 ? DateTime.Today.ToString("yyyy-MM-dd") : Model.StartDate.ToString("yyyy-MM-dd"))" />
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">End Date</label>
-                <input asp-for="EndDate" type="date" class="form-control" required
-                       value="@(Model.EndDate.Year <= 1900 ? DateTime.Today.AddDays(1).ToString("yyyy-MM-dd") : Model.EndDate.ToString("yyyy-MM-dd"))" />
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="/Admin/Trips" class="btn btn-outline-primary">Back to Trips</a>
+                    <a href="/Admin" class="btn btn-outline-primary">Dashboard</a>
+                </div>
             </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label fw-bold">Category</label>
-            <select asp-for="Category" class="form-select">
-                <option value="" selected disabled>Choose category...</option>
-                <option value="Family">Family</option>
-                <option value="Honeymoon">Honeymoon</option>
-                <option value="Adventure">Adventure</option>
-                <option value="Cruise">Cruise</option>
-                <option value="Luxury">Luxury</option>
-            </select>
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger shadow-sm mb-3">@TempData["Error"]</div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success shadow-sm mb-3">@TempData["Success"]</div>
+        }
+
+        <div class="card ta-admin-form-card">
+            <div class="card-body p-4 p-md-5">
+
+                <form asp-action="AddTrip" asp-controller="Admin" method="post" enctype="multipart/form-data">
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Package Name</label>
+                            <input asp-for="PackageName" class="form-control" required placeholder="e.g., Paris Honeymoon Package" />
+                            <span asp-validation-for="PackageName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Destination</label>
+                            <input asp-for="Destination" class="form-control" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Country</label>
+                            <input asp-for="Country" class="form-control" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Start Date</label>
+                            <input asp-for="StartDate" type="date" class="form-control" required
+                                   value="@(Model.StartDate.Year <= 1900 ? DateTime.Today.ToString("yyyy-MM-dd") : Model.StartDate.ToString("yyyy-MM-dd"))" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">End Date</label>
+                            <input asp-for="EndDate" type="date" class="form-control" required
+                                   value="@(Model.EndDate.Year <= 1900 ? DateTime.Today.AddDays(1).ToString("yyyy-MM-dd") : Model.EndDate.ToString("yyyy-MM-dd"))" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Category</label>
+                            <select asp-for="Category" class="form-select">
+                                <option value="" selected disabled>Choose category...</option>
+                                <option value="Family">Family</option>
+                                <option value="Honeymoon">Honeymoon</option>
+                                <option value="Adventure">Adventure</option>
+                                <option value="Cruise">Cruise</option>
+                                <option value="Luxury">Luxury</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Price</label>
+                            <input asp-for="Price" type="number" step="0.01" class="form-control" required />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Available Rooms</label>
+                            <input asp-for="AvailableRooms" type="number" min="1" class="form-control" required />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Cancellation Limit (days)</label>
+                            <input asp-for="CancellationDays" type="number" min="0" max="365" class="form-control" value="0" />
+                            <div class="form-text">Number of days prior to start date within which cancellations are NOT allowed. Enter 0 for no limit.</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Trip highlights, what's included, itinerary overview..."></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Main Image</label>
+                            <input type="file" name="imageFile" class="form-control" accept="image/*" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Additional Images (optional)</label>
+                            <input type="file" name="galleryImages" class="form-control" accept="image/*" multiple />
+                        </div>
+
+                        <div class="col-12 d-flex gap-2 flex-wrap mt-2">
+                            <button type="submit" class="btn btn-primary">Save Trip</button>
+                            <a href="/Admin/Trips" class="btn btn-outline-primary">Cancel</a>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label fw-bold">Price</label>
-            <input asp-for="Price" type="number" step="0.01" class="form-control" required />
-        </div>
+    </div>
+</section>
 
-        <div class="mb-3">
-            <label class="form-label fw-bold">Available Rooms</label>
-            <input asp-for="AvailableRooms" type="number" min="1" class="form-control" required />
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-bold">Cancellation Limit (days)</label>
-            <input asp-for="CancellationDays" type="number" min="0" max="365" class="form-control" value="0" />
-            <small class="text-muted">Number of days prior to start date within which cancellations are NOT allowed. Enter 0 for no limit.</small>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-bold">Description</label>
-            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-bold">Main Image</label>
-            <input type="file" name="imageFile" class="form-control" accept="image/*" required />
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-bold">Additional Images (optional)</label>
-            <input type="file" name="galleryImages" class="form-control" accept="image/*" multiple />
-        </div>
-
-        <button type="submit" class="btn btn-primary">Save Trip</button>
-    </form>
-</div>

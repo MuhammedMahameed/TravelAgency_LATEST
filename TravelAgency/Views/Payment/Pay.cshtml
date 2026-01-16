@@ -1,36 +1,55 @@
 @{
+    ViewData["Title"] = "Payment";
     var publishableKey = ViewBag.StripePublishableKey as string;
     var bookingId = (int)ViewBag.BookingId;
 }
 
-<div class="container py-4" style="max-width:520px;">
-    <h2 class="mb-3">Pay for booking #@bookingId</h2>
+<section class="ta-section ta-payment">
+    <div class="container ta-container-narrow">
 
-    @if (string.IsNullOrWhiteSpace(publishableKey) || publishableKey.Contains("REPLACE_ME", StringComparison.OrdinalIgnoreCase))
-    {
-        <div class="alert alert-warning">
-            Stripe is not configured. Set <code>Stripe:PublishableKey</code> and <code>Stripe:SecretKey</code> in <code>appsettings.json</code>.
-        </div>
-    }
-
-    <div id="payError" class="alert alert-danger d-none"></div>
-    <div id="paySuccess" class="alert alert-success d-none">Payment successful. Redirecting�</div>
-
-    <form id="payment-form">
-        <div class="mb-3">
-            <label class="form-label">Card details</label>
-            <div id="payment-element" class="form-control" style="padding: 12px;"></div>
+        <div class="ta-header-card mb-4" style="max-width: 720px; margin-inline: auto;">
+            <p class="section-subtitle mb-2">Secure Checkout</p>
+            <h2 class="h2 section-title mb-2">Pay for booking #@bookingId</h2>
+            <p class="section-text mb-0">Complete your payment securely. You’ll be redirected after success.</p>
         </div>
 
-        <button id="submit" class="btn btn-primary w-100" type="submit" disabled>
-            Pay now
-        </button>
+        <div class="card ta-payment-card" style="max-width: 720px; margin-inline: auto;">
+            <div class="card-body p-4 p-md-5">
 
-        <div class="text-muted mt-2" style="font-size:0.85rem;">
-            Test payments only (localhost). Use Stripe test cards.
+                @if (string.IsNullOrWhiteSpace(publishableKey) || publishableKey.Contains("REPLACE_ME", StringComparison.OrdinalIgnoreCase))
+                {
+                    <div class="alert alert-warning mb-3">
+                        Stripe is not configured. Set <code>Stripe:PublishableKey</code> and <code>Stripe:SecretKey</code> in <code>appsettings.json</code>.
+                    </div>
+                }
+
+                <div id="payError" class="alert alert-danger d-none"></div>
+                <div id="paySuccess" class="alert alert-success d-none">Payment successful. Redirecting…</div>
+
+                <form id="payment-form">
+                    <div class="mb-3">
+                        <label class="form-label">Card details</label>
+                        <div id="payment-element" class="form-control ta-payment-element"></div>
+                    </div>
+
+                    <button id="submit" class="btn btn-primary w-100" type="submit" disabled>
+                        Pay now
+                    </button>
+
+                    <div class="text-muted mt-3" style="font-size:0.9rem;">
+                        Stripe test mode (localhost). Use Stripe test cards.
+                    </div>
+
+                    <div class="mt-3 text-center">
+                        <a href="/Booking/MyBookings" class="btn btn-outline-primary">Back to My Bookings</a>
+                    </div>
+                </form>
+
+            </div>
         </div>
-    </form>
-</div>
+
+    </div>
+</section>
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
@@ -130,3 +149,4 @@
     });
 })();
 </script>
+

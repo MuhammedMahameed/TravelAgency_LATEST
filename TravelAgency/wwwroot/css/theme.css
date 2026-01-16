@@ -1,0 +1,1031 @@
+/* Global Theme (single file) - TravelAgency
+   Goal: Make all pages match the Tourly-style front page while keeping Bootstrap grid/utilities.
+*/
+
+:root {
+  --united-nations-blue: hsl(214, 56%, 58%);
+  --bright-navy-blue: hsl(214, 57%, 51%);
+  --spanish-gray: hsl(0, 0%, 60%);
+  --black-coral: hsl(225, 8%, 42%);
+  --oxford-blue: hsl(208, 97%, 12%);
+  --yale-blue: hsl(214, 72%, 33%);
+  --blue-ncs: hsl(197, 100%, 36%);
+  --gunmetal: hsl(206, 34%, 20%);
+  --gainsboro: hsl(0, 0%, 88%);
+  --cultured: hsl(0, 0%, 98%);
+  --white: hsl(0, 0%, 100%);
+  --black: hsl(0, 0%, 0%);
+  --onyx: hsl(0, 0%, 25%);
+  --jet: hsl(0, 0%, 20%);
+
+  --transition: 0.25s ease-in-out;
+
+  --ff-poppins: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --ff-montserrat: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  /* Typography scale (matching tourly/assets/css/style.css) */
+  --fs-1: calc(20px + 3.5vw);
+  --fs-2: calc(18px + 1.6vw);
+  --fs-3: calc(16px + 0.45vw);
+  --fs-4: 15px;
+  --fs-5: 14px;
+  --fs-6: 13px;
+  --fs-7: 12px;
+  --fs-8: 11px;
+
+  --fw-500: 500;
+  --fw-600: 600;
+  --fw-700: 700;
+  --fw-800: 800;
+
+  --section-padding: 60px;
+
+  --radius-15: 15px;
+  --radius-25: 25px;
+
+  --shadow-1: 0 2px 10px hsla(0, 0%, 0%, 0.08);
+  --shadow-2: 0 12px 30px hsla(0, 0%, 0%, 0.12);
+
+  --danger: hsl(0, 76%, 54%);
+  --success: hsl(145, 63%, 42%);
+  --warning: hsl(38, 92%, 50%);
+}
+
+/* Tourly-like baseline reset (safe subset) */
+*, *::before, *::after { box-sizing: border-box; }
+
+body.has-fixed-top-nav {
+  /* Ensure all normal pages have breathing room below the fixed navbar */
+  padding-top: 78px;
+}
+
+/* Narrow centered containers for forms/profile pages */
+.ta-container-narrow {
+  max-width: 980px;
+}
+
+/* Simple background for Profile */
+.ta-profile {
+  background: radial-gradient(1200px circle at 20% 0%, hsla(214, 57%, 51%, 0.10), transparent 55%),
+              radial-gradient(900px circle at 95% 20%, hsla(197, 100%, 36%, 0.10), transparent 50%),
+              var(--cultured);
+  padding-block: 40px;
+}
+
+/* ==========================================================
+   AUTH PAGES (Login / Register / Forgot Password) - Tourly look
+   ========================================================== */
+
+.ta-auth {
+  /* Default background (will be overridden by presets below) */
+  --ta-auth-bg: url(/images/hero-banner.jpg);
+
+  --ta-nav-h: 78px;
+
+  position: relative;
+  isolation: isolate;
+
+  min-height: calc(100vh + var(--ta-nav-h));
+  min-height: calc(100dvh + var(--ta-nav-h));
+  width: 100%;
+
+  display: grid;
+  place-items: center;
+
+  margin-top: calc(-1 * var(--ta-nav-h));
+  padding-top: calc(40px + var(--ta-nav-h));
+  padding-bottom: 40px;
+  padding-inline: 15px;
+
+  overflow: hidden;
+}
+
+.ta-auth::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  background-image: var(--ta-auth-bg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  /* Dark overlay like Tourly hero (NO blur on auth pages) */
+  background-color: hsla(0, 0%, 0%, 0.70);
+  background-blend-mode: overlay;
+}
+
+/* Restore original travel-themed presets */
+.ta-auth--login { --ta-auth-bg: url(/images/trips/hero-rome.jpg); }
+.ta-auth--register { --ta-auth-bg: url(/images/trips/hero-paris.jpg); }
+.ta-auth--forgot { --ta-auth-bg: url(/images/trips/hero-tokyo.jpg); }
+.ta-auth--change { --ta-auth-bg: url(/images/trips/hero-newyork.jpg); }
+
+.ta-auth-card {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  max-width: 460px;
+  border-radius: var(--radius-25, 25px);
+  background: var(--white, #fff);
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-2, 0 12px 30px hsla(0, 0%, 0%, 0.12));
+  overflow: hidden;
+}
+
+.ta-auth-header {
+  padding: 26px 24px 0;
+}
+
+.ta-auth-title {
+  font-family: var(--ff-montserrat, "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif);
+  text-transform: uppercase;
+  font-weight: var(--fw-800, 800);
+  color: var(--gunmetal, #22303a);
+  font-size: var(--fs-3, 18px);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.ta-auth-subtitle {
+  text-align: center;
+  color: var(--black-coral);
+  font-size: var(--fs-5);
+  margin-bottom: 18px;
+}
+
+.ta-auth-body {
+  padding: 0 24px 24px;
+}
+
+.ta-auth .form-label {
+  font-family: var(--ff-montserrat, "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif);
+  text-transform: uppercase;
+  font-size: var(--fs-7, 12px);
+  letter-spacing: 0.04em;
+}
+
+.ta-auth .form-control {
+  border-radius: 50px;
+  padding: 12px 16px;
+}
+
+.ta-auth .btn {
+  --padding: 10px 18px;
+  font-size: 14px;
+}
+
+.ta-auth .btn.w-100 {
+  padding: var(--padding, 10px 18px);
+}
+
+/* Make sure generic .btn uses the same variable-driven padding (Tourly style) */
+.btn {
+  padding: var(--padding, 8px 18px);
+}
+
+.ta-auth-footer {
+  padding: 14px 24px;
+  border-top: 1px solid hsla(0, 0%, 0%, 0.08);
+  background: var(--cultured);
+  text-align: center;
+  font-size: var(--fs-5);
+}
+
+.ta-auth-footer a {
+  color: var(--bright-navy-blue);
+  font-weight: var(--fw-700);
+}
+
+.ta-auth-footer a:hover {
+  color: var(--yale-blue);
+}
+
+/* ===== Trips Gallery (Tourly-styled) ===== */
+.ta-gallery {
+  background: var(--cultured);
+}
+
+/* Gallery background using the HOME hero image with blur */
+.ta-gallery {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.ta-gallery::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background-image: url(/images/hero-banner.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  /* Slightly lighter overlay for readability */
+  background-color: hsla(0, 0%, 0%, 0.45);
+  background-blend-mode: overlay;
+
+  /* Much less blur */
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+
+.ta-gallery > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.ta-gallery-hero {
+  border-radius: var(--radius-25);
+  overflow: hidden;
+  box-shadow: var(--shadow-2);
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+}
+
+.ta-gallery-hero .carousel-item img {
+  width: 100%;
+  height: clamp(260px, 38vw, 420px);
+  object-fit: cover;
+}
+
+.ta-filter-bar {
+  background: var(--white);
+  border-radius: var(--radius-25);
+  padding: 14px;
+  box-shadow: var(--shadow-1);
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+}
+
+.ta-gallery .trip-card {
+  border-radius: var(--radius-25);
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-1);
+}
+
+.ta-gallery .trip-card > a img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  transition: transform var(--transition);
+}
+
+.ta-gallery .trip-card:hover > a img {
+  transform: scale(1.03);
+}
+
+.ta-gallery .trip-info .package-name {
+  font-family: var(--ff-montserrat);
+  font-weight: var(--fw-800);
+  text-transform: uppercase;
+  font-size: var(--fs-6);
+  color: var(--gunmetal);
+  margin-bottom: 10px;
+}
+
+.ta-gallery .trip-info .badge {
+  background: hsla(214, 57%, 51%, 0.12);
+  color: var(--gunmetal);
+  border: 1px solid hsla(214, 57%, 51%, 0.20);
+  border-radius: 999px;
+  font-weight: var(--fw-600);
+}
+
+.ta-gallery .price-highlight {
+  color: var(--bright-navy-blue);
+  font-weight: var(--fw-800);
+}
+
+/* ===== Navbar (solid, Tourly palette) ===== */
+.navbar.gallery-navbar {
+  background: var(--white) !important;
+  border-bottom: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-1);
+}
+
+.navbar.gallery-navbar .navbar-brand,
+.navbar.gallery-navbar .gallery-brand {
+  color: var(--oxford-blue) !important;
+  font-family: var(--ff-montserrat);
+  font-weight: var(--fw-800);
+  letter-spacing: 0.2px;
+}
+
+.navbar.gallery-navbar .nav-link {
+  color: var(--gunmetal);
+  font-weight: var(--fw-600);
+}
+
+.navbar.gallery-navbar .nav-link:hover {
+  color: var(--bright-navy-blue);
+}
+
+/* Navbar buttons (keep existing bootstrap classes, just align look) */
+.navbar.gallery-navbar .gallery-btn {
+  border-radius: 999px;
+  font-weight: var(--fw-600);
+}
+
+/* Text underneath navbar: use a darker default so it reads on light backgrounds */
+body {
+  color: var(--gunmetal);
+  background: var(--cultured);
+}
+
+/* Gallery header card so intro text is readable over the background */
+.ta-gallery-header-card {
+  max-width: 720px;
+  margin-inline: auto;
+  padding: 18px 18px;
+  border-radius: var(--radius-25);
+
+  background: hsla(0, 0%, 100%, 0.92);
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-2);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* ===== Reusable header card (for pages with background images) ===== */
+.ta-header-card {
+  padding: 18px;
+  border-radius: var(--radius-25);
+  background: hsla(0, 0%, 100%, 0.92);
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-2);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* ===== My Bookings (Tourly-styled) ===== */
+.ta-mybookings {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.ta-mybookings::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background-image: url(/images/hero-banner.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  background-color: hsla(0, 0%, 0%, 0.45);
+  background-blend-mode: overlay;
+
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+
+.ta-mybookings > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.ta-mybookings .booking-card {
+  border-radius: var(--radius-25);
+  overflow: hidden;
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-1);
+}
+
+.ta-mybookings .booking-card .img-wrap img {
+  width: 100%;
+  height: 100%;
+  min-height: 210px;
+  object-fit: cover;
+}
+
+.ta-mybookings .booking-card .card-title {
+  font-family: var(--ff-montserrat);
+  font-weight: var(--fw-800);
+  text-transform: uppercase;
+}
+
+.ta-mybookings .price-box {
+  text-align: right;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: hsla(0, 0%, 98%, 0.85);
+  border: 1px solid hsla(0, 0%, 0%, 0.08);
+}
+
+.ta-mybookings .price-total {
+  color: var(--bright-navy-blue);
+  font-weight: var(--fw-800);
+  font-size: var(--fs-3);
+  line-height: 1.1;
+}
+
+.ta-mybookings .price-sub {
+  color: var(--black-coral);
+  font-size: var(--fs-6);
+}
+
+.ta-mybookings .kv {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  column-gap: 12px;
+  row-gap: 6px;
+  margin: 0;
+}
+
+.ta-mybookings .kv dt {
+  font-weight: var(--fw-700);
+  color: var(--gunmetal);
+}
+
+.ta-mybookings .kv dd {
+  margin: 0;
+  color: var(--black-coral);
+}
+
+.ta-mybookings .desc {
+  color: var(--black-coral);
+  margin-top: 10px;
+}
+
+.ta-mybookings .booking-head {
+  min-width: min(560px, 100%);
+}
+
+@media (min-width: 768px) {
+  .ta-mybookings .booking-head {
+    flex: 1 1 auto;
+  }
+
+  .ta-mybookings .price-box {
+    flex: 0 0 auto;
+    min-width: 190px;
+  }
+}
+
+/* ===== Trip Details (Tourly-styled) ===== */
+.ta-trip-details {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.ta-trip-details::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background-image: url(/images/hero-banner.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  background-color: hsla(0, 0%, 0%, 0.45);
+  background-blend-mode: overlay;
+
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+
+.ta-trip-details > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.ta-details-hero {
+  border-radius: var(--radius-25);
+  overflow: hidden;
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-2);
+}
+
+.ta-details-hero .carousel-item img {
+  width: 100%;
+  height: clamp(280px, 40vw, 460px);
+  object-fit: cover;
+}
+
+.ta-details-card,
+.ta-details-book,
+.ta-review-card,
+.ta-review-form {
+  border-radius: var(--radius-25);
+  overflow: hidden;
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-1);
+}
+
+.ta-details-meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  color: var(--black-coral);
+}
+
+.ta-details-meta strong {
+  color: var(--gunmetal);
+}
+
+@media (min-width: 768px) {
+  .ta-details-meta {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.ta-details-book .btn {
+  width: 100%;
+}
+
+/* ===== Tourly-like pill badges (override bootstrap badges slightly) ===== */
+.badge {
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: var(--fw-700);
+  letter-spacing: 0.02em;
+}
+
+.badge.text-bg-success {
+  background: hsla(145, 63%, 42%, 0.12) !important;
+  color: hsl(145, 63%, 25%) !important;
+  border: 1px solid hsla(145, 63%, 42%, 0.25);
+}
+
+.badge.text-bg-warning {
+  background: hsla(38, 92%, 50%, 0.16) !important;
+  color: hsl(38, 92%, 30%) !important;
+  border: 1px solid hsla(38, 92%, 50%, 0.28);
+}
+
+.badge.text-bg-danger {
+  background: hsla(0, 76%, 54%, 0.14) !important;
+  color: hsl(0, 76%, 32%) !important;
+  border: 1px solid hsla(0, 76%, 54%, 0.25);
+}
+
+.badge.text-bg-primary {
+  background: hsla(214, 57%, 51%, 0.14) !important;
+  color: var(--gunmetal) !important;
+  border: 1px solid hsla(214, 57%, 51%, 0.25);
+}
+
+.badge.text-bg-info {
+  background: hsla(197, 100%, 36%, 0.14) !important;
+  color: var(--gunmetal) !important;
+  border: 1px solid hsla(197, 100%, 36%, 0.25);
+}
+
+.badge.text-bg-secondary {
+  background: hsla(0, 0%, 60%, 0.16) !important;
+  color: var(--gunmetal) !important;
+  border: 1px solid hsla(0, 0%, 60%, 0.25);
+}
+
+/* ===== Trip Details - Reviews (modern) ===== */
+.ta-review-card .card-body,
+.ta-review-form .card-body {
+  background: hsla(0, 0%, 100%, 0.92);
+}
+
+.ta-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: hsla(214, 57%, 51%, 0.14);
+  border: 1px solid hsla(214, 57%, 51%, 0.22);
+  color: var(--gunmetal);
+  font-weight: var(--fw-800);
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.ta-review-name {
+  font-family: var(--ff-montserrat);
+  font-weight: var(--fw-800);
+}
+
+.ta-review-date {
+  font-size: var(--fs-6);
+}
+
+.ta-review-rating {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--warning);
+  margin-top: 2px;
+}
+
+.ta-review-rating .bi-star {
+  color: hsla(38, 92%, 50%, 0.35);
+}
+
+.ta-review-comment {
+  color: var(--black-coral);
+  line-height: 1.6;
+}
+
+.ta-review-delete {
+  border-radius: 999px;
+}
+
+.ta-review-form .form-control,
+.ta-review-form .form-select {
+  border-radius: 16px;
+}
+
+/* Trip Details - reviews header + empty state cards */
+.ta-review-header-card {
+  padding: 14px 16px;
+  border-radius: var(--radius-25);
+  background: hsla(0, 0%, 100%, 0.92);
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-2);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.ta-review-empty {
+  border-radius: var(--radius-25);
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+
+/* ===== Past Trips (same background as My Bookings) ===== */
+.ta-pasttrips {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.ta-pasttrips::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background-image: url(/images/hero-banner.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  background-color: hsla(0, 0%, 0%, 0.45);
+  background-blend-mode: overlay;
+
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+
+.ta-pasttrips > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.ta-pasttrips .past-trip-card {
+  border-radius: var(--radius-25);
+  overflow: hidden;
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-1);
+}
+
+.ta-pasttrips .past-trip-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===== Admin (landing) ===== */
+.ta-admin {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.ta-admin::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background-image: url(/images/hero-banner.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  background-color: hsla(0, 0%, 0%, 0.45);
+  background-blend-mode: overlay;
+
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+
+.ta-admin > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.ta-admin-card {
+  border-radius: var(--radius-25);
+  overflow: hidden;
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-1);
+}
+
+.ta-admin-card .card-body {
+  background: hsla(0, 0%, 100%, 0.92);
+}
+
+.ta-admin-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin-inline: auto;
+  display: grid;
+  place-items: center;
+
+  background: hsla(214, 57%, 51%, 0.14);
+  border: 1px solid hsla(214, 57%, 51%, 0.22);
+  color: var(--gunmetal);
+}
+
+.ta-admin-icon i {
+  font-size: 1.35rem;
+}
+
+.ta-admin-title {
+  font-family: var(--ff-montserrat);
+  font-weight: var(--fw-800);
+  text-transform: uppercase;
+  color: var(--gunmetal);
+}
+
+/* ===== Admin Users ===== */
+.ta-admin-users {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.ta-admin-users::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background-image: url(/images/hero-banner.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  background-color: hsla(0, 0%, 0%, 0.45);
+  background-blend-mode: overlay;
+
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+
+.ta-admin-users > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.ta-admin-table-card {
+  border-radius: var(--radius-25);
+  overflow: hidden;
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-1);
+  background: hsla(0, 0%, 100%, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.ta-admin-table thead {
+  background: var(--cultured);
+}
+
+.ta-admin-table th {
+  font-family: var(--ff-montserrat);
+  text-transform: uppercase;
+  font-size: var(--fs-7);
+  letter-spacing: 0.04em;
+  color: var(--gunmetal);
+  border-bottom: 1px solid hsla(0, 0%, 0%, 0.10);
+}
+
+.ta-admin-table td {
+  border-color: hsla(0, 0%, 0%, 0.08);
+}
+
+/* Admin Users - search */
+.ta-admin-users .ta-search .input-group-text {
+  background: hsla(0, 0%, 100%, 0.85);
+  border-color: hsla(0, 0%, 0%, 0.10);
+}
+
+.ta-admin-users .ta-search .form-control {
+  border-color: hsla(0, 0%, 0%, 0.10);
+}
+
+.ta-admin-users .ta-search .btn {
+  border-radius: 0; /* bootstrap input-group handles radius */
+}
+
+.ta-admin-users .ta-search {
+  overflow: hidden;
+  border-radius: 999px;
+  box-shadow: var(--shadow-1);
+}
+
+.ta-admin-users .ta-search .input-group-text,
+.ta-admin-users .ta-search .form-control,
+.ta-admin-users .ta-search .btn {
+  border-radius: 0;
+}
+
+/* ===== Admin Trips ===== */
+.ta-admin-trips {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.ta-admin-trips::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background-image: url(/images/hero-banner.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  background-color: hsla(0, 0%, 0%, 0.45);
+  background-blend-mode: overlay;
+
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+
+.ta-admin-trips > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.ta-admin-thumb {
+  width: 86px;
+  height: 62px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+}
+
+/* ===== Admin Add Trip ===== */
+.ta-admin-addtrip {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.ta-admin-addtrip::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background-image: url(/images/hero-banner.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  background-color: hsla(0, 0%, 0%, 0.45);
+  background-blend-mode: overlay;
+
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+
+.ta-admin-addtrip > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.ta-admin-form-card {
+  border-radius: var(--radius-25);
+  overflow: hidden;
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-1);
+  background: hsla(0, 0%, 100%, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.ta-admin-addtrip .form-label {
+  font-family: var(--ff-montserrat);
+  text-transform: uppercase;
+  font-size: var(--fs-7);
+  letter-spacing: 0.04em;
+  font-weight: var(--fw-700);
+}
+
+.ta-admin-addtrip .form-control,
+.ta-admin-addtrip .form-select {
+  border-radius: 16px;
+}
+
+/* ===== Admin Discount ===== */
+.ta-admin-discount {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.ta-admin-discount::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background-image: url(/images/hero-banner.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  background-color: hsla(0, 0%, 0%, 0.45);
+  background-blend-mode: overlay;
+
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+
+.ta-admin-discount > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== Payment (Pay + Success) ===== */
+.ta-payment {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.ta-payment::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background-image: url(/images/hero-banner.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  background-color: hsla(0, 0%, 0%, 0.45);
+  background-blend-mode: overlay;
+
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+
+.ta-payment > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.ta-payment-card {
+  border-radius: var(--radius-25);
+  overflow: hidden;
+  border: 1px solid hsla(0, 0%, 0%, 0.10);
+  box-shadow: var(--shadow-2);
+  background: hsla(0, 0%, 100%, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.ta-payment .form-label {
+  font-family: var(--ff-montserrat);
+  text-transform: uppercase;
+  font-size: var(--fs-7);
+  letter-spacing: 0.04em;
+  font-weight: var(--fw-700);
+}
+
+.ta-payment .form-control {
+  border-radius: 16px;
+}
+
+.ta-payment-element {
+  padding: 12px;
+}
