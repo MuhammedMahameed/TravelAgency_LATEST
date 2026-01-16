@@ -1,32 +1,32 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 @using Microsoft.AspNetCore.Http
-@using Microsoft.AspNetCore.Hosting
-@using Microsoft.Extensions.Hosting
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TravelAgency</title>
 
-    <script type="importmap"></script>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/TravelAgency.styles.css" asp-append-version="true" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="~/css/site-dark.css" asp-append-version="true" />
+
+    @RenderSection("Styles", required: false)
 </head>
 
 <body class="@ViewData["BodyClass"]">
+    @{
+        var isHome = (ViewContext.RouteData.Values["controller"]?.ToString() == "Home"
+        && ViewContext.RouteData.Values["action"]?.ToString() == "Index");
+    }
+
     <header>
-        <!-- ===== SIMPLE WHITE NAV LIKE GALLERY (NO MIDDLE BUTTONS) ===== -->
         <nav class="navbar navbar-expand-lg fixed-top gallery-navbar">
             <div class="container">
 
                 <!-- Brand (LEFT) -->
-                <a class="navbar-brand gallery-brand" href="/Trips/Gallery">
+                <a class="navbar-brand gallery-brand" href="/Home/Index">
                     Travel Agency
                 </a>
 
@@ -38,53 +38,32 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="galleryNav">
-                    <!-- IMPORTANT: nothing in the middle -->
                     <div class="ms-auto d-flex flex-wrap gap-2 align-items-center mt-3 mt-lg-0">
-
                         @if (Context.Session.GetInt32("UserId") != null)
                         {
                             var role = Context.Session.GetString("Role");
 
-                            <!-- Role buttons (RIGHT, next to auth) -->
                             if (role == "User")
                             {
-                                <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Trips/Gallery">
-                                    Trips
-                                </a>
-                                <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Booking/MyBookings">
-                                    My Bookings
-                                </a>
-                                <a href="/Account/Profile" class="btn btn-outline-secondary">
+                                <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Trips/Gallery">Trips</a>
+                                <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Booking/MyBookings">Cart</a>
+                                <a class="btn btn-outline-secondary btn-sm gallery-btn" href="/Account/Profile">
                                     <i class="bi bi-person-circle me-1"></i> Profile
                                 </a>
-
                             }
 
                             if (role == "Admin")
                             {
-                                <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Admin/Trips">
-                                    Manage Trips
-                                </a>
-                                <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Admin/Users">
-                                    User Management
-                                </a>
+                                <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Admin/Trips">Manage Trips</a>
+                                <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Admin/Users">User Management</a>
                             }
 
-                            <!-- Hello + Logout -->
-
-                            <a class="btn btn-danger btn-sm gallery-btn" href="/Account/Logout">
-                                Logout
-                            </a>
+                            <a class="btn btn-danger btn-sm gallery-btn" href="/Account/Logout">Logout</a>
                         }
                         else
                         {
-                            <!-- Auth (RIGHT) -->
-                            <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Account/Login">
-                                Login
-                            </a>
-                            <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Account/Register">
-                                Register
-                            </a>
+                            <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Account/Login">Login</a>
+                            <a class="btn btn-outline-primary btn-sm gallery-btn" href="/Account/Register">Register</a>
                         }
                     </div>
                 </div>
@@ -92,45 +71,44 @@
         </nav>
     </header>
 
-    <!-- offset for fixed navbar -->
-    <div class="container gallery-page-offset">
-        <main role="main" class="pb-3">
+    @if (isHome)
+    {
+        <!-- Home page full width -->
+        <main role="main">
             @RenderBody()
         </main>
-    </div>
+    }
+    else
+    {
+        <!-- All other pages keep the offset + container -->
+        <div class="container gallery-page-offset">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
-
-  
-    @if(TempData["CancellationMessage"] != null)
+    @if (TempData["CancellationMessage"] != null)
     {
-        <script>
-            alert("@TempData["CancellationMessage"]");
-        </script>
+        <script>alert("@TempData["CancellationMessage"]");</script>
     }
     @if (TempData["UserAlreadyExists"] != null)
     {
-        <script>
-            alert("@TempData["UserAlreadyExists"]")
-        </script>
+        <script>alert("@TempData["UserAlreadyExists"]");</script>
     }
-
     @if (TempData["activeBookingsMessage"] != null)
     {
-        <script>
-            alert("@TempData["activeBookingsMessage"]")
-        </script>
+        <script>alert("@TempData["activeBookingsMessage"]");</script>
     }
     @if (TempData["PaymentMessage"] != null)
     {
-        <script>
-            alert("@TempData["PaymentMessage"]");
-        </script>
+        <script>alert("@TempData["PaymentMessage"]");</script>
     }
+
 </body>
 </html>
