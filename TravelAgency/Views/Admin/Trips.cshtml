@@ -1,135 +1,185 @@
 @model List<TravelAgency.Models.Trip>
 
-<link rel="stylesheet" href="~/css/admin-trips.css" />
+@{
+    ViewData["Title"] = "Manage Trips";
+    ViewData["BodyClass"] = "";
+}
 
-<div class="login-page container-fluid py-4">
-    <div class="container admin-page">
+<section class="ta-section ta-admin-trips">
+    <div class="container">
 
-        <!-- ===== HEADER ===== -->
-        <div class="admin-header d-flex justify-content-between align-items-center flex-wrap mb-4 pt-4">
-            <h2 class="admin-title d-flex align-items-center">
-                <i class="bi bi-globe-americas text-primary me-2"></i>
-                Manage Trips
-            </h2>
+        <div class="ta-header-card mb-4">
+            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                <div>
+                    <p class="section-subtitle mb-2">Admin</p>
+                    <h2 class="h2 section-title mb-2">Manage Trips</h2>
+                    <p class="section-text mb-0">Create and maintain trips, prices, rooms, discounts, and visibility.</p>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="/Admin/AddTrip" class="btn btn-primary">Add New Trip</a>
+                    <a href="/Admin" class="btn btn-outline-primary">Back to Dashboard</a>
+                </div>
+            </div>
+
+            <div class="ta-admin-users-toolbar mt-3 d-flex flex-wrap gap-2 align-items-center">
+                <div class="input-group ta-search" style="max-width: 480px;">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input id="tripSearch" type="search" class="form-control" placeholder="Search trips by package, destination, country..." autocomplete="off" />
+                    <button id="tripSearchClear" class="btn btn-outline-secondary" type="button">Clear</button>
+                </div>
+
+                <form method="post" action="/Admin/ProcessWaitingList" class="d-inline">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-clock-history"></i> Process Waiting Lists
+                    </button>
+                </form>
+
+                <div id="tripSearchCount" class="text-muted small"></div>
+            </div>
         </div>
 
-        <!-- ===== CONTROLS ===== -->
-        <div class="admin-controls d-flex flex-wrap align-items-center gap-3 mb-4">
-            <a href="/Admin/AddTrip" class="btn btn-outline-success fw-semibold">
-                <i class="bi bi-plus-circle"></i> Add New Trip
-            </a>
-
-            <!-- 🔹 NEW BUTTON: Process Waiting Lists -->
-            <form method="post" action="/Admin/ProcessWaitingList" class="d-inline">
-                <button type="submit" class="btn btn-outline-primary fw-semibold">
-                    <i class="bi bi-clock-history"></i> Process Waiting Lists
-                </button>
-            </form>
-        </div>
-
-        <!-- ===== ALERTS ===== -->
         @if (TempData["Error"] != null)
         {
-            <div class="alert alert-danger shadow-sm mb-3">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
-            </div>
+            <div class="alert alert-danger shadow-sm mb-3">@TempData["Error"]</div>
         }
         @if (TempData["Success"] != null)
         {
-            <div class="alert alert-success shadow-sm mb-3">
-                <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
-            </div>
+            <div class="alert alert-success shadow-sm mb-3">@TempData["Success"]</div>
         }
 
-        <!-- ===== TABLE ===== -->
-        <div class="admin-card border-0 p-4 rounded-4 bg-white shadow-sm">
-            <div class="table-responsive">
-                <table class="table align-middle admin-table mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Image</th>
-                            <th>Package</th>
-                            <th>Destination</th>
-                            <th>Country</th>
-                            <th>Price</th>
-                            <th>Rooms</th>
-                            <th>Status</th>
-                            <th class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var t in Model)
-                        {
-                            var title = !string.IsNullOrWhiteSpace(t.PackageName) ? t.PackageName : t.Destination;
-
-                            <tr class="@(t.IsHidden ? "table-secondary" : "")">
-                                <!-- ====== IMAGE COLUMN ====== -->
-                                <td>
-                                    @if (!string.IsNullOrEmpty(t.ImagePath))
-                                    {
-                                        <img src="@t.ImagePath" alt="Trip Image"
-                                             style="width:80px; height:60px; object-fit:cover; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.15);" />
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">No image</span>
-                                    }
-                                </td>
-
-                                <td class="fw-semibold">@title</td>
-
-                                <!-- ====== EXISTING COLUMNS ====== -->
-                                <td class="fw-semibold">@t.Destination</td>
-                                <td>@t.Country</td>
-                                <td>₪@t.Price</td>
-                                <td>@t.AvailableRooms</td>
-
-                                <td>
-                                    @if (t.IsHidden)
-                                    {
-                                        <span class="badge bg-secondary">Hidden</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-success">Visible</span>
-                                    }
-                                </td>
-
-                                <!-- ====== ACTION BUTTONS ====== -->
-                                <td class="text-center">
-                                    <a href="/Admin/EditTrip/@t.TripId" class="btn btn-sm btn-outline-primary me-1">
-                                        <i class="bi bi-pencil-square"></i> Edit
-                                    </a>
-                                    <a href="/Admin/Discount/@t.TripId" class="btn btn-sm btn-outline-info me-1">
-                                        <i class="bi bi-tag"></i> Discount
-                                    </a>
-                                    <a href="/Admin/WaitingList/@t.TripId" class="btn btn-sm btn-outline-warning me-1">
-                                        <i class="bi bi-hourglass-split"></i> Waiting List
-                                    </a>
-
-                                    <form asp-action="ToggleTripVisibility" asp-controller="Admin" method="post" class="d-inline me-1">
-                                        <input type="hidden" name="id" value="@t.TripId" />
-                                        <button type="submit" class="btn btn-sm @(t.IsHidden ? "btn-outline-success" : "btn-outline-secondary")"
-                                                onclick="return confirm('@(t.IsHidden ? "Show this trip in the gallery?" : "Hide this trip from the gallery?")');">
-                                            <i class="bi @(t.IsHidden ? "bi-eye" : "bi-eye-slash")"></i>
-                                            @(t.IsHidden ? "Show" : "Hide")
-                                        </button>
-                                    </form>
-
-                                    <form asp-action="DeleteTrip" asp-controller="Admin" method="post" class="d-inline">
-                                        <input type="hidden" name="id" value="@t.TripId" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Are you sure you want to delete this trip?');">
-                                            <i class="bi bi-trash"></i> Delete
-                                        </button>
-                                    </form>
-                                </td>
+        <div class="card ta-admin-table-card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 ta-admin-table" id="tripsTable">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Package</th>
+                                <th>Destination</th>
+                                <th>Country</th>
+                                <th>Price</th>
+                                <th>Rooms</th>
+                                <th>Status</th>
+                                <th class="text-center">Actions</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var t in Model)
+                            {
+                                var title = !string.IsNullOrWhiteSpace(t.PackageName) ? t.PackageName : t.Destination;
+                                var statusText = t.IsHidden ? "Hidden" : "Visible";
+
+                                <tr class="@(t.IsHidden ? "table-secondary" : "")" data-search="@title @t.Destination @t.Country @statusText">
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(t.ImagePath))
+                                        {
+                                            <img src="@t.ImagePath" alt="Trip Image" class="ta-admin-thumb" />
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No image</span>
+                                        }
+                                    </td>
+
+                                    <td class="fw-semibold">@title</td>
+                                    <td class="fw-semibold">@t.Destination</td>
+                                    <td>@t.Country</td>
+                                    <td>₪@t.Price</td>
+                                    <td>@t.AvailableRooms</td>
+
+                                    <td>
+                                        @if (t.IsHidden)
+                                        {
+                                            <span class="badge text-bg-secondary">Hidden</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge text-bg-success">Visible</span>
+                                        }
+                                    </td>
+
+                                    <td class="text-center">
+                                        <a href="/Admin/EditTrip/@t.TripId" class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                        <a href="/Admin/Discount/@t.TripId" class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="bi bi-tag"></i> Discount
+                                        </a>
+                                        <a href="/Admin/WaitingList/@t.TripId" class="btn btn-sm btn-outline-warning me-1">
+                                            <i class="bi bi-hourglass-split"></i> Waiting List
+                                        </a>
+
+                                        <form asp-action="ToggleTripVisibility" asp-controller="Admin" method="post" class="d-inline me-1">
+                                            <input type="hidden" name="id" value="@t.TripId" />
+                                            <button type="submit" class="btn btn-sm @(t.IsHidden ? "btn-outline-success" : "btn-outline-secondary")"
+                                                    onclick="return confirm('@(t.IsHidden ? "Show this trip in the gallery?" : "Hide this trip from the gallery?")');">
+                                                <i class="bi @(t.IsHidden ? "bi-eye" : "bi-eye-slash")"></i>
+                                                @(t.IsHidden ? "Show" : "Hide")
+                                            </button>
+                                        </form>
+
+                                        <form asp-action="DeleteTrip" asp-controller="Admin" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@t.TripId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Are you sure you want to delete this trip?');">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
     </div>
-</div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            const input = document.getElementById('tripSearch');
+            const clearBtn = document.getElementById('tripSearchClear');
+            const countEl = document.getElementById('tripSearchCount');
+            const table = document.getElementById('tripsTable');
+            if (!input || !clearBtn || !countEl || !table) return;
+
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const total = rows.length;
+
+            function updateCount(visible) {
+                if (total === 0) {
+                    countEl.textContent = '';
+                    return;
+                }
+                countEl.textContent = visible === total ? (total + ' trip(s)') : (visible + ' / ' + total + ' shown');
+            }
+
+            function applyFilter() {
+                const q = (input.value || '').trim().toLowerCase();
+                let visible = 0;
+
+                rows.forEach(r => {
+                    const hay = (r.getAttribute('data-search') || '').toLowerCase();
+                    const show = q.length === 0 || hay.includes(q);
+                    r.style.display = show ? '' : 'none';
+                    if (show) visible++;
+                });
+
+                updateCount(visible);
+            }
+
+            input.addEventListener('input', applyFilter);
+            clearBtn.addEventListener('click', function () {
+                input.value = '';
+                input.focus();
+                applyFilter();
+            });
+
+            applyFilter();
+        })();
+    </script>
+}

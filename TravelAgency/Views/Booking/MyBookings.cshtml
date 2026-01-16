@@ -4,224 +4,228 @@
     ViewData["Title"] = "My Bookings";
 }
 
-<link rel="stylesheet" href="~/css/mybookings.css" asp-append-version="true" />
+<section class="ta-section ta-mybookings">
+    <div class="container">
 
-<div class="container my-4">
-
-    <div class="mybookings-header">
-        <div>
-            <h2 class="mb-1">My Bookings</h2>
-            <div class="text-muted">Manage your upcoming trips, payments and cancellations.</div>
+        <div class="ta-header-card mb-4">
+            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                <div>
+                    <p class="section-subtitle mb-2">Account</p>
+                    <h2 class="h2 section-title mb-2">My Bookings</h2>
+                    <p class="section-text mb-0">Manage your upcoming trips, payments and cancellations.</p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="/Trips/Gallery" class="btn btn-outline-primary">Browse trips</a>
+                    <a href="/Booking/PastTrips" class="btn btn-outline-primary">Past trips</a>
+                </div>
+            </div>
         </div>
-        <div class="d-flex gap-2">
-            <a href="/Trips/Gallery" class="btn btn-outline-secondary">Browse trips</a>
-            <a href="/Booking/PastTrips" class="btn btn-outline-primary">Past trips</a>
-        </div>
-    </div>
 
-    @if (TempData["PaymentMessage"] != null)
-    {
-        <div class="alert alert-info">@TempData["PaymentMessage"]</div>
-    }
+        @if (TempData["PaymentMessage"] != null)
+        {
+            <div class="alert alert-info">@TempData["PaymentMessage"]</div>
+        }
 
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-secondary text-center">
-            You have no active bookings.
-        </div>
-    }
-    else
-    {
-        <div class="row g-3">
-            @foreach (var b in Model)
-            {
-                var daysLeft = (int)Math.Ceiling((b.StartDate.Date - DateTime.Now.Date).TotalDays);
-                var tripStartsToday = b.StartDate.Date == DateTime.Now.Date;
-                var isUpcoming = b.StartDate.Date >= DateTime.Now.Date;
+        @if (!Model.Any())
+        {
+            <div class="alert alert-secondary text-center">
+                You have no active bookings.
+            </div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var b in Model)
+                {
+                    var daysLeft = (int)Math.Ceiling((b.StartDate.Date - DateTime.Now.Date).TotalDays);
+                    var tripStartsToday = b.StartDate.Date == DateTime.Now.Date;
+                    var isUpcoming = b.StartDate.Date >= DateTime.Now.Date;
 
-                var totalPrice = b.Price * b.Quantity;
-                var perRoom = b.Price;
+                    var totalPrice = b.Price * b.Quantity;
+                    var perRoom = b.Price;
 
-                var title = !string.IsNullOrWhiteSpace(b.PackageName)
-                    ? b.PackageName
-                    : $"{b.Destination}, {b.Country}";
+                    var title = !string.IsNullOrWhiteSpace(b.PackageName)
+                        ? b.PackageName
+                        : $"{b.Destination}, {b.Country}";
 
-                // client-side max for increase; server re-checks against DB
-                var maxRoomsClient = b.Quantity + Math.Max(0, b.AvailableRooms);
+                    // client-side max for increase; server re-checks against DB
+                    var maxRoomsClient = b.Quantity + Math.Max(0, b.AvailableRooms);
 
-                <div class="col-12">
-                    <div class="card booking-card">
-                        <div class="row g-0">
+                    <div class="col-12">
+                        <div class="card booking-card">
+                            <div class="row g-0">
 
-                            <div class="col-md-4 col-lg-3">
-                                <div class="img-wrap">
-                                    @if (!string.IsNullOrEmpty(b.ImagePath))
-                                    {
-                                        <img src="@b.ImagePath" alt="@title" />
-                                    }
-                                    else
-                                    {
-                                        <div class="d-flex align-items-center justify-content-center h-100" style="min-height:190px;">
-                                            <span class="text-muted">No image</span>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-
-                            <div class="col-md-8 col-lg-9">
-                                <div class="card-body p-3 p-md-4">
-
-                                    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
-                                        <div>
-                                            <div class="d-flex flex-column gap-1">
-                                                <h5 class="card-title mb-0">@title</h5>
-                                                <div class="text-muted small">?? @b.Destination, @b.Country</div>
-                                            </div>
-
-                                            <div class="booking-meta text-muted small">
-                                                <span>?? @b.StartDate.ToString("dd/MM/yyyy")</span>
-                                                <span class="text-muted">?</span>
-                                                <span>?? @b.EndDate.ToString("dd/MM/yyyy")</span>
-                                                <span class="text-muted">•</span>
-                                                <span>Rooms: <strong>@b.Quantity</strong></span>
-
-                                                @if (!string.IsNullOrEmpty(b.Category))
-                                                {
-                                                    <span class="text-muted">•</span>
-                                                    <span class="badge text-bg-light border">@b.Category</span>
-                                                }
-
-                                                @if (tripStartsToday)
-                                                {
-                                                    <span class="badge text-bg-info">Starts today</span>
-                                                }
-                                                else if (daysLeft > 0)
-                                                {
-                                                    <span class="badge text-bg-primary">@daysLeft day(s) left</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge text-bg-secondary">Already started</span>
-                                                }
-
-                                                @if (b.IsPaid)
-                                                {
-                                                    <span class="badge text-bg-success">Paid</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge text-bg-warning">Unpaid</span>
-                                                }
-                                            </div>
-                                        </div>
-
-                                        <div class="price-box">
-                                            <div class="price-total">@totalPrice.ToString("0.00") ¤</div>
-                                            <div class="price-sub">@perRoom.ToString("0.00") ¤ / room</div>
-                                        </div>
-                                    </div>
-
-                                    @if (!string.IsNullOrEmpty(b.Description))
-                                    {
-                                        <p class="desc">
-                                            @(b.Description.Length > 180 ? b.Description.Substring(0, 180) + "..." : b.Description)
-                                        </p>
-                                    }
-
-                                    <hr class="my-3" />
-
-                                    <div class="row g-3 small">
-                                        <div class="col-lg-6">
-                                            <dl class="kv">
-                                                <dt>Booking id</dt>
-                                                <dd>@b.BookingId</dd>
-
-                                                <dt>Booked at</dt>
-                                                <dd>@b.BookingDate.ToString("dd/MM/yyyy HH:mm")</dd>
-
-                                                <dt>Paid at</dt>
-                                                <dd>@(b.PaidAt.HasValue ? b.PaidAt.Value.ToString("dd/MM/yyyy HH:mm") : "-")</dd>
-                                            </dl>
-                                        </div>
-
-                                        <div class="col-lg-6">
-                                            <dl class="kv">
-                                                <dt>Trip min age</dt>
-                                                <dd>@(b.TripMinAge.HasValue ? b.TripMinAge.Value.ToString() : "None")</dd>
-
-                                                <dt>Your group min age</dt>
-                                                <dd>@(b.GroupMinAge.HasValue ? b.GroupMinAge.Value.ToString() : "Not provided")</dd>
-
-                                                <dt>Cancellation policy</dt>
-                                                <dd>@b.CancellationDays day(s) before start</dd>
-                                            </dl>
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-3 d-flex gap-2 flex-wrap">
-                                        <a href="/Trips/Details/@b.TripId" class="btn btn-outline-primary btn-sm">Trip details</a>
-                                        <a href="/Trips/Details/@b.TripId#reviews" class="btn btn-outline-warning btn-sm">Rate / Review</a>
-
-                                        @if (isUpcoming)
+                                <div class="col-md-4 col-lg-3">
+                                    <div class="img-wrap">
+                                        @if (!string.IsNullOrEmpty(b.ImagePath))
                                         {
-                                            <a href="/Booking/ItineraryPdf?bookingId=@b.BookingId" class="btn btn-outline-dark btn-sm">
-                                                Download itinerary (PDF)
-                                            </a>
+                                            <img src="@b.ImagePath" alt="@title" />
                                         }
-
-                                        @if (isUpcoming && !b.IsPaid)
+                                        else
                                         {
-                                            <form method="post" action="/Booking/UpdateQuantity" class="d-inline">
-                                                <input type="hidden" name="bookingId" value="@b.BookingId" />
+                                            <div class="d-flex align-items-center justify-content-center h-100" style="min-height:190px;">
+                                                <span class="text-muted">No image</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
 
-                                                <div class="d-inline-flex flex-column gap-1">
-                                                    <div class="input-group input-group-sm shadow-sm" style="width: 260px;">
-                                                        <span class="input-group-text bg-light">Rooms</span>
-                                                        <button class="btn btn-outline-secondary" type="button" onclick="decQty(this)">-</button>
-                                                        <input type="number"
-                                                               class="form-control text-center"
-                                                               name="newQty"
-                                                               min="1"
-                                                               max="@maxRoomsClient"
-                                                               value="@b.Quantity"
-                                                               style="max-width:80px;" />
-                                                        <button class="btn btn-outline-secondary" type="button" onclick="incQty(this)">+</button>
-                                                        <button class="btn btn-primary" type="submit">Update</button>
-                                                    </div>
+                                <div class="col-md-8 col-lg-9">
+                                    <div class="card-body p-3 p-md-4">
 
-                                                    <div class="text-muted" style="font-size:0.78rem; line-height:1.1;">
-                                                        Available now: <strong>@b.AvailableRooms</strong> &nbsp;|&nbsp; Current: <strong>@b.Quantity</strong>
+                                        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                                            <div class="booking-head">
+                                                <div class="d-flex flex-column gap-1">
+                                                    <h5 class="card-title mb-0">@title</h5>
+                                                    <div class="text-muted small"><i class="bi bi-geo-alt me-1"></i>@b.Destination, @b.Country</div>
+
+                                                    <div class="booking-meta text-muted small">
+                                                        <span><i class="bi bi-calendar-event me-1"></i>@b.StartDate.ToString("dd/MM/yyyy")</span>
+                                                        <span class="text-muted">â€¢</span>
+                                                        <span><i class="bi bi-calendar-check me-1"></i>@b.EndDate.ToString("dd/MM/yyyy")</span>
+                                                        <span class="text-muted">â€¢</span>
+                                                        <span><i class="bi bi-door-closed me-1"></i>Rooms: <strong>@b.Quantity</strong></span>
+
+                                                        @if (!string.IsNullOrEmpty(b.Category))
+                                                        {
+                                                            <span class="text-muted">â€¢</span>
+                                                            <span class="badge text-bg-light border">@b.Category</span>
+                                                        }
+
+                                                        @if (tripStartsToday)
+                                                        {
+                                                            <span class="badge text-bg-info">Starts today</span>
+                                                        }
+                                                        else if (daysLeft > 0)
+                                                        {
+                                                            <span class="badge text-bg-primary">@daysLeft day(s) left</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge text-bg-secondary">Already started</span>
+                                                        }
+
+                                                        @if (b.IsPaid)
+                                                        {
+                                                            <span class="badge text-bg-success">Paid</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge text-bg-warning">Unpaid</span>
+                                                        }
                                                     </div>
                                                 </div>
-                                            </form>
-                                        }
+                                            </div>
 
-                                        @if (!b.IsPaid)
+                                            <div class="price-box">
+                                                <div class="price-total">â‚ª@totalPrice.ToString("0.00")</div>
+                                                <div class="price-sub">â‚ª@perRoom.ToString("0.00") / room</div>
+                                            </div>
+                                        </div>
+
+                                        @if (!string.IsNullOrEmpty(b.Description))
                                         {
-                                            <a href="/Payment/Pay?bookingId=@b.BookingId" class="btn btn-success btn-sm">Pay now</a>
+                                            <p class="desc">
+                                                @(b.Description.Length > 180 ? b.Description.Substring(0, 180) + "..." : b.Description)
+                                            </p>
                                         }
 
-                                        <form method="post" action="/Booking/Cancel" class="d-inline">
-                                            <input type="hidden" name="bookingId" value="@b.BookingId" />
-                                            <button class="btn btn-danger btn-sm">Cancel</button>
-                                        </form>
+                                        <hr class="my-3" />
+
+                                        <div class="row g-3 small">
+                                            <div class="col-lg-6">
+                                                <dl class="kv">
+                                                    <dt>Booking id</dt>
+                                                    <dd>@b.BookingId</dd>
+
+                                                    <dt>Booked at</dt>
+                                                    <dd>@b.BookingDate.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                                                    <dt>Paid at</dt>
+                                                    <dd>@(b.PaidAt.HasValue ? b.PaidAt.Value.ToString("dd/MM/yyyy HH:mm") : "-")</dd>
+                                                </dl>
+                                            </div>
+
+                                            <div class="col-lg-6">
+                                                <dl class="kv">
+                                                    <dt>Trip min age</dt>
+                                                    <dd>@(b.TripMinAge.HasValue ? b.TripMinAge.Value.ToString() : "None")</dd>
+
+                                                    <dt>Your group min age</dt>
+                                                    <dd>@(b.GroupMinAge.HasValue ? b.GroupMinAge.Value.ToString() : "Not provided")</dd>
+
+                                                    <dt>Cancellation policy</dt>
+                                                    <dd>@b.CancellationDays day(s) before start</dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3 d-flex gap-2 flex-wrap">
+                                            <a href="/Trips/Details/@b.TripId" class="btn btn-outline-primary btn-sm">Trip details</a>
+                                            <a href="/Trips/Details/@b.TripId#reviews" class="btn btn-outline-warning btn-sm">Rate / Review</a>
+
+                                            @if (isUpcoming)
+                                            {
+                                                <a href="/Booking/ItineraryPdf?bookingId=@b.BookingId" class="btn btn-outline-dark btn-sm">
+                                                    Download itinerary (PDF)
+                                                </a>
+                                            }
+
+                                            @if (isUpcoming && !b.IsPaid)
+                                            {
+                                                <form method="post" action="/Booking/UpdateQuantity" class="d-inline">
+                                                    <input type="hidden" name="bookingId" value="@b.BookingId" />
+
+                                                    <div class="d-inline-flex flex-column gap-1">
+                                                        <div class="input-group input-group-sm shadow-sm" style="width: 260px;">
+                                                            <span class="input-group-text bg-light">Rooms</span>
+                                                            <button class="btn btn-outline-secondary" type="button" onclick="decQty(this)">-</button>
+                                                            <input type="number"
+                                                                   class="form-control text-center"
+                                                                   name="newQty"
+                                                                   min="1"
+                                                                   max="@maxRoomsClient"
+                                                                   value="@b.Quantity"
+                                                                   style="max-width:80px;" />
+                                                            <button class="btn btn-outline-secondary" type="button" onclick="incQty(this)">+</button>
+                                                            <button class="btn btn-primary" type="submit">Update</button>
+                                                        </div>
+
+                                                        <div class="text-muted" style="font-size:0.78rem; line-height:1.1;">
+                                                            Available now: <strong>@b.AvailableRooms</strong> &nbsp;|&nbsp; Current: <strong>@b.Quantity</strong>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            }
+
+                                            @if (!b.IsPaid)
+                                            {
+                                                <a href="/Payment/Pay?bookingId=@b.BookingId" class="btn btn-success btn-sm">Pay now</a>
+                                            }
+
+                                            <form method="post" action="/Booking/Cancel" class="d-inline">
+                                                <input type="hidden" name="bookingId" value="@b.BookingId" />
+                                                <button class="btn btn-danger btn-sm">Cancel</button>
+                                            </form>
+                                        </div>
+
                                     </div>
-
                                 </div>
-                            </div>
 
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
-    }
-</div>
+                }
+            </div>
+        }
+
+    </div>
+</section>
 
 @section Scripts {
     <script>

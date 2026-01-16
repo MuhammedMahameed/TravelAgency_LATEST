@@ -4,30 +4,30 @@
     ViewData["Title"] = "Past Trips";
 }
 
-<link rel="stylesheet" href="~/css/past-trips.css" asp-append-version="true" />
+<section class="ta-section ta-pasttrips">
+    <div class="container">
 
-<div class="past-trips-page">
-    <div class="container past-trips-container">
+        <div class="ta-header-card mb-4">
+            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                <div>
+                    <p class="section-subtitle mb-2">Account</p>
+                    <h2 class="h2 section-title mb-2">My Past Trips</h2>
+                    <p class="section-text mb-0">Trips you already completed.</p>
+                </div>
 
-        <!-- ===== HEADER ===== -->
-        <div class="past-trips-header d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-            <div>
-                <h2 class="past-trips-title d-flex align-items-center mb-1">
-                    <i class="bi bi-airplane-fill me-2"></i> My Past Trips
-                </h2>
-                <div class="past-trips-subtitle">Trips you already completed</div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="/Booking/MyBookings" class="btn btn-outline-primary">My Bookings</a>
+                    <a href="/Trips/Gallery" class="btn btn-outline-primary">Back to Gallery</a>
+                </div>
             </div>
-
-            <a href="/Trips/Gallery" class="btn btn-outline-secondary fw-semibold">
-                <i class="bi bi-arrow-left"></i> Back to Gallery
-            </a>
         </div>
 
-        <!-- ===== EMPTY STATE ===== -->
         @if (Model == null || !Model.Any())
         {
-            <div class="alert alert-info shadow-sm rounded-4 py-3 px-4 text-center">
-                <i class="bi bi-info-circle me-2"></i>You have no past trips yet.
+            <div class="ta-review-empty card mb-3">
+                <div class="card-body text-center">
+                    <p class="mb-0 text-muted">You have no past trips yet.</p>
+                </div>
             </div>
         }
         else
@@ -53,9 +53,7 @@
                                         <i class="bi bi-calendar-event me-1"></i>@trip.StartDate.ToShortDateString()
                                     </small>
 
-                                    <span class="badge past-trip-badge px-3 py-2 rounded-pill">
-                                        Completed
-                                    </span>
+                                    <span class="badge past-trip-badge px-3 py-2 rounded-pill">Completed</span>
                                 </div>
                             </div>
                         </div>
@@ -65,4 +63,4 @@
         }
 
     </div>
-</div>
+</section>

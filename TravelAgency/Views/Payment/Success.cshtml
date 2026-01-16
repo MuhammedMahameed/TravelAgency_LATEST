@@ -1,5 +1,24 @@
-<h2>Payment Successful</h2>
+@{
+    ViewData["Title"] = "Payment Successful";
+}
 
-<p>Your payment was processed successfully.</p>
+<section class="ta-section ta-payment">
+    <div class="container ta-container-narrow">
+        <div class="ta-header-card mb-4" style="max-width: 720px; margin-inline: auto;">
+            <p class="section-subtitle mb-2">Payment</p>
+            <h2 class="h2 section-title mb-2">Payment Successful</h2>
+            <p class="section-text mb-0">Your payment was processed successfully.</p>
+        </div>
 
-<a href="/Booking/MyBookings">Back to My Bookings</a>
+        <div class="card ta-payment-card" style="max-width: 720px; margin-inline: auto;">
+            <div class="card-body p-4 p-md-5">
+                <p class="mb-4">Thanks! Your booking is now confirmed.</p>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <a class="btn btn-primary" href="/Booking/MyBookings">My Bookings</a>
+                    <a class="btn btn-outline-primary" href="/Trips/Gallery">Explore Trips</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
