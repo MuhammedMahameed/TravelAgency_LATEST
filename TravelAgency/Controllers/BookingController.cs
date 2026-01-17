@@ -674,6 +674,14 @@ public class BookingController : Controller
 
         int userId = HttpContext.Session.GetInt32("UserId").Value;
 
+        // Capture info for email (best-effort)
+        string? userEmail = null;
+        string packageName = "";
+        string destination = "";
+        string country = "";
+        DateTime? tripStartDateForEmail = null;
+        DateTime? tripEndDateForEmail = null;
+
         using (SqlConnection connection = new SqlConnection(_connStr))
         {
             connection.Open();
@@ -681,12 +689,23 @@ public class BookingController : Controller
             try
             {
                 var getCmd = new SqlCommand(@"
-                    SELECT b.TripId, b.IsPaid, ISNULL(b.Quantity,1) AS Quantity, t.StartDate, ISNULL(t.CancellationDays, 0) AS CancellationDays
+                    SELECT
+                        b.TripId,
+                        b.IsPaid,
+                        ISNULL(b.Quantity,1) AS Quantity,
+                        t.StartDate,
+                        t.EndDate,
+                        ISNULL(t.CancellationDays, 0) AS CancellationDays,
+                        t.PackageName,
+                        t.Destination,
+                        t.Country,
+                        u.Email
                     FROM Bookings b
                     JOIN Trips t ON b.TripId = t.TripId
+                    JOIN Users u ON b.UserId = u.UserId
                     WHERE b.BookingId = @bid
-                    AND b.UserId = @uid
-                    AND b.Status = @status",
+                      AND b.UserId = @uid
+                      AND b.Status = @status",
                      connection, transaction);
 
                 getCmd.Parameters.AddWithValue("@bid", bookingId);
@@ -712,6 +731,13 @@ public class BookingController : Controller
                     qty = reader["Quantity"] == DBNull.Value ? 1 : Convert.ToInt32(reader["Quantity"]);
                     startDate = (DateTime)reader["StartDate"];
                     cancellationDays = reader["CancellationDays"] == DBNull.Value ? 0 : (int)reader["CancellationDays"];
+
+                    userEmail = reader["Email"] == DBNull.Value ? null : reader["Email"]?.ToString();
+                    packageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"]?.ToString() ?? "";
+                    destination = reader["Destination"] == DBNull.Value ? "" : reader["Destination"]?.ToString() ?? "";
+                    country = reader["Country"] == DBNull.Value ? "" : reader["Country"]?.ToString() ?? "";
+                    tripStartDateForEmail = reader["StartDate"] == DBNull.Value ? null : (DateTime?)reader["StartDate"];
+                    tripEndDateForEmail = reader["EndDate"] == DBNull.Value ? null : (DateTime?)reader["EndDate"];
                 }
 
                 // Enforce cancellation day limit
@@ -784,8 +810,37 @@ public class BookingController : Controller
 
                 transaction.Commit();
 
-                // ?? Trigger waiting list check (automatic 24h notification)
+                // Trigger waiting list check (best-effort)
                 WaitingListHelper.ProcessTripWaitingList(_connStr, tripId);
+
+                // Send cancellation email (outside transaction, best-effort)
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(userEmail))
+                    {
+                        var title = (packageName ?? "").Trim();
+                        var displayTitle = !string.IsNullOrWhiteSpace(title)
+                            ? title
+                            : $"{destination}, {country}".Trim().Trim(',');
+
+                        var dateRange = (tripStartDateForEmail.HasValue && tripEndDateForEmail.HasValue)
+                            ? $"{tripStartDateForEmail.Value:dd/MM/yyyy} - {tripEndDateForEmail.Value:dd/MM/yyyy}"
+                            : "(dates unavailable)";
+
+                        var body =
+                            $"Your booking has been cancelled.\n\n" +
+                            $"Trip: {displayTitle}\n" +
+                            $"Dates: {dateRange}\n\n" +
+                            $"You can view your bookings anytime from: /Booking/MyBookings\n\n" +
+                            $"Travel Agency";
+
+                        EmailHelper.Send(userEmail, "Booking Cancelled", body);
+                    }
+                }
+                catch
+                {
+                    // Email failure should not break cancellation
+                }
 
                 TempData["PaymentMessage"] = "Booking cancelled successfully.";
                 return RedirectToAction("MyBookings");
