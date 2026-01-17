@@ -1164,3 +1164,28 @@ body {
   position: relative;
   z-index: 1;
 }
+
+
+/* Reviews section labels should be white */
+.ta-reviews .form-label,
+.ta-reviews .form-check-label,
+.ta-reviews label {
+    color: #fff !important;
+}
+
+/* Optional: title white too */
+.ta-reviews h3 {
+    color: #fff !important;
+}
+
+/* Keep inputs readable */
+.ta-reviews .form-control,
+.ta-reviews .form-select {
+    background: #fff;
+    color: #111;
+}
+
+.ta-reviews textarea::placeholder,
+.ta-reviews input::placeholder {
+    color: #6c757d;
+}
