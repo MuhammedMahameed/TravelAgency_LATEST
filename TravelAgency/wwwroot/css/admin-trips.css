@@ -1,16 +1,12 @@
-﻿/* ===== CLEAN TRAVEL AGENCY ADMIN TRIPS PAGE (NO HOVER) ===== */
-
-body {
+﻿body {
     background-color: #f6f9fc;
 }
 
-/* עיצוב כללי לדף */
 .admin-page {
     max-width: 1100px;
     margin: 0 auto;
 }
 
-/* כותרת עליונה */
 .admin-header {
     border-bottom: 2px solid #e3ebf5;
     padding-bottom: 10px;
@@ -24,26 +20,22 @@ body {
     align-items: center;
 }
 
-/* כפתורים עליונים */
 .admin-header-buttons .btn {
     border-radius: 10px;
     font-weight: 600;
 }
 
-/* כפתורים רגילים */
 .admin-controls .btn {
     border-radius: 12px;
     font-weight: 600;
     transition: all 0.2s ease;
 }
 
-    /* ביטול אפקט hover לחלוטין */
     .admin-controls .btn:hover {
         transform: none;
         box-shadow: none;
     }
 
-/* ===== טבלה ===== */
 .admin-card {
     border-radius: 16px !important;
     background: #ffffff;
@@ -53,14 +45,12 @@ body {
     transform: none !important;
 }
 
-    /* ביטול hover על כל הטבלה */
     .admin-card:hover {
         transform: none !important;
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.04) !important;
         background-color: #ffffff !important;
     }
 
-/* עיצוב הכותרות של הטבלה */
 .admin-table th {
     color: #0d47a1;
     font-weight: 700;
@@ -68,25 +58,21 @@ body {
     background-color: #f9fbff;
 }
 
-/* תאים */
 .admin-table td {
     border-color: #f1f3f6;
 }
 
-/* עיצוב כפתורי פעולה בטבלה */
 .admin-table .btn {
     border-radius: 10px;
     font-weight: 600;
     transition: none !important;
 }
 
-    /* בלי hover בכלל */
     .admin-table .btn:hover {
         transform: none !important;
         box-shadow: none !important;
     }
 
-/* עיצוב הודעות */
 .alert {
     border-radius: 10px;
     font-weight: 500;
@@ -94,7 +80,6 @@ body {
     border: 1px solid #cfe2ff;
     color: #0d47a1;
 }
-/* ===== User status badge ===== */
 .status-badge {
     font-weight: 700;
     padding: 8px 12px;

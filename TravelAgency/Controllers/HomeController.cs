@@ -20,21 +20,19 @@ public class HomeController : Controller
     {
         int totalTrips = 0;
 
-        var popularTrips = new List<Trip>();     // TOP 3 by bookings
-        var featuredPackages = new List<Trip>(); // TOP 3 discounted (fallback latest)
-        var galleryImages = new List<string>();  // TOP 5 random images
-        var siteReviews = new List<dynamic>();   // TOP 6 latest
+        var popularTrips = new List<Trip>();         
+        var featuredPackages = new List<Trip>();      
+        var galleryImages = new List<string>();      
+        var siteReviews = new List<dynamic>();      
 
         using var conn = new SqlConnection(_connStr);
         conn.Open();
 
-        // 1) Total visible trips
         using (var cmd = new SqlCommand(@"SELECT COUNT(*) FROM Trips WHERE ISNULL(IsHidden,0)=0", conn))
         {
             totalTrips = Convert.ToInt32(cmd.ExecuteScalar());
         }
 
-        // 2) Popular trips (by bookings count)
         using (var cmd = new SqlCommand(@"
             SELECT TOP 3 t.*
             FROM Trips t
@@ -48,7 +46,6 @@ public class HomeController : Controller
             }
         }
 
-        // 3) Featured packages = discounted active (top 3)
         using (var cmd = new SqlCommand(@"
             SELECT TOP 3 *
             FROM Trips
@@ -65,7 +62,6 @@ public class HomeController : Controller
             }
         }
 
-        // Fallback if not enough discounted trips -> fill with latest trips
         if (featuredPackages.Count < 3)
         {
             int need = 3 - featuredPackages.Count;
@@ -83,7 +79,6 @@ public class HomeController : Controller
             }
         }
 
-        // 4) Gallery images random from TripImages (fallback to Trips.ImagePath)
         using (var cmd = new SqlCommand(@"
             SELECT TOP 5 ti.ImagePath
             FROM TripImages ti
@@ -115,7 +110,6 @@ public class HomeController : Controller
             }
         }
 
-        // 5) Site reviews
         using (var cmd = new SqlCommand(@"
             SELECT TOP 6 sr.Rating, sr.Comment, sr.CreatedAt, u.FullName
             FROM SiteReviews sr

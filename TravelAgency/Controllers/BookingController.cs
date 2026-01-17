@@ -14,7 +14,6 @@ public class BookingController : Controller
         _connStr = config.GetConnectionString("DefaultConnection");
     }
 
-    // Allow specifying quantity and groupMinAge
     public IActionResult Start(int id, int qty = 1, int? groupMinAge = null)
     {
         if (!AuthHelper.IsLoggedIn(HttpContext))
@@ -35,10 +34,6 @@ public class BookingController : Controller
             {
                 try
                 {
-                    // ===== Limit to 3 distinct upcoming trip packages =====
-                    // Rule: user may have at most 3 DISTINCT upcoming TripId bookings (Status='Active' and Trip.StartDate > GETDATE()).
-                    // Booking extra rooms for an already-booked trip does NOT count as a new trip.
-
                     var alreadyBookedCmd = new SqlCommand(@"
                         SELECT COUNT(*)
                         FROM Bookings
@@ -47,7 +42,6 @@ public class BookingController : Controller
                     alreadyBookedCmd.Parameters.AddWithValue("@tid", id);
                     bool alreadyBooked = (int)alreadyBookedCmd.ExecuteScalar() > 0;
 
-                    // Count how many OTHER upcoming trips the user has.
                     var countCmd = new SqlCommand(@"
                         SELECT COUNT(DISTINCT b.TripId)
                         FROM Bookings b
@@ -62,7 +56,6 @@ public class BookingController : Controller
 
                     int otherUpcomingTrips = (int)countCmd.ExecuteScalar();
 
-                    // If not already booked, this booking would add one new distinct trip.
                     int distinctAfter = otherUpcomingTrips + (alreadyBooked ? 0 : 1);
 
                     if (!alreadyBooked && distinctAfter >= 4)
@@ -72,10 +65,6 @@ public class BookingController : Controller
                         return RedirectToAction("MyBookings");
                     }
 
-                    // ===== Waiting list priority =====
-                    // (moved after locking trip row so we can compare notified slots against available rooms)
-
-                    // ===== Lock trip row and check rooms =====
                     var roomCmd = new SqlCommand(@"
                         SELECT AvailableRooms, MinAge FROM Trips WITH (UPDLOCK)
                         WHERE TripId = @tid",
@@ -94,7 +83,6 @@ public class BookingController : Controller
                     int? tripMinAge = roomsReader["MinAge"] == DBNull.Value ? null : (int?)roomsReader["MinAge"];
                     roomsReader.Close();
 
-                    // Validate groupMinAge against trip's MinAge (if trip has a limitation)
                     if (tripMinAge.HasValue && groupMinAge.HasValue)
                     {
                         if (groupMinAge.Value < tripMinAge.Value)
@@ -105,7 +93,6 @@ public class BookingController : Controller
                         }
                     }
 
-                    // If trip requires a minimum age but user didn't provide groupMinAge, block
                     if (tripMinAge.HasValue && !groupMinAge.HasValue)
                     {
                         transaction.Rollback();
@@ -116,11 +103,9 @@ public class BookingController : Controller
                     if (rooms <= 0 || rooms < qty)
                     {
                         transaction.Rollback();
-                        // Join is POST-only. Send user to Status page (which can show info + allow joining).
                         return RedirectToAction("Status", "WaitingList", new { tripId = id });
                     }
 
-                    // Now evaluate waiting list notified slots vs available rooms
                     var activeNotifiedCmd = new SqlCommand(@"
                         SELECT COUNT(*) FROM WaitingList
                         WHERE TripId=@tid AND ExpirationAt IS NOT NULL AND GETDATE() < ExpirationAt", connection, transaction);
@@ -129,7 +114,6 @@ public class BookingController : Controller
 
                     if (activeNotified > 0)
                     {
-                        // If there are more or equal notified users than available rooms, only notified users may book.
                         if (rooms <= activeNotified)
                         {
                             var myNotifCmd = new SqlCommand(@"
@@ -145,10 +129,8 @@ public class BookingController : Controller
                                 return Content("You are not first in the waiting list.");
                             }
                         }
-                        // else: there are more rooms than currently-notified users -> allow anyone to book remaining rooms
                     }
 
-                    // ===== Create or update booking (with quantity) =====
                     var existingCmd = new SqlCommand(@"
                         SELECT BookingId, ISNULL(Quantity,1) AS Quantity FROM Bookings WHERE UserId=@uid AND TripId=@tid AND Status='Active'", connection, transaction);
                     existingCmd.Parameters.AddWithValue("@uid", userId);
@@ -168,7 +150,6 @@ public class BookingController : Controller
 
                     if (existingBookingId > 0)
                     {
-                        // set absolute new quantity to avoid double increments from concurrent executions
                         int newQty = existingQty + qty;
                         var updCmd = new SqlCommand(@"UPDATE Bookings SET Quantity = @newQty, GroupMinAge = @gmin WHERE BookingId=@bid", connection, transaction);
                         updCmd.Parameters.AddWithValue("@newQty", newQty);
@@ -194,7 +175,6 @@ public class BookingController : Controller
                         newBookingId = (int)bookCmd.ExecuteScalar();
                     }
 
-                    // ===== Update rooms =====
                     var updateCmd = new SqlCommand(@"
                         UPDATE Trips
                         SET AvailableRooms = AvailableRooms - @qty
@@ -205,7 +185,6 @@ public class BookingController : Controller
                     updateCmd.Parameters.AddWithValue("@qty", qty);
                     updateCmd.ExecuteNonQuery();
 
-                    // ===== Remove from waiting list =====
                     var delCmd = new SqlCommand(@"
                         DELETE FROM WaitingList
                         WHERE TripId = @tid AND UserId = @uid",
@@ -215,7 +194,6 @@ public class BookingController : Controller
                     delCmd.Parameters.AddWithValue("@uid", userId);
                     delCmd.ExecuteNonQuery();
 
-                    // ===== Get user email BEFORE closing =====
                     var emailCmd = new SqlCommand(
                         "SELECT Email FROM Users WHERE UserId = @uid",
                         connection, transaction);
@@ -232,12 +210,10 @@ public class BookingController : Controller
             }
         }
 
-        // ===== Send email (outside transaction) =====
         try
         {
             if (!string.IsNullOrEmpty(userEmail))
             {
-                // Fetch friendly trip info for the email
                 string title = "";
                 string destination = "";
                 string country = "";
@@ -281,13 +257,11 @@ public class BookingController : Controller
         }
         catch
         {
-            // Email failure should not break booking
         }
 
         return RedirectToAction("MyBookings");
     }
 
-    // Similar to Start but after booking redirects user directly to payment page
     public IActionResult BookNow(int id, int qty = 1, bool pay = false, int? groupMinAge = null)
     {
         if (!AuthHelper.IsLoggedIn(HttpContext))
@@ -308,8 +282,6 @@ public class BookingController : Controller
             {
                 try
                 {
-                    // limit to 3 distinct upcoming trip packages
-                    // If user is booking more rooms for an already-booked trip, it should NOT count as a new trip.
                     var alreadyBookedCmd = new SqlCommand(@"
                         SELECT COUNT(*)
                         FROM Bookings
@@ -340,7 +312,6 @@ public class BookingController : Controller
                         return RedirectToAction("MyBookings");
                     }
 
-                    // ===== Lock trip row and check rooms =====
                     var roomCmd = new SqlCommand(@"
                         SELECT AvailableRooms, MinAge FROM Trips WITH (UPDLOCK)
                         WHERE TripId = @tid",
@@ -359,7 +330,6 @@ public class BookingController : Controller
                     int? tripMinAge = rReader["MinAge"] == DBNull.Value ? null : (int?)rReader["MinAge"];
                     rReader.Close();
 
-                    // Validate groupMinAge against trip's MinAge (if trip has a limitation)
                     if (tripMinAge.HasValue && groupMinAge.HasValue)
                     {
                         if (groupMinAge.Value < tripMinAge.Value)
@@ -370,7 +340,6 @@ public class BookingController : Controller
                         }
                     }
 
-                    // If trip requires a minimum age but user didn't provide groupMinAge, block
                     if (tripMinAge.HasValue && !groupMinAge.HasValue)
                     {
                         transaction.Rollback();
@@ -381,11 +350,9 @@ public class BookingController : Controller
                     if (rooms <= 0 || rooms < qty)
                     {
                         transaction.Rollback();
-                        // Join is POST-only. Send user to Status page (which can show info + allow joining).
                         return RedirectToAction("Status", "WaitingList", new { tripId = id });
                     }
 
-                    // waiting list priority: only restrict booking when notified users occupy all available rooms
                     var activeNotifiedCmd = new SqlCommand(@"
                         SELECT COUNT(*) FROM WaitingList
                         WHERE TripId=@tid AND ExpirationAt IS NOT NULL AND GETDATE() < ExpirationAt", connection, transaction);
@@ -408,7 +375,6 @@ public class BookingController : Controller
                         }
                     }
 
-                    // If user already has an active booking for this trip, increment its Quantity instead of inserting a new row.
                     var existingCmd = new SqlCommand(@"
                         SELECT BookingId, ISNULL(Quantity,1) AS Quantity FROM Bookings WHERE UserId=@uid AND TripId=@tid AND Status='Active'", connection, transaction);
                     existingCmd.Parameters.AddWithValue("@uid", userId);
@@ -453,7 +419,6 @@ public class BookingController : Controller
                         newBookingId = (int)bookCmd.ExecuteScalar();
                     }
 
-                    // ===== Update rooms =====
                     var updateCmd = new SqlCommand(@"
                         UPDATE Trips
                         SET AvailableRooms = AvailableRooms - @qty
@@ -464,7 +429,6 @@ public class BookingController : Controller
                     updateCmd.Parameters.AddWithValue("@qty", qty);
                     updateCmd.ExecuteNonQuery();
 
-                    // ===== Remove from waiting list =====
                     var delCmd = new SqlCommand(@"
                         DELETE FROM WaitingList
                         WHERE TripId = @tid AND UserId = @uid",
@@ -474,7 +438,6 @@ public class BookingController : Controller
                     delCmd.Parameters.AddWithValue("@uid", userId);
                     delCmd.ExecuteNonQuery();
 
-                    // ===== Get user email BEFORE closing =====
                     var emailCmd = new SqlCommand(
                         "SELECT Email FROM Users WHERE UserId = @uid",
                         connection, transaction);
@@ -491,12 +454,10 @@ public class BookingController : Controller
             }
         }
 
-        // send email
         try
         {
             if (!string.IsNullOrEmpty(userEmail))
             {
-                // Fetch friendly trip info for the email
                 string title = "";
                 string destination = "";
                 string country = "";
@@ -541,7 +502,6 @@ public class BookingController : Controller
         }
         catch { }
 
-        // If caller requested immediate payment, redirect to Payment page, otherwise go to MyBookings
         if (pay)
         {
             return RedirectToAction("Pay", "Payment", new { bookingId = newBookingId });
@@ -551,44 +511,6 @@ public class BookingController : Controller
         return RedirectToAction("MyBookings", "Booking");
     }
 
-    //public IActionResult MyBookings()
-    //{
-    //    if (!AuthHelper.IsLoggedIn(HttpContext))
-    //        return RedirectToAction("Login", "Account");
-
-    //    int userId = HttpContext.Session.GetInt32("UserId").Value;
-    //    var list = new List<BookingViewModel>();
-
-    //    using (SqlConnection connection = new SqlConnection(_connStr))
-    //    {
-    //        connection.Open();
-    //        var cmd = new SqlCommand(@"
-    //            SELECT b.BookingId, t.Destination, t.Country, t.StartDate, b.Status, b.IsPaid, ISNULL(b.Quantity,1) AS Quantity
-    //            FROM Bookings b
-    //            JOIN Trips t ON b.TripId = t.TripId
-    //            WHERE b.UserId = @uid AND b.Status = @status",
-    //            connection);
-
-    //        cmd.Parameters.AddWithValue("@uid", userId);
-    //        cmd.Parameters.AddWithValue("@status", "Active");
-
-    //        var reader = cmd.ExecuteReader();
-    //        while (reader.Read())
-    //        {
-    //            list.Add(new BookingViewModel
-    //            {
-    //                BookingId = (int)reader["BookingId"],
-    //                Destination = reader["Destination"].ToString(),
-    //                Country = reader["Country"].ToString(),
-    //                StartDate = (DateTime)reader["StartDate"],
-    //                IsPaid = (bool)reader["IsPaid"],
-    //                Quantity = reader["Quantity"] == DBNull.Value ? 1 : Convert.ToInt32(reader["Quantity"])
-    //            });
-    //        }
-    //    }
-
-    //    return View(list);
-    //}
     public IActionResult MyBookings()
     {
         if (!AuthHelper.IsLoggedIn(HttpContext))
@@ -674,7 +596,6 @@ public class BookingController : Controller
 
         int userId = HttpContext.Session.GetInt32("UserId").Value;
 
-        // Capture info for email (best-effort)
         string? userEmail = null;
         string packageName = "";
         string destination = "";
@@ -740,7 +661,6 @@ public class BookingController : Controller
                     tripEndDateForEmail = reader["EndDate"] == DBNull.Value ? null : (DateTime?)reader["EndDate"];
                 }
 
-                // Enforce cancellation day limit
                 if (cancellationDays > 0)
                 {
                     var daysUntilStart = (startDate - DateTime.Now).TotalMinutes;
@@ -752,7 +672,6 @@ public class BookingController : Controller
                     }
                 }
 
-                // Cancel booking
                 var cancelCmd = new SqlCommand(@"
                     UPDATE Bookings
                     SET Status = @cancelled
@@ -765,7 +684,6 @@ public class BookingController : Controller
                 cancelCmd.Parameters.AddWithValue("@uid", userId);
                 cancelCmd.ExecuteNonQuery();
 
-                // Refund if paid
                 if (wasPaid)
                 {
                     var unpaidCmd = new SqlCommand(@"
@@ -797,7 +715,6 @@ public class BookingController : Controller
                     refundCmd.ExecuteNonQuery();
                 }
 
-                // Free up room(s) by qty
                 var roomCmd = new SqlCommand(@"
                     UPDATE Trips
                     SET AvailableRooms = AvailableRooms + @qty
@@ -810,10 +727,8 @@ public class BookingController : Controller
 
                 transaction.Commit();
 
-                // Trigger waiting list check (best-effort)
                 WaitingListHelper.ProcessTripWaitingList(_connStr, tripId);
 
-                // Send cancellation email (outside transaction, best-effort)
                 try
                 {
                     if (!string.IsNullOrWhiteSpace(userEmail))
@@ -839,7 +754,6 @@ public class BookingController : Controller
                 }
                 catch
                 {
-                    // Email failure should not break cancellation
                 }
 
                 TempData["PaymentMessage"] = "Booking cancelled successfully.";
@@ -865,9 +779,6 @@ public class BookingController : Controller
         {
             connection.Open();
 
-            // Past trip = the trip ended in the past.
-            // Some legacy rows may have EndDate missing/incorrect; in that case, treat StartDate in the past as a fallback.
-            // Only include bookings that are effectively completed (exclude Cancelled).
             var cmd = new SqlCommand(@"
                 SELECT
                     b.BookingId,
@@ -917,7 +828,6 @@ public class BookingController : Controller
         return View();
     }
 
-    // GET: /Booking/ItineraryPdf?bookingId=123
     public IActionResult ItineraryPdf(int bookingId)
     {
         if (!AuthHelper.IsLoggedIn(HttpContext))
@@ -931,8 +841,6 @@ public class BookingController : Controller
         {
             connection.Open();
 
-            // Only allow downloading for the current user's booking.
-            // We'll validate upcoming vs past in C# so we can show a friendly message.
             var cmd = new SqlCommand(@"
                 SELECT
                     b.BookingId,
@@ -996,7 +904,6 @@ public class BookingController : Controller
         if (booking == null)
             return NotFound();
 
-        // Validation: block PDF for trips that already started.
         if (booking.StartDate.Date < DateTime.Now.Date)
         {
             TempData["Error"] = "You can only download an itinerary for upcoming trips.";
@@ -1024,7 +931,6 @@ public class BookingController : Controller
         using var tx = conn.BeginTransaction();
         try
         {
-            // Lock booking + trip row (and read everything needed for policy)
             var cmd = new SqlCommand(@"
                 SELECT
                     b.BookingId,
@@ -1066,7 +972,6 @@ public class BookingController : Controller
                 isPaid = (bool)r["IsPaid"];
             }
 
-            // NEW: Disallow editing once booking is paid
             if (isPaid)
             {
                 tx.Rollback();
@@ -1074,14 +979,12 @@ public class BookingController : Controller
                 return RedirectToAction("MyBookings");
             }
 
-            // No changes
             if (newQty == currentQty)
             {
                 tx.Rollback();
                 return RedirectToAction("MyBookings");
             }
 
-            // Disallow editing once the trip starts
             if (startDate.Date <= DateTime.Now.Date)
             {
                 tx.Rollback();
@@ -1089,9 +992,6 @@ public class BookingController : Controller
                 return RedirectToAction("MyBookings");
             }
 
-            // Waiting list priority: if there are active notified slots and they occupy all rooms,
-            // only notified users may consume rooms.
-            // This mirrors your booking rules.
             var activeNotifiedCmd = new SqlCommand(@"
                 SELECT COUNT(*) FROM WaitingList
                 WHERE TripId=@tid AND ExpirationAt IS NOT NULL AND GETDATE() < ExpirationAt", conn, tx);
@@ -1119,7 +1019,6 @@ public class BookingController : Controller
 
             if (delta > 0)
             {
-                // Need more rooms
                 if (availableRooms < delta)
                 {
                     tx.Rollback();
@@ -1140,7 +1039,6 @@ public class BookingController : Controller
             }
             else
             {
-                // Release rooms
                 int release = -delta;
 
                 var updBooking = new SqlCommand(@"UPDATE Bookings SET Quantity=@q WHERE BookingId=@bid AND UserId=@uid AND Status='Active'", conn, tx);
@@ -1154,7 +1052,6 @@ public class BookingController : Controller
                 updTrip.Parameters.AddWithValue("@tid", tripId);
                 updTrip.ExecuteNonQuery();
 
-                // Rooms freed -> let waiting list logic run after commit
             }
 
             tx.Commit();
@@ -1166,11 +1063,8 @@ public class BookingController : Controller
             return RedirectToAction("MyBookings");
         }
 
-        // If rooms were freed, process waiting list best-effort.
-        // (Not in transaction to avoid prolonging locks.)
         try
         {
-            // We need tripId to process; re-read quickly.
             using var conn2 = new SqlConnection(_connStr);
             conn2.Open();
             var tcmd = new SqlCommand("SELECT TripId FROM Bookings WHERE BookingId=@bid AND UserId=@uid", conn2);

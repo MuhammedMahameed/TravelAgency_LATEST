@@ -31,7 +31,6 @@ namespace TravelAgency.Models
         [Range(0, 100000, ErrorMessage = "Price must be between 0 and 100000")]
         public decimal Price { get; set; }
 
-        //  Added for discounts
         [Range(0, 100000, ErrorMessage = "Old price must be between 0 and 100000")]
         public decimal? OldPrice { get; set; }
 
@@ -54,19 +53,15 @@ namespace TravelAgency.Models
 
         public string? ImagePath { get; set; }
 
-        // New: number of days before StartDate after which cancellation is NOT allowed.
-        // 0 = no limit (users may cancel up to the start date)
         [Range(0, 365, ErrorMessage = "Cancellation days must be between 0 and 365")]
         public int CancellationDays { get; set; } = 0;
 
-        // NEW: allow admin to hide trips from public Gallery (soft hide)
         public bool IsHidden { get; set; } = false;
     }
 
 
 }
 
-// Simple custom validation attribute for EndDate > StartDate
 public class DateGreaterThanAttribute : ValidationAttribute
 {
     private readonly string _comparisonProperty;

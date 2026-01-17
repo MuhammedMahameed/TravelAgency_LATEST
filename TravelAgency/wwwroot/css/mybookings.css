@@ -1,6 +1,3 @@
-/* My Bookings page styles */
-
-/* page background */
 body {
   background: #e7eaee;
 }
@@ -18,11 +15,10 @@ body {
   border: 1px solid rgba(16, 24, 40, .12);
   border-radius: 16px;
   overflow: hidden;
-  background: #dfe3e8; /* darker gray card surface */
+  background: #dfe3e8;      
   box-shadow: 0 10px 24px rgba(0, 0, 0, .10);
 }
 
-/* content area: slightly different surface for contrast */
 .booking-card .card-body {
   background: #eef1f4;
   color: #111827;
@@ -32,7 +28,7 @@ body {
 .booking-card .price-sub,
 .booking-card .desc,
 .booking-card .kv dt {
-  color: #4b5563 !important; /* improve contrast for secondary text */
+  color: #4b5563 !important;       
 }
 
 .booking-card hr {

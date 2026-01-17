@@ -23,7 +23,6 @@ namespace TravelAgency.Controllers
 
             int userId = HttpContext.Session.GetInt32("UserId").Value;
 
-            // לוודא שהמשתמש באמת הזמין את הטיול
             using (SqlConnection conn = new SqlConnection(_connStr))
             {
                 conn.Open();
@@ -77,7 +76,6 @@ namespace TravelAgency.Controllers
                 return RedirectToAction("EditTrip", "Admin", new { id = tripId });
             }
 
-            // אחרת - נחזור ל-Details הרגיל
             return RedirectToAction("Details", "Trips", new { id = tripId });
         }
     }

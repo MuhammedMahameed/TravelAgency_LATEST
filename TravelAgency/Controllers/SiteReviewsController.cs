@@ -74,7 +74,6 @@ namespace TravelAgency.Controllers
             return Json(list);
         }
 
-        // ✅ מחיקה: Admin מוחק הכל, משתמש מוחק רק את שלו
         [HttpPost("Delete")]
         public IActionResult Delete(int id)
         {
@@ -87,7 +86,6 @@ namespace TravelAgency.Controllers
             using var conn = new SqlConnection(_connStr);
             conn.Open();
 
-            // מי כתב את הביקורת?
             var ownerCmd = new SqlCommand("SELECT UserId FROM SiteReviews WHERE ReviewId=@id", conn);
             ownerCmd.Parameters.AddWithValue("@id", id);
             var ownerObj = ownerCmd.ExecuteScalar();
@@ -97,7 +95,6 @@ namespace TravelAgency.Controllers
 
             int ownerUserId = (int)ownerObj;
 
-            // אם לא אדמין וגם לא הבעלים -> אין הרשאה
             if (role != "Admin" && ownerUserId != currentUserId)
                 return Unauthorized();
 

@@ -42,8 +42,6 @@ public class TripsController : Controller
                 sql += " AND Price <= @maxPrice";
             }
 
-            // NEW: Discounted-only filter (must match what the UI considers "On Sale")
-            // On sale when OldPrice and DiscountEndDate are set and DiscountEndDate is in the future.
             if (discountedOnly)
             {
                 sql += " AND OldPrice IS NOT NULL AND DiscountEndDate IS NOT NULL AND DiscountEndDate > GETDATE()";
@@ -156,7 +154,6 @@ public class TripsController : Controller
                     myPositions[(int)r2["TripId"]] = Convert.ToInt32(r2["Pos"]);
             }
 
-            // 4) Build view model
             var vm = trips.Select(t => new TripGalleryItemVM
             {
                 Trip = t,
@@ -164,7 +161,6 @@ public class TripsController : Controller
                 MyPosition = myPositions.TryGetValue(t.TripId, out var p) ? p : (int?)null
             }).ToList();
 
-            // New: detect which trips the current user already booked
             if (uidObj != null)
             {
                 int userId = uidObj.Value;
@@ -187,7 +183,6 @@ public class TripsController : Controller
                 }
             }
 
-            // ===== ADDED: fetch general site reviews for Gallery page =====
             var siteReviews = new List<dynamic>();
             using (var rcmd = new SqlCommand(@"
                 SELECT TOP 6 sr.Rating, sr.Comment, sr.CreatedAt, u.FullName
@@ -208,9 +203,6 @@ public class TripsController : Controller
                 }
             }
             ViewBag.SiteReviews = siteReviews;
-            // ===== END added section =====
-
-            // keep state for view
             ViewBag.DiscountedOnly = discountedOnly;
 
             conn.Close();
@@ -255,7 +247,6 @@ public class TripsController : Controller
                 };
             }
 
-            // detect if current user already has an active booking for this trip
             var uidObj = HttpContext.Session.GetInt32("UserId");
             if (uidObj != null)
             {
@@ -273,14 +264,12 @@ public class TripsController : Controller
                     ViewBag.IsBooked = false;
                 }
 
-                // also detect if there are waiting entries for this trip (for details view)
                 var waitCountCmd = new SqlCommand("SELECT COUNT(*) FROM WaitingList WHERE TripId=@tid", conn);
                 waitCountCmd.Parameters.AddWithValue("@tid", id);
                 var wcnt = (int)waitCountCmd.ExecuteScalar();
                 ViewBag.HasWaiting = wcnt > 0;
-                ViewBag.WaitingCount = wcnt; // expose count so view can decide if waiting blocks booking
+                ViewBag.WaitingCount = wcnt;           
 
-                // detect if current user is in waiting list for this trip and their position
                 var userInWaitCmd = new SqlCommand("SELECT COUNT(*) FROM WaitingList WHERE TripId=@tid AND UserId=@uid", conn);
                 userInWaitCmd.Parameters.AddWithValue("@tid", id);
                 userInWaitCmd.Parameters.AddWithValue("@uid", uidObj.Value);
@@ -289,7 +278,6 @@ public class TripsController : Controller
                 {
                     ViewBag.IsInWaiting = true;
 
-                    // compute position
                     var posCmd = new SqlCommand(@"
                         SELECT COUNT(*) FROM WaitingList w
                         WHERE w.TripId = @tid AND w.JoinDate <= (
@@ -363,7 +351,6 @@ public class TripsController : Controller
     }
 
 
-    // GET
     public IActionResult Index()
     {
         return View();

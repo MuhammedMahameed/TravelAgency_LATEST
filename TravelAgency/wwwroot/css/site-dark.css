@@ -1,19 +1,16 @@
 
-/* ==== DISABLE DARK MODE BY DEFAULT ==== */
 body {
     background-color: #ffffff !important;
     color: #0b1f44 !important;
 }
 
 
-/* Cards */
 .card {
     background-color: #1e1e1e;
     color: #e0e0e0;
     border: 1px solid #2a2a2a;
 }
 
-/* Tables */
 .table {
     color: #e0e0e0;
 }
@@ -22,7 +19,6 @@ body {
     background-color: #1a1a1a;
 }
 
-/* Forms (GLOBAL DARK) */
 form-control,
 .form-select,
 textarea,
@@ -32,13 +28,11 @@ input {
     border: 1px solid #444;
 }
 
-/* Placeholder text */
 .form-control::placeholder,
 textarea::placeholder {
     color: #aaa;
 }
 
-/* Focus state */
 .form-control:focus,
 .form-select:focus,
 textarea:focus {
@@ -48,7 +42,6 @@ textarea:focus {
     box-shadow: 0 0 0 0.2rem rgba(138, 180, 248, 0.25);
 }
 
-/* Autofill dark */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -59,13 +52,11 @@ select:-webkit-autofill {
     transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Buttons */
 .btn-outline-light {
     border-color: #aaa;
     color: #e0e0e0;
 }
 
-/* Links */
 a {
     color: #8ab4f8;
 }
@@ -74,9 +65,6 @@ a:hover {
     color: #a1c2fa;
 }
 
-/* =======================
-   ADMIN DASHBOARD
-   ======================= */
 .admin-card {
     background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
     border-radius: 14px;
@@ -104,11 +92,6 @@ a:hover {
     -webkit-text-fill-color: transparent;
 }
 
-/* =================================================
-   LIGHT LOGIN PAGE � STRONG OVERRIDE (SAFE)
-   ================================================= */
-
-/* Full-page light background */
 .login-page {
     min-height: calc(100vh - 120px);
     background: linear-gradient(180deg, #f4f6fb 0%, #ffffff 60%, #f4f6fb 100%);
@@ -118,7 +101,6 @@ a:hover {
     padding: 40px 12px;
 }
 
-/* Card */
 .login-card {
     background: #ffffff !important;
     color: #0b1f44 !important;
@@ -129,14 +111,12 @@ a:hover {
     max-width: 420px;
 }
 
-/* Text */
 .login-title,
 .login-subtitle,
 .login-label {
     color: #0b1f44 !important;
 }
 
-/* Inputs � FORCE LIGHT */
 .login-page input,
 .login-page textarea,
 .login-page select {
@@ -145,7 +125,6 @@ a:hover {
     border: 1px solid rgba(0,0,0,0.15) !important;
 }
 
-/* Focus */
 .login-page input:focus {
     background-color: #ffffff !important;
     color: #0b1f44 !important;
@@ -153,13 +132,11 @@ a:hover {
     box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.15) !important;
 }
 
-/* Autofill FIX for light */
 .login-page input:-webkit-autofill {
     -webkit-text-fill-color: #0b1f44 !important;
     -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
 }
 
-/* Footer */
 .login-footer {
     background: #fbfbfd;
     border-top: 1px solid rgba(0,0,0,0.06);
@@ -172,17 +149,11 @@ a:hover {
 }
 
 
-/* =========================
-   LOGIN FULL LIGHT MODE
-   ========================= */
-
-/* Force white body ONLY on login */
 body.login-light {
     background-color: #ffffff !important;
     color: #0b1f44 !important;
 }
 
-/* Light navbar on login */
 body.login-light .navbar {
     background-color: #ffffff !important;
     border-bottom: 1px solid #e5e7eb;
@@ -197,17 +168,14 @@ body.login-light .btn-outline-light {
     border-color: #0b1f44 !important;
 }
 
-/* Remove dark container feeling */
 body.login-light .container {
     background: transparent !important;
 }
 
-/* Login page background */
 body.login-light .login-page {
     background: #ffffff !important;
 }
 
-/* Inputs � force light */
 body.login-light input,
 body.login-light textarea,
 body.login-light select {
@@ -216,21 +184,15 @@ body.login-light select {
     border: 1px solid #d1d5db !important;
 }
 
-/* Autofill fix (light) */
 body.login-light input:-webkit-autofill {
     -webkit-text-fill-color: #0b1f44 !important;
     -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
 }
 
-/* Footer light */
 body.login-light footer {
     background-color: #ffffff !important;
     color: #6b7280 !important;
 }
-
-/* =======================
-   LIGHT USER TABLE FIX
-   ======================= */
 
 .user-table-light {
     color: #0b1f44 !important;
@@ -247,31 +209,23 @@ body.login-light footer {
     background-color: #f3f4f6 !important;
 }
 
-/* =========================
-   LIGHT GALLERY OVERRIDES
-   ========================= */
-
-/* Cards */
 body.login-light .card {
     background-color: #ffffff !important;
     color: #0b1f44 !important;
     border: 1px solid #e5e7eb;
 }
 
-/* Card body & footer */
 body.login-light .card-body,
 body.login-light .card-footer {
     background-color: #ffffff !important;
     color: #0b1f44 !important;
 }
 
-/* Remove dark badges side-effect */
 body.login-light .badge.bg-secondary {
     background-color: #6c757d !important;
     color: #ffffff !important;
 }
 
-/* Inputs in gallery filters */
 body.login-light .form-control,
 body.login-light .form-select {
     background-color: #ffffff !important;
@@ -279,17 +233,14 @@ body.login-light .form-select {
     border: 1px solid #ced4da !important;
 }
 
-/* Fix fully booked / warnings */
 body.login-light .text-danger {
     color: #dc3545 !important;
 }
 
-/* Images placeholder */
 body.login-light .card-img-top {
     background-color: #f1f3f5;
 }
 
-/* Hover effect */
 body.login-light .card:hover {
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     transform: translateY(-2px);
@@ -298,7 +249,6 @@ body.login-light .card:hover {
 
 
 
-/* Ensure page is white everywhere */
 body.login-light,
 body.login-light main,
 body.login-light header,
@@ -309,7 +259,6 @@ body.login-light .container-fluid {
     color: #0b1f44 !important;
 }
 
-/* Make gallery cards feel smaller & cleaner */
 body.login-light .card-body {
     padding: 0.75rem 0.9rem !important;
     font-size: 0.92rem;
@@ -319,7 +268,6 @@ body.login-light .card-footer {
     padding: 0.65rem 0.9rem !important;
 }
 
-/* Make headings always dark */
 body.login-light h1,
 body.login-light h2,
 body.login-light h3,
@@ -344,7 +292,6 @@ body.login-light h6 {
 }
 
 
-/* ===== TravelAgency: White + Blue theme for Details page ===== */
 :root {
     --ta-blue: #6BA7E6;
     --ta-white: #ffffff;
@@ -356,7 +303,6 @@ body {
     background: var(--ta-white);
 }
 
-/* Wrapper */
 .ta-details-wrap {
     background: var(--ta-white);
     border-radius: 14px;
@@ -394,7 +340,6 @@ body {
     margin: 16px 0;
 }
 
-/* Hero image */
 .ta-details-hero {
     width: 100%;
     max-height: 420px;
@@ -403,7 +348,6 @@ body {
     margin-bottom: 16px;
 }
 
-/* Info cards */
 .ta-info-card {
     background: var(--ta-soft);
     border: 1px solid var(--ta-border);
@@ -411,13 +355,11 @@ body {
     padding: 14px;
 }
 
-/* Description */
 .ta-details-desc {
     font-size: 1.05rem;
     margin-bottom: 0;
 }
 
-/* Actions */
 .ta-actions {
     margin-top: 14px;
     display: flex;
@@ -457,7 +399,6 @@ body {
     font-weight: 700;
 }
 
-/* Reviews */
 .ta-section-title {
     color: var(--ta-blue);
     font-weight: 800;
@@ -483,10 +424,9 @@ body {
 
 
 
-/* ===== Override dark boxes in light mode ===== */
 .review, .ta-review {
-    background-color: #f8fbff !important; /* לבן-כחול עדין */
-    color: #0b1f44 !important; /* כחול כהה */
+    background-color: #f8fbff !important;    
+    color: #0b1f44 !important;    
     border: 1px solid rgba(0,0,0,0.1) !important;
     border-radius: 10px !important;
     padding: 12px !important;
@@ -501,10 +441,9 @@ body {
     }
 
 .text-warning {
-    color: #f2b01e !important; /* כוכבים זהב */
+    color: #f2b01e !important;    
 }
 
-/* תיבות טקסט של הוספת ביקורת */
 input, textarea, select {
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -516,7 +455,6 @@ input, textarea, select {
         color: #888 !important;
     }
 
-/* Trip Details - Carousel */
 #tripGallery {
     max-width: 1100px;
     margin: 0 auto 20px auto;
@@ -525,11 +463,10 @@ input, textarea, select {
     #tripGallery .carousel-inner {
         border-radius: 14px;
         overflow: hidden;
-        background: #f3f6ff; /* רקע בהיר */
+        background: #f3f6ff;    
         border: 1px solid rgba(0,0,0,0.08);
     }
 
-    /* קובע גובה קבוע יפה */
     #tripGallery .carousel-item img {
         width: 100%;
         height: 320px;
@@ -537,14 +474,12 @@ input, textarea, select {
     }
 
 
-    /* החיצים לבנים וברורים */
     #tripGallery .carousel-control-prev-icon,
     #tripGallery .carousel-control-next-icon {
         filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
     }
 
 
-/* ====== Trip Gallery Styling ====== */
 .gallery-container {
     background: linear-gradient(180deg, #f4f8ff 0%, #ffffff 100%);
     min-height: 100vh;
@@ -634,10 +569,6 @@ input, textarea, select {
     }
 
 
-/* ===============================
-   TravelAgency - Modern Navbar
-   =============================== */
-
 .ta-navbar {
     background: linear-gradient(90deg, #0b4aa2 0%, #1976d2 45%, #1e88e5 100%);
     box-shadow: 0 8px 22px rgba(0,0,0,0.10);
@@ -724,12 +655,10 @@ input, textarea, select {
     border: 1px solid rgba(0,0,0,0.06) !important;
 }
 
-/* מרווח עליון כדי לא להיכנס מתחת ל-navbar */
 .ta-page-offset {
     padding-top: 84px;
 }
 
-/* במובייל: רווחים */
 @media (max-width: 991.98px) {
     .ta-left, .ta-right {
         padding-bottom: 10px;
@@ -737,8 +666,6 @@ input, textarea, select {
 }
 
 
-
-/* ===== Admin Trips Page (matches modern TravelAgency style) ===== */
 
 .admin-title {
     font-weight: 800;
@@ -798,7 +725,6 @@ input, textarea, select {
     margin: 0 6px;
 }
 
-/* make it nicer on small screens */
 @media (max-width: 576px) {
     .admin-actions {
         display: flex;
@@ -814,7 +740,6 @@ input, textarea, select {
 
 
 
-/* ===== Gallery-like simple white navbar ===== */
 .gallery-navbar {
     background: #fff !important;
     border-bottom: 1px solid #e9ecef;
@@ -842,30 +767,26 @@ input, textarea, select {
 }
 
 .gallery-page-offset {
-    padding-top: 80px; /* so content won't hide under fixed nav */
+    padding-top: 80px;         
 }
 
 
-/* ===== Fix login/register card position ===== */
 .login-page {
     min-height: 100vh;
     display: flex;
-    align-items: center; /* ממרכז אנכית */
-    justify-content: center; /* ממרכז אופקית */
-    padding-top: 70px; /* מקום ל-navbar */
+    align-items: center;    
+    justify-content: center;    
+    padding-top: 70px;    
     padding-bottom: 30px;
 }
 
-/* אם הכרטיס עדיין נמוך מידי תקטין ל-50px */
 
-
-/* --- Fix black input background on focus --- */
 input.form-control:focus,
 textarea.form-control:focus,
 select.form-control:focus {
-    background-color: #ffffff !important; /* רקע לבן */
-    color: #000000 !important; /* טקסט שחור */
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* גבול כחול עדין */
+    background-color: #ffffff !important;    
+    color: #000000 !important;    
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);     
     border-color: #86b7fe;
 }
 

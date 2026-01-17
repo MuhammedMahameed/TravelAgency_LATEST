@@ -13,8 +13,6 @@ public class WaitingListController : Controller
         _connStr = config.GetConnectionString("DefaultConnection");
     }
 
-    // GET: /WaitingList/JoinInfo?tripId=123
-    // Shows info and allows user to choose to join.
     [HttpGet]
     public IActionResult JoinInfo(int tripId)
     {
@@ -62,12 +60,10 @@ public class WaitingListController : Controller
         {
             conn.Open();
 
-            // total waiting count
             var cntCmd = new SqlCommand(@"SELECT COUNT(*) FROM WaitingList WHERE TripId=@tid", conn);
             cntCmd.Parameters.AddWithValue("@tid", tripId);
             int waitingCount = Convert.ToInt32(cntCmd.ExecuteScalar());
 
-            // are we already waiting?
             var inWaitCmd = new SqlCommand(@"SELECT COUNT(*) FROM WaitingList WHERE TripId=@tid AND UserId=@uid", conn);
             inWaitCmd.Parameters.AddWithValue("@tid", tripId);
             inWaitCmd.Parameters.AddWithValue("@uid", userId);
@@ -88,7 +84,6 @@ public class WaitingListController : Controller
                 position = Convert.ToInt32(posCmd.ExecuteScalar());
             }
 
-            // best-effort ETA: when the earliest active-notified slot expires
             var etaCmd = new SqlCommand(@"
                 SELECT MIN(ExpirationAt)
                 FROM WaitingList
@@ -129,7 +124,6 @@ public class WaitingListController : Controller
         return RedirectToAction("Details", "Trips", new { id = tripId });
     }
 
-    // GET
     public IActionResult Index()
     {
         return View();

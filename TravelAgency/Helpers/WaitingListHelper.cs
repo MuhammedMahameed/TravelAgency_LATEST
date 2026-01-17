@@ -13,7 +13,6 @@ namespace TravelAgency.Helpers
 
             try
             {
-                // read current available rooms
                 var roomsCmd = new SqlCommand("SELECT AvailableRooms FROM Trips WHERE TripId=@tid", conn);
                 roomsCmd.Parameters.AddWithValue("@tid", tripId);
                 var roomsObj = roomsCmd.ExecuteScalar();
@@ -24,19 +23,16 @@ namespace TravelAgency.Helpers
                 if (availableRooms <= 0)
                     return;
 
-                // count currently-notified (active) waiting entries
                 var activeNotifiedCmd = new SqlCommand(@"
                     SELECT COUNT(*) FROM WaitingList
                     WHERE TripId=@tid AND ExpirationAt IS NOT NULL AND GETDATE() < ExpirationAt", conn);
                 activeNotifiedCmd.Parameters.AddWithValue("@tid", tripId);
                 int activeNotified = (int)activeNotifiedCmd.ExecuteScalar();
 
-                // how many new notifications we can send without blocking non-waiting users
                 int freeSlots = availableRooms - activeNotified;
                 if (freeSlots <= 0)
                     return;
 
-                // select next freeSlots users from waiting list who were not notified yet
                 var nextCmd = new SqlCommand(@"
                     SELECT TOP (@n) w.WaitingId, u.Email
                     FROM WaitingList w
@@ -55,7 +51,6 @@ namespace TravelAgency.Helpers
                     }
                 }
 
-                // Fetch friendly trip info once
                 string title = "";
                 string destination = "";
                 string country = "";
@@ -84,7 +79,6 @@ namespace TravelAgency.Helpers
                     ? $"{startDate.Value:dd/MM/yyyy} - {endDate.Value:dd/MM/yyyy}"
                     : "(dates unavailable)";
 
-                // mark notified and send emails
                 foreach (var entry in toNotify)
                 {
                     var update = new SqlCommand(@"
@@ -109,15 +103,12 @@ namespace TravelAgency.Helpers
                     catch { }
                 }
 
-                // If there are fewer waiting users than available rooms, clear remaining waiting entries
-                // so that non-waiting users can also book immediately.
                 var remainingCmd = new SqlCommand(@"SELECT COUNT(*) FROM WaitingList WHERE TripId=@tid AND NotifiedAt IS NULL", conn);
                 remainingCmd.Parameters.AddWithValue("@tid", tripId);
                 int remaining = (int)remainingCmd.ExecuteScalar();
 
                 if (remaining == 0)
                 {
-                    // delete any entries (including notified ones) to remove the waiting list altogether
                     var delAll = new SqlCommand("DELETE FROM WaitingList WHERE TripId=@tid", conn);
                     delAll.Parameters.AddWithValue("@tid", tripId);
                     delAll.ExecuteNonQuery();

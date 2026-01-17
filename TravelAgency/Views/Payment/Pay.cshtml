@@ -79,7 +79,6 @@
 
     const stripe = Stripe(publishableKey);
 
-    // 1) Create PaymentIntent
     fetch('/Payment/CreateIntent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -99,7 +98,6 @@
 
         submitBtn.disabled = false;
 
-        // 2) Confirm on submit
         document.getElementById('payment-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             submitBtn.disabled = true;
@@ -107,7 +105,6 @@
             const { error, paymentIntent } = await stripe.confirmPayment({
                 elements,
                 confirmParams: {
-                    // no redirect
                 },
                 redirect: 'if_required'
             });
@@ -124,7 +121,6 @@
                 return;
             }
 
-            // 3) Notify server to mark booking paid
             const finalize = await fetch('/Payment/Confirm', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

@@ -3,7 +3,6 @@ using Microsoft.Data.SqlClient;
 using TravelAgency.Models;
 using TravelAgency.Helpers;
 
-// ? added (does not remove anything)
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -61,7 +60,6 @@ namespace TravelAgency.Controllers
             using var conn = new SqlConnection(_connStr);
             conn.Open();
 
-            // Ensure the column exists (dev safety). If it doesn't, fail with a friendly message.
             try
             {
                 var cmd = new SqlCommand(@"
@@ -93,7 +91,7 @@ namespace TravelAgency.Controllers
 
             var t = new Trip();
             t.StartDate = DateTime.Today;
-            t.EndDate = DateTime.Today.AddDays(1); // או 3 ימים, מה שאתה רוצה
+            t.EndDate = DateTime.Today.AddDays(1);       
             return View(t);
         }
 
@@ -109,7 +107,6 @@ namespace TravelAgency.Controllers
                     ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
             }
 
-            // SQL Server datetime valid range starts at 1753-01-01
             var sqlMin = new DateTime(1753, 1, 1);
 
             if (trip.StartDate == default(DateTime) || trip.EndDate == default(DateTime) ||
@@ -133,12 +130,10 @@ namespace TravelAgency.Controllers
                 return View(trip);
             }
 
-            // Ensure folder exists
             var imagesPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/trips");
             if (!Directory.Exists(imagesPath))
                 Directory.CreateDirectory(imagesPath);
 
-            // Save MAIN image (existing behavior)
             if (imageFile != null && imageFile.Length > 0)
             {
                 var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
@@ -251,7 +246,6 @@ namespace TravelAgency.Controllers
                 }
                 reader.Close();
 
-                // load gallery images
                 var imgCmd = new SqlCommand("SELECT ImageId, ImagePath FROM TripImages WHERE TripId=@id", conn);
                 imgCmd.Parameters.AddWithValue("@id", id);
                 using var r2 = imgCmd.ExecuteReader();
@@ -303,7 +297,6 @@ namespace TravelAgency.Controllers
             if (!AuthHelper.IsAdmin(HttpContext))
                 return RedirectToAction("Login", "Account");
 
-            // If model is invalid, reload gallery/main image and return view so validation messages show
             if (!ModelState.IsValid)
             {
                 var gallery = new List<TripImage>();
@@ -328,7 +321,6 @@ namespace TravelAgency.Controllers
                     }
                     r2.Close();
 
-                    // load main image path
                     var mainCmd = new SqlCommand("SELECT ImagePath FROM Trips WHERE TripId=@id", conn);
                     mainCmd.Parameters.AddWithValue("@id", trip.TripId);
                     var obj = mainCmd.ExecuteScalar();
@@ -366,7 +358,6 @@ namespace TravelAgency.Controllers
                 return View(trip);
             }
 
-            // Ensure folder exists
             var imagesPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/trips");
             if (!Directory.Exists(imagesPath))
                 Directory.CreateDirectory(imagesPath);
@@ -383,7 +374,6 @@ namespace TravelAgency.Controllers
                     oldRooms = (int)oldCmd.ExecuteScalar();
                 }
 
-                // read existing main image path so we can delete it if replaced/removed
                 string? existingMainPath = null;
                 using (var mainCmd = new SqlCommand("SELECT ImagePath FROM Trips WHERE TripId=@id", conn))
                 {
@@ -392,11 +382,9 @@ namespace TravelAgency.Controllers
                     existingMainPath = obj == DBNull.Value || obj == null ? null : obj.ToString();
                 }
 
-                // determine requested main image path (from gallery) if provided
                 string? requestedMainPath = null;
                 if (setMainImageId.HasValue)
                 {
-                    // ensure not trying to set a main image that is marked for deletion
                     if (deleteImageIds == null || !deleteImageIds.Contains(setMainImageId.Value))
                     {
                         using var smCmd = new SqlCommand("SELECT ImagePath FROM TripImages WHERE ImageId=@iid AND TripId=@tid", conn);
@@ -407,19 +395,16 @@ namespace TravelAgency.Controllers
                     }
                 }
 
-                // handle deletions of gallery images (both DB and filesystem)
                 if (deleteImageIds != null && deleteImageIds.Length > 0)
                 {
                     foreach (var imgId in deleteImageIds)
                     {
-                        // get path
                         var pCmd = new SqlCommand("SELECT ImagePath FROM TripImages WHERE ImageId=@id", conn);
                         pCmd.Parameters.AddWithValue("@id", imgId);
                         var pathObj = pCmd.ExecuteScalar();
                         if (pathObj != null && pathObj != DBNull.Value)
                         {
                             var rel = pathObj.ToString();
-                            // if this gallery image is currently set as main, clear main image
                             if (!string.IsNullOrEmpty(existingMainPath) && string.Equals(existingMainPath, rel, StringComparison.OrdinalIgnoreCase))
                             {
                                 var clearCmd = new SqlCommand("UPDATE Trips SET ImagePath = NULL WHERE TripId=@id", conn);
@@ -468,10 +453,8 @@ namespace TravelAgency.Controllers
 
                 cmd.ExecuteNonQuery();
 
-                // handle main image upload (replace existing)
                 if (imageFile != null && imageFile.Length > 0)
                 {
-                    // delete previous main image file if any, but only if it's not referenced in TripImages
                     if (!string.IsNullOrEmpty(existingMainPath))
                     {
                         bool referencedInGallery = false;
@@ -502,12 +485,10 @@ namespace TravelAgency.Controllers
                     imgUpdate.Parameters.AddWithValue("@id", trip.TripId);
                     imgUpdate.ExecuteNonQuery();
 
-                    existingMainPath = dbPath; // update for later logic
+                    existingMainPath = dbPath;     
                 }
                 else if (!string.IsNullOrEmpty(requestedMainPath))
                 {
-                    // set main image to the selected gallery image
-                    // delete previous main file if it's different and not referenced by gallery
                     if (!string.IsNullOrEmpty(existingMainPath) && !string.Equals(existingMainPath, requestedMainPath, StringComparison.OrdinalIgnoreCase))
                     {
                         bool referencedInGallery = false;
@@ -535,10 +516,8 @@ namespace TravelAgency.Controllers
 
                 else if (Request.Form["deleteMainImage"].FirstOrDefault() == "true")
                 {
-                    // delete main image if requested and not replaced
                     if (!string.IsNullOrEmpty(existingMainPath))
                     {
-                        // delete file only if not referenced in gallery
                         bool referencedInGallery = false;
                         using (var refCmd = new SqlCommand("SELECT COUNT(*) FROM TripImages WHERE ImagePath=@path", conn))
                         {
@@ -561,7 +540,6 @@ namespace TravelAgency.Controllers
                     }
                 }
 
-                // handle new gallery images
                 if (galleryImages != null && galleryImages.Count > 0)
                 {
                     foreach (var img in galleryImages)
@@ -704,8 +682,6 @@ namespace TravelAgency.Controllers
             return RedirectToAction("Trips");
         }
 
-        // ======================= USERS MANAGEMENT =======================
-
         public IActionResult Users()
         {
             if (!AuthHelper.IsAdmin(HttpContext))
@@ -763,7 +739,6 @@ namespace TravelAgency.Controllers
             {
                 conn.Open();
 
-                // בדיקה שלא קיים אימייל
                 var checkCmd = new SqlCommand("SELECT COUNT(*) FROM Users WHERE Email=@e", conn);
                 checkCmd.Parameters.AddWithValue("@e", email);
                 int exists = (int)checkCmd.ExecuteScalar();
@@ -812,8 +787,6 @@ namespace TravelAgency.Controllers
             return RedirectToAction("Users");
         }
 
-        // Removing users (לפי דרישה) – נעשה בצורה btוחה:
-        // אם יש הזמנות -> לא מוחקים פיזית, אלא Status='Blocked' (זה עדיין "removing" מהמערכת).
         [HttpPost]
         public IActionResult RemoveUser(int userId)
         {
@@ -830,7 +803,6 @@ namespace TravelAgency.Controllers
 
                 if (bookings > 0)
                 {
-                    // Soft remove
                     var blockCmd = new SqlCommand("UPDATE Users SET Status='Blocked' WHERE UserId=@uid", conn);
                     blockCmd.Parameters.AddWithValue("@uid", userId);
                     blockCmd.ExecuteNonQuery();
@@ -839,7 +811,6 @@ namespace TravelAgency.Controllers
                     return RedirectToAction("Users");
                 }
 
-                // אם אין הזמנות — מוחקים פיזית (removing)
                 var delCmd = new SqlCommand("DELETE FROM Users WHERE UserId=@uid", conn);
                 delCmd.Parameters.AddWithValue("@uid", userId);
                 delCmd.ExecuteNonQuery();
@@ -851,7 +822,6 @@ namespace TravelAgency.Controllers
             return RedirectToAction("Users");
         }
 
-        // Booking history של משתמש
         public IActionResult UserBookings(int id)
         {
             if (!AuthHelper.IsAdmin(HttpContext))
@@ -939,7 +909,6 @@ namespace TravelAgency.Controllers
             using var conn = new SqlConnection(_connStr);
             conn.Open();
 
-            // 1?? – נבדוק מי קיבל הזדמנות של 24 שעות אבל לא הזמין
             var expiredCmd = new SqlCommand(@"
         SELECT WaitingId, TripId, UserId
         FROM WaitingList
@@ -959,15 +928,12 @@ namespace TravelAgency.Controllers
                 }
             }
 
-            // 2?? – נסיר אותם ונשלח הודעה למי שאחריהם
             foreach (var x in toRemove)
             {
-                // מחיקה
                 var del = new SqlCommand("DELETE FROM WaitingList WHERE WaitingId=@id", conn);
                 del.Parameters.AddWithValue("@id", x.waitingId);
                 del.ExecuteNonQuery();
 
-                // מציאת הבא בתור
                 var nextCmd = new SqlCommand(@"
             SELECT TOP 1 w.WaitingId, u.Email
             FROM WaitingList w
@@ -982,7 +948,6 @@ namespace TravelAgency.Controllers
                     int nextId = Convert.ToInt32(r2["WaitingId"]);
                     string email = r2["Email"].ToString();
 
-                    // עדכון תאריך ההתרעה + תפוגה
                     r2.Close();
                     var update = new SqlCommand(@"
                 UPDATE WaitingList
@@ -991,7 +956,6 @@ namespace TravelAgency.Controllers
                     update.Parameters.AddWithValue("@id", nextId);
                     update.ExecuteNonQuery();
 
-                    // שליחת מייל
                     EmailHelper.Send(
                         email,
                         "Room now available!",
@@ -1000,7 +964,6 @@ namespace TravelAgency.Controllers
                 }
             }
 
-            // 3?? – אם אין פעילים, נאתר את הראשונים שעדיין לא קיבלו הודעה (חדשים ברשימה)
             var freshCmd = new SqlCommand(@"
         SELECT TOP 1 w.WaitingId, u.Email
         FROM WaitingList w

@@ -121,7 +121,6 @@ public class AccountController : Controller
         return RedirectToAction("Login");
     }
 
-    // GET
     public IActionResult Index()
     {
         return View();
@@ -160,7 +159,6 @@ public class AccountController : Controller
 
             string resetToken = Guid.NewGuid().ToString();
 
-            // נוודא שקיימת טבלת PasswordResets במסד
             var createTableCmd = new SqlCommand(@"
                 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PasswordResets' AND xtype='U')
                 CREATE TABLE PasswordResets (
@@ -171,7 +169,6 @@ public class AccountController : Controller
                 )", conn);
             createTableCmd.ExecuteNonQuery();
 
-            // נוסיף את הטוקן עם תוקף של שעה
             var tokenCmd = new SqlCommand(@"
                 INSERT INTO PasswordResets (Email, Token, ExpireAt)
                 VALUES (@e, @t, DATEADD(HOUR, 1, GETDATE()))", conn);
@@ -198,7 +195,6 @@ public class AccountController : Controller
 
         TempData["Success"] = null;
         TempData["Error"] = null;
-        // אם יש טוקן בקישור - נבדוק אותו
         if (!string.IsNullOrEmpty(token))
         {
             using (var conn = new SqlConnection(_connStr))
@@ -215,7 +211,6 @@ public class AccountController : Controller
                     return RedirectToAction("ForgotPassword");
                 }
 
-                // נשמור את האימייל בסשן כדי לזהות את המשתמש בשלב האיפוס
                 HttpContext.Session.SetString("ResetEmail", email);
             }
         }
@@ -249,7 +244,6 @@ public class AccountController : Controller
             cmd.Parameters.AddWithValue("@e", email);
             cmd.ExecuteNonQuery();
 
-            // מוחקים את הטוקן כדי למנוע שימוש חוזר
             var del = new SqlCommand("DELETE FROM PasswordResets WHERE Email=@e", conn);
             del.Parameters.AddWithValue("@e", email);
             del.ExecuteNonQuery();
@@ -291,7 +285,6 @@ public class AccountController : Controller
             }
             else
             {
-                // אם משום מה אין משתמש במסד
                 HttpContext.Session.Clear();
                 return RedirectToAction("Login");
             }
@@ -327,7 +320,6 @@ public class AccountController : Controller
             cmd.ExecuteNonQuery();
         }
 
-        // עדכון גם ב-Session כדי שיראה מיד בכותרת (Hello, ...)
         HttpContext.Session.SetString("FullName", vm.FullName.Trim());
 
         TempData["Success"] = "Profile updated successfully!";

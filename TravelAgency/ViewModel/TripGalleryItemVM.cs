@@ -11,7 +11,6 @@ public class TripGalleryItemVM
     public bool IsMyTurn => MyPosition == 1;
     public string? ImagePath { get; set; }
 
-    // indicates whether the current logged-in user already has an active booking for this trip
     public bool IsBookedByMe { get; set; }
     public int? MyBookingId { get; set; }
 }

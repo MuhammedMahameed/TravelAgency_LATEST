@@ -19,7 +19,6 @@ namespace TravelAgency.Helpers
             {
                 SendReminders();
 
-                // ריצה פעם ב-24 שעות
                 await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
             }
         }

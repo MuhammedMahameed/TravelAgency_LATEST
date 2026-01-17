@@ -22,7 +22,6 @@
     padding: 26px 0 70px;
 }
 
-/* make page full width even if layout has container */
 .ta-home {
     width: 100%;
 }
@@ -33,7 +32,6 @@
     padding: 0 16px;
 }
 
-/* HERO */
 .ta-hero {
     padding: 10px 0 16px;
 }
@@ -164,7 +162,6 @@
     font-size: 13px;
 }
 
-/* RIGHT CARD */
 .ta-card {
     height: 100%;
     border-radius: calc(var(--r) + 4px);
@@ -208,7 +205,6 @@
     font-weight: 700;
 }
 
-/* SEARCH */
 .ta-search {
     margin-top: 14px;
 }
@@ -272,7 +268,6 @@
         border-color: rgba(110,168,255,.45);
     }
 
-/* SECTION + GRID */
 .ta-section {
     margin-top: 40px;
 }
@@ -364,7 +359,6 @@
     line-height: 1.6;
 }
 
-/* EMPTY */
 .ta-empty {
     grid-column: 1 / -1;
     padding: 18px;
@@ -382,7 +376,6 @@
     color: var(--muted);
 }
 
-/* PANEL + FORM */
 .ta-panel {
     border-radius: calc(var(--r) + 4px);
     border: 1px solid var(--border);

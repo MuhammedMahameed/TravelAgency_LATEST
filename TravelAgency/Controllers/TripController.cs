@@ -12,7 +12,6 @@ public class TripController : Controller
     {
         _conn = config.GetConnectionString("DefaultConnection");
     }
-    // GET
     public IActionResult Index()
     {
         var trips = new List<Trip>();

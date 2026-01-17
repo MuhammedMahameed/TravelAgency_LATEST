@@ -1,6 +1,4 @@
-﻿/* ===== Tourly Global (ASP.NET MVC) ===== */
-
-:root {
+﻿:root {
     --united-nations-blue: hsl(214, 56%, 58%);
     --bright-navy-blue: hsl(214, 57%, 51%);
     --spanish-gray: hsl(0, 0%, 60%);
@@ -46,7 +44,6 @@ body {
     background: var(--white)
 }
 
-/* container */
 .container {
     padding-inline: 15px
 }
@@ -76,7 +73,6 @@ body {
     }
 }
 
-/* buttons */
 .btnx {
     color: var(--white);
     text-transform: uppercase;
@@ -109,7 +105,6 @@ body {
         background: hsla(0,0%,100%,.12)
     }
 
-/* headings */
 .h1, .h2, .h3 {
     font-weight: 800;
     font-family: var(--ff-montserrat);
@@ -145,7 +140,6 @@ body {
     margin-bottom: 30px
 }
 
-/* ===== Header (Tourly style) ===== */
 .header {
     position: absolute;
     top: 0;
@@ -220,7 +214,6 @@ body {
     font-size: 20px
 }
 
-/* bottom row */
 .header-bottom {
     border-bottom: 1px solid hsla(0,0%,100%,.1);
 }
@@ -250,7 +243,6 @@ body {
         background: hsla(0,0%,100%,.2)
     }
 
-/* Offcanvas navbar (mobile) */
 .navbar {
     position: fixed;
     top: 0;
@@ -326,7 +318,6 @@ body {
         pointer-events: all
     }
 
-/* Desktop navbar */
 @media (min-width: 992px) {
     .nav-open-btn, .navbar-top {
         display: none
@@ -356,13 +347,10 @@ body {
     }
 }
 
-/* ===== Page modes ===== */
-/* Home mode: header transparent on hero */
 body.layout-home .header {
     position: absolute
 }
 
-/* Normal pages: fixed white header */
 body.layout-normal {
     padding-top: 90px;
     background: var(--cultured);
@@ -412,9 +400,8 @@ body.layout-normal {
         grid-template-columns: 1fr 1fr 1fr
     }
 
-/* ===== Hero (Home page only) ===== */
 .hero {
-    background-image: url("/images/hero-banner.jpg"); /* <<<<<< זה הנתיב הנכון */
+    background-image: url("/images/hero-banner.jpg");      
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -440,7 +427,6 @@ body.layout-normal {
     gap: 10px
 }
 
-/* ===== Content wrappers for normal pages ===== */
 .page-shell {
     padding: 20px 0 35px;
 }
@@ -453,7 +439,6 @@ body.layout-normal {
     padding: 18px;
 }
 
-/* ===== Footer ===== */
 .footer-top {
     background: var(--gunmetal);
     padding-block: var(--section-padding);

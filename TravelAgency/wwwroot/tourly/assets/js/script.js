@@ -1,6 +1,5 @@
 ﻿"use strict";
 
-// elements
 const header = document.querySelector("[data-header]");
 const nav = document.querySelector("[data-navbar]");
 const overlay = document.querySelector("[data-overlay]");
@@ -9,7 +8,6 @@ const navCloseBtn = document.querySelector("[data-nav-close-btn]");
 const navLinks = document.querySelectorAll("[data-nav-link]");
 const goTopBtn = document.querySelector("[data-go-top]");
 
-// open / close nav
 const openNav = () => {
     nav?.classList.add("active");
     overlay?.classList.add("active");
@@ -25,7 +23,6 @@ overlay?.addEventListener("click", closeNav);
 
 navLinks?.forEach(link => link.addEventListener("click", closeNav));
 
-// header active + go top
 window.addEventListener("scroll", () => {
     const scrolled = window.scrollY >= 200;
 

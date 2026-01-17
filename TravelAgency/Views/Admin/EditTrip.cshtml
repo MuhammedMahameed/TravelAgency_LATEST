@@ -311,7 +311,6 @@
     @await Html.PartialAsync("_ValidationScriptsPartial")
     <script>
         (function(){
-            // confirm when deleting gallery images
             document.querySelectorAll('.delete-checkbox').forEach(function(chk){
                 chk.addEventListener('change', function(){
                     if(this.checked){
@@ -322,7 +321,6 @@
                 });
             });
 
-            // confirm when deleting main image
             var mainChk = document.querySelector('.delete-main');
             if(mainChk){
                 mainChk.addEventListener('change', function(){

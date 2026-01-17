@@ -27,8 +27,6 @@ public class PaymentController : Controller
         return View();
     }
 
-    // Creates a Stripe PaymentIntent for this booking and returns its client_secret.
-    // Payment is confirmed client-side using Stripe Elements.
     [HttpPost]
     public IActionResult CreateIntent(int bookingId)
     {
@@ -43,7 +41,6 @@ public class PaymentController : Controller
         using var conn = new SqlConnection(_connStr);
         conn.Open();
 
-        // Ensure booking belongs to user, is active, and not already paid
         var infoCmd = new SqlCommand(@"
             SELECT t.Price, ISNULL(b.Quantity,1) AS Quantity, b.IsPaid
             FROM Bookings b
@@ -75,10 +72,8 @@ public class PaymentController : Controller
         if (qty < 1)
             return BadRequest(new { error = "Quantity is invalid (must be >= 1)." });
 
-        // Stripe uses the smallest currency unit. Using ILS by default.
-        // If you use a different currency, change this.
         var amount = (long)Math.Round(price * qty * 100m, MidpointRounding.AwayFromZero);
-        if (amount < 50) // example minimum for ILS; use Stripe docs for exact
+        if (amount < 50)          
             return BadRequest(new { error = "Amount is below Stripe minimum for ILS." });
 
         var service = new PaymentIntentService();
@@ -100,7 +95,6 @@ public class PaymentController : Controller
         return Json(new { clientSecret = intent.ClientSecret });
     }
 
-    // Called after client-side confirmation succeeds, so we can mark booking paid.
     [HttpPost]
     public IActionResult Confirm(int bookingId, string paymentIntentId)
     {
@@ -115,7 +109,6 @@ public class PaymentController : Controller
         if (string.IsNullOrWhiteSpace(StripeConfiguration.ApiKey))
             return BadRequest(new { error = "Stripe is not configured." });
 
-        // Verify intent status with Stripe
         var piService = new PaymentIntentService();
         var pi = piService.Get(paymentIntentId);
 
@@ -128,7 +121,6 @@ public class PaymentController : Controller
         using var tx = conn.BeginTransaction();
         try
         {
-            // double-check booking ownership and not already paid
             var infoCmd = new SqlCommand(@"
                 SELECT t.Price, ISNULL(b.Quantity,1) AS Quantity, b.IsPaid
                 FROM Bookings b
@@ -162,7 +154,6 @@ public class PaymentController : Controller
 
             decimal amount = price * qty;
 
-            // Record payment
             var payCmd = new SqlCommand(@"
                 INSERT INTO Payments (BookingId, Amount, Status)
                 VALUES (@bid, @amount, 'Success');", conn, tx);
@@ -170,7 +161,6 @@ public class PaymentController : Controller
             payCmd.Parameters.AddWithValue("@amount", amount);
             payCmd.ExecuteNonQuery();
 
-            // Mark booking paid
             var markCmd = new SqlCommand(@"
                 UPDATE Bookings
                 SET IsPaid = 1, PaidAt = SYSUTCDATETIME()
@@ -187,7 +177,6 @@ public class PaymentController : Controller
             return StatusCode(500, new { error = "Failed to finalize payment." });
         }
 
-        // email on success (best-effort)
         try
         {
             var emailCmd = new SqlCommand(@"
@@ -212,7 +201,6 @@ public class PaymentController : Controller
         return View();
     }
 
-    // GET
     public IActionResult Index()
     {
         return View();

@@ -16,18 +16,18 @@ public class BookingViewModel
     public decimal Price { get; set; }
     public string? Category { get; set; }
 
-    public int? TripMinAge { get; set; }        // Trips.MinAge
-    public int? GroupMinAge { get; set; }       // Bookings.GroupMinAge
-    public int CancellationDays { get; set; }   // Trips.CancellationDays
+    public int? TripMinAge { get; set; }         
+    public int? GroupMinAge { get; set; }        
+    public int CancellationDays { get; set; }    
 
-    public DateTime BookingDate { get; set; }   // Bookings.BookingDate
+    public DateTime BookingDate { get; set; }    
     public bool IsPaid { get; set; }
     public DateTime? PaidAt { get; set; }
 
     public string Status { get; set; } = string.Empty;
     public int Quantity { get; set; } = 1;
 
-    public int AvailableRooms { get; set; }       // CURRENT: available rooms for this.tripId (Trips.AvailableRooms)
+    public int AvailableRooms { get; set; }             
 
     public string? ImagePath { get; set; }
     public string? Description { get; set; }

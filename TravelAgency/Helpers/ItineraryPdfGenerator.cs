@@ -7,7 +7,6 @@ namespace TravelAgency.Helpers;
 
 public static class ItineraryPdfGenerator
 {
-    // Generates a simple itinerary PDF for a booking.
     public static byte[] Generate(BookingViewModel booking)
     {
         QuestPDF.Settings.License = LicenseType.Community;

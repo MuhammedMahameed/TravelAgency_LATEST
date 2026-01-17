@@ -21,7 +21,6 @@
             <p class="section-text mb-0">Browse our travel packages and book your next adventure.</p>
         </div>
 
-        <!-- ===== TEMP MESSAGES ===== -->
         @if (TempData["Success"] != null)
         {
             <div class="alert alert-success text-center shadow-sm">
@@ -72,7 +71,6 @@
             </div>
         </div>
 
-        <!-- FILTERS -->
         <form method="get" class="ta-filter-bar ta-filter-card mb-4">
             <div class="ta-filter-grid">
 
@@ -152,7 +150,6 @@
             <div class="alert alert-warning text-center">No trips found.</div>
         }
 
-        <!-- CARDS -->
         <div class="row g-4">
             @foreach (var item in Model)
             {
@@ -297,7 +294,6 @@
              }
          </div>
 
-        <!-- ======== WHAT USERS THINK SECTION ======== -->
         <hr class="my-5" />
         <section id="site-reviews" class="mb-5 ta-reviews">
             <h3 class="text-center fw-bold text-primary mb-4">What users think about our service</h3>
@@ -331,7 +327,6 @@
     </div>
  </section>
 
-<!-- BOOK MODAL -->
 <div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-sm modal-dialog-centered">
     <div class="modal-content">
@@ -389,15 +384,13 @@
                 });
             });
 
-            // simple client-side validation before submit
             document.getElementById('bookForm').addEventListener('submit', function(e){
                 var qty = parseInt(document.getElementById('modalQty').value || '1', 10);
                 var max = parseInt(document.getElementById('modalQty').max || '1', 10);
                 var providedMinAge = parseInt(document.getElementById('modalMinAge').value || '0', 10);
-                var tripMinAge = parseInt(document.getElementById('modalMinAge').min || '0', 10); // not authoritative
+                var tripMinAge = parseInt(document.getElementById('modalMinAge').min || '0', 10);     
                 if(qty < 1) { e.preventDefault(); alert('Quantity must be at least 1'); return; }
                 if(qty > max) { e.preventDefault(); alert('Requested quantity exceeds availability'); return; }
-                // server will enforce trip minAge, but do a quick client-side hint
                 var hint = document.getElementById('modalMinAgeHint').textContent || '';
                 if (hint.indexOf('requires minimum age') !== -1) {
                     var required = parseInt(hint.replace(/[^0-9]/g,'')) || 0;

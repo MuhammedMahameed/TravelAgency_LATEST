@@ -1,6 +1,4 @@
-﻿/* ===== HOME (Tourly style) scoped to .ta-home only ===== */
-
-.ta-home {
+﻿.ta-home {
   --united-nations-blue: hsl(214, 56%, 58%);
   --bright-navy-blue: hsl(214, 57%, 51%);
   --spanish-gray: hsl(0, 0%, 60%);
@@ -43,7 +41,6 @@
   background: var(--white);
 }
 
-/* reset inside home only */
 .ta-home *, .ta-home *::before, .ta-home *::after { box-sizing: border-box; }
 .ta-home a { text-decoration: none; }
 .ta-home img { display: block; width: 100%; }
@@ -55,7 +52,6 @@
 @media (min-width: 992px) { .ta-home .container { max-width: 1050px; } }
 @media (min-width: 1200px) { .ta-home .container { max-width: 1180px; } }
 
-/* Buttons */
 .ta-home .btn {
   color: var(--white);
   text-transform: uppercase;
@@ -83,7 +79,6 @@
 }
 .ta-home .btn-secondary:hover { background: hsla(0,0%,100%,0.1); }
 
-/* Headings */
 .ta-home .h1, .ta-home .h2, .ta-home .h3 {
   font-weight: var(--fw-800);
   font-family: var(--ff-montserrat);
@@ -103,7 +98,6 @@
 .ta-home .section-title { margin-bottom: 15px; }
 .ta-home .section-text { color: var(--black-coral); margin-bottom: 30px; }
 
-/* HERO */
 .ta-home .hero {
   background-image: url("/images/hero-banner.jpg");
   background-repeat: no-repeat;
@@ -115,7 +109,7 @@
   place-items: center;
   min-height: 600px;
   text-align: center;
-  padding-top: 110px; /* because navbar fixed */
+  padding-top: 110px;     
 }
 
 .ta-home .hero-title { margin-bottom: 20px; }
@@ -144,7 +138,6 @@
 .ta-home .badge-number { font-size: 26px; font-weight: 800; font-family: var(--ff-montserrat); }
 .ta-home .badge-text { font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: .6px; }
 
-/* SEARCH */
 .ta-home .tour-search {
   background: var(--bright-navy-blue);
   padding-block: var(--section-padding);
@@ -193,7 +186,6 @@
   .ta-home .discounted-only { grid-column: span 5; }
 }
 
-/* POPULAR */
 .ta-home .popular { padding-block: var(--section-padding); }
 .ta-home .popular-list, .ta-home .popular-list > li:not(:last-child) { margin-bottom: 30px; }
 
@@ -277,7 +269,6 @@
   .ta-home .popular-list { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* PACKAGE */
 .ta-home .package { padding-block: var(--section-padding); }
 .ta-home .package-list { margin-bottom: 40px; }
 .ta-home .package-list > li:not(:last-child) { margin-bottom: 30px; }
@@ -385,7 +376,6 @@
   .ta-home .package-card .card-price { display: grid; place-content: center; }
 }
 
-/* REVIEWS */
 .ta-home .reviews { padding-block: var(--section-padding); }
 .ta-home .reviews-grid{
   display: grid;
@@ -459,7 +449,6 @@
 .ta-home .review-msg .msg.ok{ background: #e8fff1; border: 1px solid #b8f0cf; color: #0f5132; }
 .ta-home .review-msg .msg.error{ background: #fff0f0; border: 1px solid #f2b8b8; color: #842029; }
 
-/* GALLERY */
 .ta-home .gallery { padding-block: var(--section-padding); }
 .ta-home .gallery-list {
   display: grid;
@@ -481,7 +470,6 @@
   .ta-home .gallery-image { border-radius: var(--radius-25); }
 }
 
-/* CTA */
 .ta-home .cta {
   background: var(--bright-navy-blue);
   padding-block: var(--section-padding);
@@ -498,7 +486,6 @@
   }
 }
 
-/* FOOTER */
 .ta-home .footer-top {
   background: var(--gunmetal);
   padding-block: var(--section-padding);
@@ -571,7 +558,6 @@
 .ta-home .footer-bottom-link { color: var(--gainsboro); font-size: 12px; }
 .ta-home .footer-bottom-link:hover { color: var(--white); }
 
-/* GO TOP */
 .ta-home .go-top {
   position: fixed;
   bottom: 15px;

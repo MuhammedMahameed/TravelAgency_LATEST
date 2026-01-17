@@ -1,5 +1,4 @@
-﻿/* ====== MODERN TRAVEL AGENCY GALLERY ====== */
-body {
+﻿body {
     background: linear-gradient(180deg, #f4f8ff 0%, #ffffff 100%);
 }
 
@@ -83,7 +82,6 @@ body {
     border-top: 1px solid #eaeaea;
 }
 
-/* ====== HERO CAROUSEL ====== */
 .hero-wrap {
     margin-top: 8px;
     margin-bottom: 22px;
@@ -137,7 +135,6 @@ body {
     border-radius: 50%;
 }
 
-/* Gallery: package name as primary title */
 .trip-info .package-name {
   font-size: 1.15rem;
   font-weight: 800;

@@ -1,18 +1,6 @@
-﻿/*-----------------------------------*\
- * #style.css
-\*-----------------------------------*/
-
-
-
-/*-----------------------------------*\
- * #CUSTOM PROPERTY
-\*-----------------------------------*/
+﻿
 
 :root {
-    /**
-   * colors
-   */
-
     --united-nations-blue: hsl(214, 56%, 58%);
     --bright-navy-blue: hsl(214, 57%, 51%);
     --spanish-gray: hsl(0, 0%, 60%);
@@ -27,10 +15,6 @@
     --black: hsl(0, 0%, 0%);
     --onyx: hsl(0, 0%, 25%);
     --jet: hsl(0, 0%, 20%);
-    /**
-   * typography
-   */
-
     --ff-poppins: "Poppins", sans-serif;
     --ff-montserrat: "Montserrat", sans-serif;
     --fs-1: calc(20px + 3.5vw);
@@ -45,20 +29,8 @@
     --fw-600: 600;
     --fw-700: 700;
     --fw-800: 800;
-    /**
-   * transition
-   */
-
     --transition: 0.25s ease-in-out;
-    /**
-   * spacing
-   */
-
     --section-padding: 60px;
-    /**
-   * border-radius
-   */
-
     --radius-15: 15px;
     --radius-25: 25px;
 }
@@ -66,10 +38,6 @@
 
 
 
-
-/*-----------------------------------*\
- * #RESET
-\*-----------------------------------*/
 
 *, *::before, *::after {
     margin: 0;
@@ -126,10 +94,6 @@ body {
 
 
 
-
-/*-----------------------------------*\
- * #REUSED STYLE
-\*-----------------------------------*/
 
 .container {
     padding-inline: 15px;
@@ -215,10 +179,6 @@ body {
 
 
 
-
-/*-----------------------------------*\
- * #HEADER
-\*-----------------------------------*/
 
 .header {
     position: absolute;
@@ -408,10 +368,6 @@ body {
 
 
 
-/*-----------------------------------*\
- * #HERO
-\*-----------------------------------*/
-
 .hero {
     background-image: url("/images/hero-banner.jpg");
     background-repeat: no-repeat;
@@ -447,10 +403,6 @@ body {
 
 
 
-
-/*-----------------------------------*\
- * #TOUR SEARCH
-\*-----------------------------------*/
 
 .tour-search {
     background: var(--bright-navy-blue);
@@ -494,10 +446,6 @@ body {
 
 
 
-
-/*-----------------------------------*\
- * #POPULAR
-\*-----------------------------------*/
 
 .popular {
     padding-block: var(--section-padding);
@@ -573,10 +521,6 @@ body {
 
 
 
-
-/*-----------------------------------*\
- * #PACKAGE
-\*-----------------------------------*/
 
 .package {
     padding-block: var(--section-padding);
@@ -712,10 +656,6 @@ body {
 
 
 
-/*-----------------------------------*\
- * #GALLERY
-\*-----------------------------------*/
-
 .gallery {
     padding-block: var(--section-padding);
 }
@@ -747,10 +687,6 @@ body {
 
 
 
-/*-----------------------------------*\
- * #CTA
-\*-----------------------------------*/
-
 .cta {
     background: var(--bright-navy-blue);
     padding-block: var(--section-padding);
@@ -767,10 +703,6 @@ body {
 
 
 
-
-/*-----------------------------------*\
- * #FOOTER
-\*-----------------------------------*/
 
 .footer-top {
     background: var(--gunmetal);
@@ -919,10 +851,6 @@ address {
 
 
 
-/*-----------------------------------*\
- * #GO TO TOP
-\*-----------------------------------*/
-
 .go-top {
     position: fixed;
     bottom: 15px;
@@ -956,19 +884,7 @@ address {
 
 
 
-/*-----------------------------------*\
- * #MEDIA QUERIES
-\*-----------------------------------*/
-
-/**
- * responsive for larger than 580px screen
- */
-
 @media (min-width: 580px) {
-
-    /**
-   * REUSED STYLE
-   */
 
     .container {
         max-width: 580px;
@@ -993,10 +909,6 @@ address {
     }
 
 
-
-    /**
-   * HEADER
-   */
 
     .header {
         padding-top: 83px;
@@ -1025,10 +937,6 @@ address {
 
 
 
-    /**
-   * HERO
-   */
-
     .hero {
         min-height: 800px;
         padding-top: 85px;
@@ -1043,10 +951,6 @@ address {
     }
 
 
-
-    /**
-   * TOUR SEARCH
-   */
 
     .tour-search-form {
         display: grid;
@@ -1070,19 +974,11 @@ address {
 
 
 
-    /**
-   * POPULAR
-   */
-
     .popular-card .card-content {
         right: auto;
     }
 
 
-
-    /**
-   * FOOTER
-   */
 
     .footer .container {
         display: grid;
@@ -1111,29 +1007,13 @@ address {
 
 
 
-/**
- * responsive for larger than 768px screen
- */
-
 @media (min-width: 768px) {
 
-    /**
-   * CUSTOM PROPERTY
-   */
-
     :root {
-        /**
-     * typography
-     */
-
         --fs-5: 15px;
     }
 
 
-
-    /**
-   * REUSED STYLE
-   */
 
     .container {
         max-width: 800px;
@@ -1145,10 +1025,6 @@ address {
     }
 
 
-
-    /**
-   * HEADER
-   */
 
     .helpline-box {
         display: flex;
@@ -1169,10 +1045,6 @@ address {
 
 
 
-    /**
-   * POPULAR
-   */
-
     .popular-list {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -1189,10 +1061,6 @@ address {
     }
 
 
-
-    /**
-   * PACKAGE
-   */
 
     .package-list {
         margin-bottom: 50px;
@@ -1226,10 +1094,6 @@ address {
 
 
 
-    /**
-   * GALLERY
-   */
-
     .gallery {
         padding-bottom: calc(var(--section-padding * 2));
     }
@@ -1244,10 +1108,6 @@ address {
     }
 
 
-
-    /**
-   * CTA
-   */
 
     .cta .container {
         display: flex;
@@ -1264,10 +1124,6 @@ address {
     }
 
 
-
-    /**
-   * FOOTER
-   */
 
     .form-wrapper {
         display: flex;
@@ -1289,25 +1145,13 @@ address {
 
 
 
-/**
- * responsive for larger than 992px screen
- */
-
 @media (min-width: 992px) {
-
-    /**
-   * REUSED STYLE
-   */
 
     .container {
         max-width: 1050px;
     }
 
 
-
-    /**
-   * HEADER
-   */
 
     .header.active .header-top {
         position: unset;
@@ -1380,19 +1224,11 @@ address {
 
 
 
-    /**
-   * HERO
-   */
-
     .hero .container {
         max-width: 740px;
     }
 
 
-
-    /**
-   * TOUR SEARCH
-   */
 
     .tour-search-form {
         grid-template-columns: repeat(5, 1fr);
@@ -1406,19 +1242,11 @@ address {
 
 
 
-    /**
-   * POPULAR
-   */
-
     .popular-list {
         grid-template-columns: repeat(3, 1fr);
     }
 
 
-
-    /**
-   * PACKAGE
-   */
 
     .meta-box {
         --fs-8: 13px;
@@ -1430,19 +1258,11 @@ address {
 
 
 
-    /**
-   * CTA 
-   */
-
     .cta .section-title {
         max-width: 25ch;
     }
 
 
-
-    /**
-   * FOOTER
-   */
 
     .footer-top .container {
         grid-template-columns: repeat(3, 1fr);
@@ -1466,29 +1286,13 @@ address {
 
 
 
-/**
- * responsive for larger than 1200px screen
- */
-
 @media (min-width: 1200px) {
 
-    /**
-   * CUSTOM PROPERTY
-   */
-
     :root {
-        /**
-     * spacing
-     */
-
         --section-padding: 100px;
     }
 
 
-
-    /**
-   * REUSED STYLE
-   */
 
     .container {
         max-width: 1180px;

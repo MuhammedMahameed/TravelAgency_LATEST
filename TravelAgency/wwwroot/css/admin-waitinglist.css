@@ -1,10 +1,8 @@
 ﻿
 .waiting-page {
-    /* להרים קצת למעלה כמו שביקשת */
     margin-top: -30px;
 }
 
-/* Header */
 .waiting-header {
     padding-top: 6px;
 }
@@ -17,7 +15,6 @@
     font-size: 0.95rem;
 }
 
-/* Alert */
 .waiting-alert {
     border-radius: 14px;
     border: 0;
@@ -25,16 +22,13 @@
     box-shadow: 0 6px 14px rgba(0,0,0,0.06);
 }
 
-/* Card */
 .waiting-card {
     border-radius: 18px !important;
     overflow: hidden;
     box-shadow: 0 10px 26px rgba(0,0,0,0.08);
 }
 
-/* Table */
 .waiting-table thead th {
-    /* כותרות שדות בצבע מתאים */
     color: #2b4a7f;
     font-weight: 800;
     font-size: 0.92rem;
@@ -48,12 +42,10 @@
     padding-bottom: 14px;
 }
 
-/* Hover row */
 .waiting-table.table-hover tbody tr:hover {
     background: rgba(107,167,230,0.08);
 }
 
-/* Email pill */
 .email-pill {
     display: inline-block;
     padding: 6px 10px;
@@ -64,7 +56,6 @@
     font-size: 0.9rem;
 }
 
-/* Position badge bigger */
 .position-badge {
     font-size: 0.9rem;
     padding: 8px 12px;
@@ -72,7 +63,6 @@
     box-shadow: 0 8px 18px rgba(13,110,253,0.18);
 }
 
-/* Back button */
 .waiting-back {
     border-radius: 12px;
 }
