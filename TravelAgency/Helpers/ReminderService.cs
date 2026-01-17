@@ -26,50 +26,50 @@ namespace TravelAgency.Helpers
 
         private void SendReminders()
         {
-            using var conn = new SqlConnection(
-                _config.GetConnectionString("DefaultConnection"));
-            conn.Open();
-
-            var cmd = new SqlCommand(@"
-                SELECT u.Email,
-                       t.PackageName,
-                       t.Destination,
-                       t.Country,
-                       t.StartDate,
-                       t.EndDate
-                FROM Bookings b
-                JOIN Trips t ON b.TripId = t.TripId
-                JOIN Users u ON b.UserId = u.UserId
-                WHERE b.Status = 'Active'
-                AND CAST(t.StartDate AS DATE) =
-                    CAST(DATEADD(day, 5, GETDATE()) AS DATE)
-            ", conn);
-
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            try
             {
-                var packageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"]?.ToString() ?? "";
-                var destination = reader["Destination"]?.ToString() ?? "";
-                var country = reader["Country"]?.ToString() ?? "";
-                var startDate = (DateTime)reader["StartDate"];
-                var endDate = (DateTime)reader["EndDate"];
+                using var conn = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+                conn.Open();
 
-                var title = !string.IsNullOrWhiteSpace(packageName)
-                    ? packageName
-                    : $"{destination}, {country}";
+                var cmd = new SqlCommand(@"
+            SELECT u.Email, t.PackageName, t.Destination, t.Country, t.StartDate, t.EndDate
+            FROM Bookings b
+            JOIN Trips t ON b.TripId = t.TripId
+            JOIN Users u ON b.UserId = u.UserId
+            WHERE b.Status = 'Active'
+              AND CAST(t.StartDate AS DATE) = CAST(DATEADD(day, 5, GETDATE()) AS DATE)
+        ", conn);
 
-                var body =
-                    $"Friendly reminder: your upcoming trip is starting soon.\n\n" +
-                    $"Trip: {title}\n" +
-                    $"Dates: {startDate:dd/MM/yyyy} - {endDate:dd/MM/yyyy}\n\n" +
-                    $"You can review details and your itinerary here: /Booking/MyBookings\n\n" +
-                    $"Travel Agency";
+                using var reader = cmd.ExecuteReader();
+                int count = 0;
 
-                EmailHelper.Send(
-                    reader["Email"]?.ToString() ?? "",
-                    "Trip reminder – starts in 5 days",
-                    body
-                );
+                while (reader.Read())
+                {
+                    count++;
+
+                    var email = reader["Email"]?.ToString() ?? "";
+                    var packageName = reader["PackageName"] == DBNull.Value ? "" : reader["PackageName"]?.ToString() ?? "";
+                    var destination = reader["Destination"]?.ToString() ?? "";
+                    var country = reader["Country"]?.ToString() ?? "";
+                    var startDate = (DateTime)reader["StartDate"];
+                    var endDate = (DateTime)reader["EndDate"];
+
+                    var title = !string.IsNullOrWhiteSpace(packageName) ? packageName : $"{destination}, {country}";
+
+                    var body =
+                        $"Friendly reminder: your upcoming trip is starting soon.\n\n" +
+                        $"Trip: {title}\n" +
+                        $"Dates: {startDate:dd/MM/yyyy} - {endDate:dd/MM/yyyy}\n\n" +
+                        $"Travel Agency";
+
+                    EmailHelper.Send(email, "Trip reminder – starts in 5 days", body);
+                }
+
+                Console.WriteLine($"[ReminderService] Sent reminders: {count}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ReminderService] ERROR: {ex.Message}");
             }
         }
     }
