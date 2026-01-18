@@ -107,9 +107,9 @@ CREATE TABLE SiteReviews (
 ALTER TABLE Trips
 ADD CancellationDays INT NOT NULL CONSTRAINT DF_Trips_CancellationDays DEFAULT 0;
 ALTER TABLE Bookings
-ADD Quantitiy INT NOT NULL Default 1;
+ADD Quantity INT NOT NULL Default 1;
 ALTER TABLE Trips
-ADD Quantitiy INT NOT NULL DEFAULT 1;
+ADD Quantity INT NOT NULL DEFAULT 1;
 -- Add column if it doesn't exist
 IF NOT EXISTS (
     SELECT 1
@@ -145,7 +145,7 @@ BEGIN
 END
 GO
 
--- Optional: backfill empty PackageName to a friendly default
+
 UPDATE dbo.Trips
 SET PackageName =
     LTRIM(RTRIM(
