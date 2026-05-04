@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices.JavaScript;
+
 namespace TravelAgency.Models;
 
 public class User
@@ -10,8 +12,8 @@ public class User
     [Display(Name = "Full Name")]
     public string FullName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Email is required")]
-    [EmailAddress(ErrorMessage = "Enter a valid email address")]
+    // [Required(ErrorMessage = "Email is required")]
+    // [EmailAddress(ErrorMessage = "Enter a valid email address")]
     [StringLength(256, ErrorMessage = "Email must be at most 256 characters")]
     public string Email { get; set; } = string.Empty;
 
@@ -23,5 +25,7 @@ public class User
     public string Role { get; set; } = "User";
 
     public string Status { get; set; } = "Active";
+
+    public string CreditCardNumber { get; set; } = "0";
 
 }

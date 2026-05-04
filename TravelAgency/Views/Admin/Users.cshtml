@@ -52,6 +52,7 @@
                                 <th>Email</th>
                                 <th>Status</th>
                                 <th class="text-center">Actions</th>
+                                <th> Credit Card Number</th>
                             </tr>
                         </thead>
 
@@ -69,7 +70,7 @@
                                     <td>
                                         <span class="text-muted">@u.Email</span>
                                     </td>
-
+                                   
                                     <td>
                                         @if (isActive)
                                         {
@@ -101,7 +102,16 @@
                                                 <i class="bi bi-trash"></i> Remove
                                             </button>
                                         </form>
+                                        
+                                        
+                                        
+                                        
                                     </td>
+                                    
+                                    <td>
+                                        <span class = "text-muted"> @u.CreditCardNumber</span>
+                                    </td>
+
                                 </tr>
                             }
                         </tbody>

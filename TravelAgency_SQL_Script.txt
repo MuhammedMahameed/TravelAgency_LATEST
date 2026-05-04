@@ -165,3 +165,11 @@ BEGIN
         CONSTRAINT DF_Trips_IsHidden DEFAULT 0;
 END
 GO
+
+ALTER TABLE Users
+    ALTER COLUMN CreditCardNumber BIGINT;
+
+ALTER TABLE Users
+    ADD CONSTRAINT DF_Users_CreditCardNumber DEFAULT 0 FOR CreditCardNumber;
+
+

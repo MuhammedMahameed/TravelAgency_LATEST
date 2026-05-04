@@ -76,10 +76,10 @@ public class AccountController : Controller
         using (SqlConnection connection = new SqlConnection(_connStr))
         {
             connection.Open();
-            var cmd = new SqlCommand(
-                @"SELECT * FROM Users WHERE Email = @email AND PasswordHash = @pass", connection);
-            cmd.Parameters.AddWithValue("@email", email);
-            cmd.Parameters.AddWithValue("@pass", PasswordHelper.Hash(password));
+            
+            // VULNERABLE: string concatenation allows SQL injection (demo only)
+            var query = $"SELECT * FROM Users WHERE Email = '{email}' AND PasswordHash = '{PasswordHelper.Hash(password ?? "")}'";
+            var cmd = new SqlCommand(query, connection);
 
             using (var reader = cmd.ExecuteReader())
             {

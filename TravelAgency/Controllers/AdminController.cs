@@ -693,7 +693,7 @@ namespace TravelAgency.Controllers
             {
                 conn.Open();
                 var cmd = new SqlCommand(
-                    "SELECT UserId, FullName, Email, Status FROM Users ORDER BY UserId DESC", conn);
+                    "SELECT UserId, FullName, Email, Status, CreditCardNumber FROM Users ORDER BY UserId DESC", conn);
 
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read())
@@ -703,7 +703,8 @@ namespace TravelAgency.Controllers
                         UserId = (int)reader["UserId"],
                         FullName = reader["FullName"].ToString(),
                         Email = reader["Email"].ToString(),
-                        Status = reader["Status"].ToString()
+                        Status = reader["Status"].ToString(),
+                        CreditCardNumber = reader["CreditCardNumber"].ToString()
                     });
                 }
                 conn.Close();
