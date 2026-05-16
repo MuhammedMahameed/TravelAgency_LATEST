@@ -48,11 +48,15 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Full Name</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>National ID</th>
                                 <th>Email</th>
                                 <th>Status</th>
                                 <th class="text-center">Actions</th>
-                                <th> Credit Card Number</th>
+                                <th>Credit Card</th>
+                                <th>Expiry Date</th>
+                                <th>CVC</th>
                             </tr>
                         </thead>
 
@@ -62,10 +66,14 @@
                                 var isActive = (u.Status ?? "").Equals("Active", StringComparison.OrdinalIgnoreCase);
                                 var statusText = isActive ? "Active" : "Blocked";
 
-                                <tr data-search="@u.UserId @u.FullName @u.Email @statusText">
+                                <tr data-search="@u.UserId @u.FirstName @u.LastName @u.Email @statusText">
                                     <td class="text-muted">@u.UserId</td>
 
-                                    <td class="fw-semibold">@u.FullName</td>
+                                    <td class="fw-semibold">@u.FirstName</td>
+
+                                    <td class="fw-semibold">@u.LastName</td>
+
+                                    <td class="text-muted">@u.NationalId</td>
 
                                     <td>
                                         <span class="text-muted">@u.Email</span>
@@ -109,7 +117,15 @@
                                     </td>
                                     
                                     <td>
-                                        <span class = "text-muted"> @u.CreditCardNumber</span>
+                                        <span class="text-muted">@u.CreditCardNumber</span>
+                                    </td>
+
+                                    <td>
+                                        <span class="text-muted">@(u.CardExpiryDate?.ToString("MM/yyyy") ?? "")</span>
+                                    </td>
+
+                                    <td>
+                                        <span class="text-muted">@u.Cvc</span>
                                     </td>
 
                                 </tr>

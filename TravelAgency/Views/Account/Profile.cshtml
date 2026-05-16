@@ -28,8 +28,18 @@
                 <form method="post">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Full Name</label>
-                            <input class="form-control" name="FullName" value="@Model.FullName" required />
+                            <label class="form-label">First Name</label>
+                            <input class="form-control" name="FirstName" value="@Model.FirstName" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            <input class="form-control" name="LastName" value="@Model.LastName" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">National ID</label>
+                            <input class="form-control" name="NationalId" value="@Model.NationalId" />
                         </div>
 
                         <div class="col-md-6">
@@ -45,6 +55,23 @@
                         <div class="col-md-6">
                             <label class="form-label">Status</label>
                             <input class="form-control" value="@Model.Status" readonly />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Credit Card Number</label>
+                            <input class="form-control" name="CreditCardNumber" value="@Model.CreditCardNumber" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Card Expiry Date</label>
+                            <input type="date" class="form-control" name="CardExpiryDate"
+                                   value="@(Model.CardExpiryDate?.ToString("yyyy-MM-dd") ?? "")" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">CVC</label>
+                            <input class="form-control" name="Cvc" value="@Model.Cvc"
+                                   maxlength="4" placeholder="3 or 4 digits" />
                         </div>
                     </div>
 

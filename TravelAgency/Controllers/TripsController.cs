@@ -185,7 +185,8 @@ public class TripsController : Controller
 
             var siteReviews = new List<dynamic>();
             using (var rcmd = new SqlCommand(@"
-                SELECT TOP 6 sr.Rating, sr.Comment, sr.CreatedAt, u.FullName
+                SELECT TOP 6 sr.Rating, sr.Comment, sr.CreatedAt,
+                       u.FirstName + ' ' + u.LastName AS FullName
                 FROM SiteReviews sr
                 JOIN Users u ON sr.UserId = u.UserId
                 ORDER BY sr.CreatedAt DESC", conn))

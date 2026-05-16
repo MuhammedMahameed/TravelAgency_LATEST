@@ -33,10 +33,12 @@ public class AccountController : Controller
         {
             connection.Open();
             var cmd = new SqlCommand(
-                @"INSERT INTO Users(FullName,Email,PasswordHash,Role,Status) 
-                  VALUES(@name,@email,@pass, 'User', 'Active')", connection);
+                @"INSERT INTO Users(FirstName,LastName,NationalId,Email,PasswordHash,Role,Status)
+                  VALUES(@firstName,@lastName,@nationalId,@email,@pass, 'User', 'Active')", connection);
 
-            cmd.Parameters.AddWithValue("@name", user.FullName);
+            cmd.Parameters.AddWithValue("@firstName", user.FirstName);
+            cmd.Parameters.AddWithValue("@lastName", user.LastName);
+            cmd.Parameters.AddWithValue("@nationalId", user.NationalId);
             cmd.Parameters.AddWithValue("@email", user.Email);
             cmd.Parameters.AddWithValue("@pass", PasswordHelper.Hash(user.Password));
 
@@ -99,7 +101,8 @@ public class AccountController : Controller
                 }
 
                 HttpContext.Session.SetInt32("UserId", (int)reader["UserId"]);
-                HttpContext.Session.SetString("FullName", reader["FullName"]?.ToString() ?? "");
+                HttpContext.Session.SetString("FirstName", reader["FirstName"]?.ToString() ?? "");
+                HttpContext.Session.SetString("LastName", reader["LastName"]?.ToString() ?? "");
                 HttpContext.Session.SetString("Role", role);
                 HttpContext.Session.SetString("Status", status);
             }
@@ -268,7 +271,8 @@ public class AccountController : Controller
         {
             conn.Open();
             var cmd = new SqlCommand(@"
-            SELECT UserId, FullName, Email, Role, Status
+            SELECT UserId, FirstName, LastName, NationalId, Email, Role, Status,
+                   CreditCardNumber, CardExpiryDate, Cvc
             FROM Users
             WHERE UserId = @id", conn);
 
@@ -278,10 +282,15 @@ public class AccountController : Controller
             if (reader.Read())
             {
                 vm.UserId = (int)reader["UserId"];
-                vm.FullName = reader["FullName"]?.ToString() ?? "";
+                vm.FirstName = reader["FirstName"]?.ToString() ?? "";
+                vm.LastName = reader["LastName"]?.ToString() ?? "";
+                vm.NationalId = reader["NationalId"]?.ToString() ?? "";
                 vm.Email = reader["Email"]?.ToString() ?? "";
                 vm.Role = reader["Role"]?.ToString() ?? "User";
                 vm.Status = reader["Status"]?.ToString() ?? "Active";
+                vm.CreditCardNumber = reader["CreditCardNumber"]?.ToString() ?? "";
+                vm.CardExpiryDate = reader["CardExpiryDate"] as DateTime?;
+                vm.Cvc = reader["Cvc"]?.ToString();
             }
             else
             {
@@ -300,9 +309,9 @@ public class AccountController : Controller
         if (userId == null)
             return RedirectToAction("Login");
 
-        if (string.IsNullOrWhiteSpace(vm.FullName))
+        if (string.IsNullOrWhiteSpace(vm.FirstName) || string.IsNullOrWhiteSpace(vm.LastName))
         {
-            TempData["Error"] = "Full name is required.";
+            TempData["Error"] = "First name and last name are required.";
             return View(vm);
         }
 
@@ -311,16 +320,27 @@ public class AccountController : Controller
             conn.Open();
             var cmd = new SqlCommand(@"
             UPDATE Users
-            SET FullName = @name
+            SET FirstName = @firstName,
+                LastName = @lastName,
+                NationalId = @nationalId,
+                CreditCardNumber = @card,
+                CardExpiryDate = @expiry,
+                Cvc = @cvc
             WHERE UserId = @id", conn);
 
-            cmd.Parameters.AddWithValue("@name", vm.FullName.Trim());
+            cmd.Parameters.AddWithValue("@firstName", vm.FirstName.Trim());
+            cmd.Parameters.AddWithValue("@lastName", vm.LastName.Trim());
+            cmd.Parameters.AddWithValue("@nationalId", vm.NationalId?.Trim() ?? "");
+            cmd.Parameters.AddWithValue("@card", vm.CreditCardNumber?.Trim() ?? "");
+            cmd.Parameters.AddWithValue("@expiry", (object?)vm.CardExpiryDate ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@cvc", (object?)vm.Cvc?.Trim() ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@id", userId.Value);
 
             cmd.ExecuteNonQuery();
         }
 
-        HttpContext.Session.SetString("FullName", vm.FullName.Trim());
+        HttpContext.Session.SetString("FirstName", vm.FirstName.Trim());
+        HttpContext.Session.SetString("LastName", vm.LastName.Trim());
 
         TempData["Success"] = "Profile updated successfully!";
         return RedirectToAction("Profile");

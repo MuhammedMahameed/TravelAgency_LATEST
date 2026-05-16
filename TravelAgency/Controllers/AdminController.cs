@@ -112,7 +112,7 @@ namespace TravelAgency.Controllers
             if (trip.StartDate == default(DateTime) || trip.EndDate == default(DateTime) ||
                 trip.StartDate < sqlMin || trip.EndDate < sqlMin)
             {
-                TempData["Error"] = "éù ìáçåø Start Date å-End Date ú÷éðéí.";
+                TempData["Error"] = "ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ Start Date ï¿½-End Date ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.";
                 return View(trip);
             }
 
@@ -261,7 +261,8 @@ namespace TravelAgency.Controllers
                 r2.Close();
 
                 var revCmd = new SqlCommand(@"
-                    SELECT r.ReviewId, r.Rating, r.Comment, r.CreatedAt, u.FullName
+                    SELECT r.ReviewId, r.Rating, r.Comment, r.CreatedAt,
+                           u.FirstName + ' ' + u.LastName AS FullName
                     FROM Reviews r
                     JOIN Users u ON r.UserId = u.UserId
                     WHERE r.TripId = @tid
@@ -327,7 +328,8 @@ namespace TravelAgency.Controllers
                     existingMainPath = obj == DBNull.Value || obj == null ? null : obj.ToString();
 
                     var revCmd = new SqlCommand(@"
-                        SELECT r.ReviewId, r.Rating, r.Comment, r.CreatedAt, u.FullName
+                        SELECT r.ReviewId, r.Rating, r.Comment, r.CreatedAt,
+                               u.FirstName + ' ' + u.LastName AS FullName
                         FROM Reviews r
                         JOIN Users u ON r.UserId = u.UserId
                         WHERE r.TripId = @tid
@@ -586,7 +588,7 @@ namespace TravelAgency.Controllers
 
                 if ((int)checkCmd.ExecuteScalar() > 0)
                 {
-                    TempData["Error"] = "ìà ðéúï ìîçå÷ èéåì ùéù ìå äæîðåú.";
+                    TempData["Error"] = "ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.";
                     return RedirectToAction("Trips");
                 }
 
@@ -599,7 +601,7 @@ namespace TravelAgency.Controllers
                 new SqlCommand("DELETE FROM Trips WHERE TripId=@id", conn)
                 { Parameters = { new SqlParameter("@id", id) } }.ExecuteNonQuery();
 
-                TempData["Success"] = "äèéåì ðîç÷ áäöìçä.";
+                TempData["Success"] = "ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.";
                 return RedirectToAction("Trips");
             }
         }
@@ -622,7 +624,7 @@ namespace TravelAgency.Controllers
 
             if (endDate > DateTime.Now.AddDays(7))
             {
-                TempData["Error"] = "äðçä éëåìä ìäéåú î÷ñéîåí ìùáåò àçã.";
+                TempData["Error"] = "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½.";
                 return RedirectToAction("Trips");
             }
 
@@ -642,7 +644,7 @@ namespace TravelAgency.Controllers
                 cmd.ExecuteNonQuery();
             }
 
-            TempData["Success"] = "ääðçä òåãëðä áäöìçä.";
+            TempData["Success"] = "ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.";
             return RedirectToAction("Trips");
         }
 
@@ -693,7 +695,7 @@ namespace TravelAgency.Controllers
             {
                 conn.Open();
                 var cmd = new SqlCommand(
-                    "SELECT UserId, FullName, Email, Status, CreditCardNumber FROM Users ORDER BY UserId DESC", conn);
+                    "SELECT UserId, FirstName, LastName, NationalId, Email, Status, CreditCardNumber, CardExpiryDate, Cvc FROM Users ORDER BY UserId DESC", conn);
 
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read())
@@ -701,10 +703,14 @@ namespace TravelAgency.Controllers
                     users.Add(new User
                     {
                         UserId = (int)reader["UserId"],
-                        FullName = reader["FullName"].ToString(),
-                        Email = reader["Email"].ToString(),
-                        Status = reader["Status"].ToString(),
-                        CreditCardNumber = reader["CreditCardNumber"].ToString()
+                        FirstName = reader["FirstName"]?.ToString() ?? "",
+                        LastName = reader["LastName"]?.ToString() ?? "",
+                        NationalId = reader["NationalId"]?.ToString() ?? "",
+                        Email = reader["Email"]?.ToString() ?? "",
+                        Status = reader["Status"]?.ToString() ?? "",
+                        CreditCardNumber = reader["CreditCardNumber"]?.ToString() ?? "",
+                        CardExpiryDate = reader["CardExpiryDate"] as DateTime?,
+                        Cvc = reader["Cvc"]?.ToString()
                     });
                 }
                 conn.Close();
@@ -723,12 +729,13 @@ namespace TravelAgency.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddUser(string fullName, string email, string password)
+        public IActionResult AddUser(string firstName, string lastName, string nationalId, string email, string password)
         {
             if (!AuthHelper.IsAdmin(HttpContext))
                 return RedirectToAction("Login", "Account");
 
-            if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) ||
+                string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
                 TempData["Error"] = "All fields are required.";
                 return RedirectToAction("AddUser");
@@ -750,10 +757,12 @@ namespace TravelAgency.Controllers
                 }
 
                 var cmd = new SqlCommand(@"
-            INSERT INTO Users (FullName, Email, PasswordHash, Role, Status)
-            VALUES (@n, @e, @p, 'User', 'Active')", conn);
+            INSERT INTO Users (FirstName, LastName, NationalId, Email, PasswordHash, Role, Status)
+            VALUES (@fn, @ln, @nid, @e, @p, 'User', 'Active')", conn);
 
-                cmd.Parameters.AddWithValue("@n", fullName);
+                cmd.Parameters.AddWithValue("@fn", firstName);
+                cmd.Parameters.AddWithValue("@ln", lastName);
+                cmd.Parameters.AddWithValue("@nid", nationalId?.Trim() ?? "");
                 cmd.Parameters.AddWithValue("@e", email);
                 cmd.Parameters.AddWithValue("@p", hashed);
 
@@ -871,7 +880,7 @@ namespace TravelAgency.Controllers
                 conn.Open();
 
                 var cmd = new SqlCommand(@"
-            SELECT w.WaitingId, u.FullName, u.Email, w.JoinDate,
+            SELECT w.WaitingId, u.FirstName + ' ' + u.LastName AS FullName, u.Email, w.JoinDate,
                    ROW_NUMBER() OVER (ORDER BY w.JoinDate) AS Position
             FROM WaitingList w
             JOIN Users u ON w.UserId = u.UserId
@@ -960,7 +969,7 @@ namespace TravelAgency.Controllers
                     EmailHelper.Send(
                         email,
                         "Room now available!",
-                        "A room is now available for your desired trip. You have 24 hours to book it before it’s offered to the next user."
+                        "A room is now available for your desired trip. You have 24 hours to book it before itï¿½s offered to the next user."
                     );
                 }
             }

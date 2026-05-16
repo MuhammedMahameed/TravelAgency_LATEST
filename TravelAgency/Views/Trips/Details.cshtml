@@ -214,7 +214,8 @@
                 {
                     conn.Open();
                     using var cmd = new SqlCommand(@"
-        SELECT r.ReviewId, r.Rating, r.Comment, r.CreatedAt, u.FullName
+        SELECT r.ReviewId, r.Rating, r.Comment, r.CreatedAt,
+               u.FirstName + ' ' + u.LastName AS FullName
         FROM Reviews r
         JOIN Users u ON r.UserId = u.UserId
         WHERE r.TripId = @tid

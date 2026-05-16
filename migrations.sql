@@ -62,11 +62,17 @@ BEGIN
     IF OBJECT_ID('dbo.Users', 'U') IS NULL
     BEGIN
         CREATE TABLE dbo.Users (
-            UserId        INT            IDENTITY PRIMARY KEY,
-            FullName      NVARCHAR(100)  NOT NULL,
-            Email         NVARCHAR(100)  NOT NULL UNIQUE,
-            PasswordHash  NVARCHAR(255)  NOT NULL,
-            Role          NVARCHAR(20)   NOT NULL   -- 'Admin' | 'User'
+            UserId          INT            IDENTITY PRIMARY KEY,
+            FirstName       NVARCHAR(50)   NOT NULL,
+            LastName        NVARCHAR(50)   NOT NULL,
+            NationalId      NVARCHAR(20)   NOT NULL DEFAULT '',
+            Email           NVARCHAR(100)  NOT NULL UNIQUE,
+            PasswordHash    NVARCHAR(255)  NOT NULL,
+            Role            NVARCHAR(20)   NOT NULL DEFAULT 'User',
+            Status          NVARCHAR(20)   NOT NULL DEFAULT 'Active',
+            CreditCardNumber NVARCHAR(20)  NOT NULL DEFAULT '',
+            CardExpiryDate  DATE           NULL,
+            Cvc             NVARCHAR(4)    NULL
         );
     END
 

@@ -52,8 +52,9 @@ namespace TravelAgency.Controllers
             conn.Open();
 
             var cmd = new SqlCommand(@"
-                SELECT r.ReviewId, r.UserId, r.Rating, r.Comment, r.CreatedAt, u.FullName
-                FROM SiteReviews r 
+                SELECT r.ReviewId, r.UserId, r.Rating, r.Comment, r.CreatedAt,
+                       u.FirstName + ' ' + u.LastName AS FullName
+                FROM SiteReviews r
                 JOIN Users u ON r.UserId = u.UserId
                 ORDER BY r.CreatedAt DESC", conn);
 
