@@ -79,10 +79,17 @@ public class AccountController : Controller
         {
             connection.Open();
             
-            // VULNERABLE: string concatenation allows SQL injection
-            var query = $"SELECT * FROM Users WHERE Email = '{email}' AND PasswordHash = '{PasswordHelper.Hash(password ?? "")}'";
-            var cmd = new SqlCommand(query, connection);
+            //SAFE
+            var cmd = new SqlCommand(
+                @"SELECT * FROM Users WHERE Email = @email AND PasswordHash = @pass", connection);
+            cmd.Parameters.AddWithValue("@email", email); 
+            cmd.Parameters.AddWithValue("@pass", PasswordHelper.Hash(password ?? ""));
+                
             
+            // VULNERABLE: string concatenation allows SQL injection
+            // var query = $"SELECT * FROM Users WHERE Email = '{email}' AND PasswordHash = '{password}'";
+            // var cmd = new SqlCommand(query, connection);
+            //
             using (var reader = cmd.ExecuteReader())
             {
                 if (!reader.Read())

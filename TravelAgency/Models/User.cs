@@ -21,6 +21,9 @@ public class User
     [Display(Name = "National ID")]
     public string NationalId { get; set; } = string.Empty;
 
+    //Email Validation
+    [Required(ErrorMessage = "Email is required")]
+    [EmailAddress(ErrorMessage = "Email is invalid")]
     [StringLength(256, ErrorMessage = "Email must be at most 256 characters")]
     public string Email { get; set; } = string.Empty;
 

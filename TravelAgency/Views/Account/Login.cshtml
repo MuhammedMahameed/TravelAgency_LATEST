@@ -1,3 +1,4 @@
+@model TravelAgency.Models.User
 @{
     ViewData["Title"] = "Login";
     ViewData["BodyClass"] = "";
@@ -18,22 +19,32 @@
                     @ViewBag.Error
                 </div>
             }
-
-            <form method="post">
+            
+            <form method="post" asp-controller="Account" asp-action="Login">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                
                 <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input name="email"
+                    @* Vulnerable (no validation): *@
+                    @* <input name="email" *@
+                    @*        class="form-control" *@
+                    @*        placeholder="name@example.com" *@
+                    @*        /> *@
+                    @* *@
+                    @* *@
+                    SAFE (with validation):
+                    <label asp-for="Email" class="form-label">Email</label>
+                    <input asp-for="Email"
                            class="form-control"
-                           placeholder="name@example.com"
-                           required />
+                           placeholder="name@example.com"/>
+                    <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Password</label>
                     <input name="password" type="password"
                            class="form-control"
-                           placeholder="Enter your password"
-                           />
+                           placeholder="Enter your password"/>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
